@@ -1,0 +1,152 @@
+@import "tailwindcss";
+
+/* ============================================================
+   興毅基金會 — 設計 token（Tailwind v4 CSS-first 設定）
+   方向：溫暖的信任感 — 深藍(信任) + 暖琥珀(希望) + 米白
+   ============================================================ */
+@theme {
+  /* 深藍 — 機構信任主色 */
+  --color-navy-50: #f1f6fb;
+  --color-navy-100: #e0ebf6;
+  --color-navy-200: #c0d5ec;
+  --color-navy-300: #8fb4dd;
+  --color-navy-400: #5388c4;
+  --color-navy-500: #2f63ad;
+  --color-navy-600: #234f93;
+  --color-navy-700: #1b3d72;
+  --color-navy-800: #15315c;
+  --color-navy-900: #0f2647;
+  --color-navy-950: #0a1a33;
+
+  /* 暖琥珀 — 麥穗/希望強調色 */
+  --color-amber-50: #fef7e8;
+  --color-amber-100: #fdedcf;
+  --color-amber-200: #fbd99b;
+  --color-amber-300: #f9c266;
+  --color-amber-400: #f7ad3c;
+  --color-amber-500: #f5a623;
+  --color-amber-600: #e0891a;
+  --color-amber-700: #b96914;
+  --color-amber-800: #935116;
+  --color-amber-900: #784316;
+
+  /* 中性 — 米白紙感與墨色 */
+  --color-cream: #fbf6ec;
+  --color-paper: #fffdf8;
+  --color-mist: #eef3f9;
+  --color-ink: #1c2b40;
+  --color-ink-soft: #46566f;
+  --color-ink-muted: #7a889e;
+
+  /* 字型 — serif 標題(人文) + sans 內文 */
+  --font-sans: var(--font-noto-sans-tc), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-noto-serif-tc), ui-serif, Georgia, "Times New Roman", serif;
+
+  /* 圓角與陰影 */
+  --radius-2xl: 1.25rem;
+  --radius-3xl: 1.75rem;
+  --shadow-soft: 0 10px 40px -12px rgb(15 38 71 / 0.18);
+  --shadow-card: 0 4px 24px -8px rgb(15 38 71 / 0.14);
+  --shadow-glow: 0 12px 36px -10px rgb(245 166 35 / 0.45);
+
+  /* 動畫 */
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-marquee: marquee 32s linear infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: var(--color-amber-200);
+    color: var(--color-navy-900);
+  }
+
+  /* 自訂捲軸 */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-mist);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-navy-200);
+    border-radius: 999px;
+    border: 2px solid var(--color-mist);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-navy-300);
+  }
+}
+
+/* ============================================================
+   Utilities / 裝飾母題
+   ============================================================ */
+@layer utilities {
+  /* 米白紙紋背景 — 細微點狀紋理增加溫度 */
+  .bg-grain {
+    background-image: radial-gradient(
+      rgb(28 43 64 / 0.035) 1px,
+      transparent 1px
+    );
+    background-size: 22px 22px;
+  }
+
+  /* 區塊容器 */
+  .container-x {
+    width: 100%;
+    max-width: 1200px;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+
+  /* 標題下方麥穗暖線 */
+  .accent-underline {
+    position: relative;
+  }
+  .accent-underline::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -0.5rem;
+    height: 4px;
+    width: 3rem;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--color-amber-500), var(--color-amber-300));
+  }
+
+  /* 文字漸層 */
+  .text-gradient-amber {
+    background: linear-gradient(120deg, var(--color-amber-600), var(--color-amber-400));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
