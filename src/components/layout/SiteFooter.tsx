@@ -5,12 +5,8 @@ import { siteConfig } from "@/config/site";
 import { mainNav } from "@/config/nav";
 import { FacebookIcon, YoutubeIcon } from "@/components/brand/SocialIcons";
 
-/** UN SDGs 17 項官方色 */
-const SDG_COLORS = [
-  "#E5243B", "#DDA63A", "#4C9F38", "#C5192D", "#FF3A21", "#26BDE2",
-  "#FCC30B", "#A21942", "#FD6925", "#DD1367", "#FD9D24", "#BF8B2E",
-  "#3F7E44", "#0A97D9", "#56C02B", "#00689D", "#19486A",
-];
+/** 基金會已落實的 SDGs（依原站，跳過 6、14、15） */
+const SDG_NUMBERS = [1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 16, 17];
 
 export function SiteFooter() {
   const { contact, donation, registration } = siteConfig;
@@ -96,20 +92,20 @@ export function SiteFooter() {
 
       {/* SDGs */}
       <div className="border-t border-white/10">
-        <div className="container-x flex flex-col items-start gap-4 py-6 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm font-medium text-navy-100/70">
-            響應聯合國永續發展目標 SDGs
+        <div className="container-x py-10">
+          <p className="mb-6 text-center text-sm font-semibold tracking-wide text-navy-100/80">
+            已落實聯合國永續發展目標（SDGs）
           </p>
-          <div className="flex flex-wrap gap-1.5">
-            {SDG_COLORS.map((color, i) => (
-              <span
-                key={i}
-                className="flex size-7 items-center justify-center rounded-[5px] text-[11px] font-bold text-white/95"
-                style={{ backgroundColor: color }}
-                title={`SDG ${i + 1}`}
-              >
-                {i + 1}
-              </span>
+          <div className="mx-auto grid max-w-3xl grid-cols-4 gap-2 sm:grid-cols-7 sm:gap-2.5">
+            {SDG_NUMBERS.map((n) => (
+              <Image
+                key={n}
+                src={`/images/sdg/sdg-${n}.png`}
+                alt={`SDG ${n}`}
+                width={160}
+                height={160}
+                className="w-full rounded-md shadow-sm transition-transform hover:scale-105"
+              />
             ))}
           </div>
         </div>
