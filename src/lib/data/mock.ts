@@ -19,7 +19,7 @@ export const heroSlides: HeroSlide[] = [
     subtitle: "透過社會救助與食物銀行服務，陪伴弱勢家庭度過難關。",
     image: IMG_B,
     tone: "amber",
-    cta: { label: "立即捐款", href: "/donate" },
+    cta: { label: "了解服務", href: "/services" },
   },
   {
     id: "hero-2",

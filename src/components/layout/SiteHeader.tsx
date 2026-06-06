@@ -28,6 +28,7 @@ export function SiteHeader() {
   }, [open]);
 
   return (
+    <>
     <header
       className={cn(
         "sticky top-0 z-50 transition-all duration-300",
@@ -98,10 +99,11 @@ export function SiteHeader() {
           </button>
         </div>
       </div>
-
-      {/* 行動版抽屜 */}
-      <MobileDrawer open={open} onClose={() => setOpen(false)} />
     </header>
+
+    {/* 行動版抽屜（放在 header 外，避免 backdrop-blur 造成 fixed 定位錯誤） */}
+    <MobileDrawer open={open} onClose={() => setOpen(false)} />
+    </>
   );
 }
 
