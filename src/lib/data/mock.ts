@@ -43,27 +43,39 @@ export const serviceFeatures: ServiceFeature[] = [
   {
     id: "relief",
     icon: "relief",
+    accent: "amber",
     title: "社會救助",
-    description: "提供緊急紓困、生活扶助與關懷訪視，為弱勢家庭撐起一把傘。",
-    bullets: ["急難救助", "生活扶助", "關懷訪視"],
+    description: "提供急難救助、生活扶助與關懷訪視，陪伴弱勢家庭度過困境，重建生活希望。",
+    image: IMG_B,
+    bullets: [
+      { label: "急難救助", icon: "handHeart" },
+      { label: "生活扶助", icon: "lifeKit" },
+      { label: "關懷訪視", icon: "visit" },
+    ],
     href: "/services/relief",
   },
   {
     id: "foodbank",
     icon: "foodbank",
-    title: "忠信食物銀行",
-    description: "募集即期與愛心物資，依需求分送至弱勢家庭，讓資源不浪費。",
-    bullets: ["食物募集", "物資分送", "定點領取"],
+    accent: "navy",
+    title: "食物銀行",
+    description: "透過募集、整理與發放物資，減少食物浪費，將愛心送到有需要的家庭與團體。",
+    image: IMG_A,
+    bullets: [
+      { label: "食物募集", icon: "collect" },
+      { label: "物資整理", icon: "sort" },
+      { label: "物資發放", icon: "distribute" },
+    ],
     href: "/foodbank",
   },
 ];
 
 export const impactStats: ImpactStat[] = [
-  { id: "s1", icon: "users", value: 700, suffix: "+", label: "服務人次" },
-  { id: "s2", icon: "calendar", value: 50, suffix: "+", label: "合作據點" },
-  { id: "s3", icon: "box", value: 128, suffix: "+", label: "物資發放（噸）" },
-  { id: "s4", icon: "heart", value: 160, suffix: "+", label: "公益活動場次" },
-  { id: "s5", icon: "hands", value: 1000, suffix: "+", label: "志工投入人次" },
+  { id: "s1", icon: "family", topLabel: "每月服務", value: 700, suffix: "+", bottomLabel: "戶弱勢家庭" },
+  { id: "s2", icon: "leaf", topLabel: "每月減少", value: 50, suffix: "+", bottomLabel: "公噸食物浪費" },
+  { id: "s3", icon: "store", topLabel: "串聯", value: 128, suffix: "+", bottomLabel: "家合作店家" },
+  { id: "s4", icon: "partners", topLabel: "分享", value: 160, suffix: "+", bottomLabel: "個社福團體與里長" },
+  { id: "s5", icon: "hands", topLabel: "每月服務", value: 1000, suffix: "+", bottomLabel: "人次" },
 ];
 
 export const facebookPosts: FacebookPost[] = [
@@ -108,31 +120,38 @@ export const facebookPosts: FacebookPost[] = [
 export const transparencyDocs: TransparencyDoc[] = [
   {
     id: "t1",
-    icon: "fundraising",
-    title: "勸募成果報告",
-    description: "公開每期勸募金額與運用明細。",
-    href: "/transparency/fundraising",
+    icon: "sustainability",
+    title: "永續報告書",
+    description: "揭露永續發展目標的實踐與成果。",
+    href: "/sustainability",
   },
   {
     id: "t2",
-    icon: "financial",
-    title: "財務報告",
-    description: "年度財務報表與會計師查核。",
-    href: "/transparency/financial",
-  },
-  {
-    id: "t3",
     icon: "donors",
     title: "捐款芳名錄",
     description: "感謝每一份善心的支持。",
     href: "/transparency/donors",
   },
   {
-    id: "t4",
+    id: "t3",
     icon: "recipients",
     title: "受贈者名單",
     description: "公開受助對象與服務成果。",
     href: "/transparency/recipients",
+  },
+  {
+    id: "t4",
+    icon: "financial",
+    title: "財務報告",
+    description: "年度財務報表與會計師查核。",
+    href: "/transparency/financial",
+  },
+  {
+    id: "t5",
+    icon: "fundraising",
+    title: "勸募成果報告",
+    description: "公開每期勸募金額與運用明細。",
+    href: "/transparency/fundraising",
   },
 ];
 

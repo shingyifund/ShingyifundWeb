@@ -3,20 +3,21 @@
 import { useEffect, useRef, useState } from "react";
 import CountUp from "react-countup";
 import {
-  CalendarDays,
   HandHeart,
-  HeartHandshake,
-  PackageOpen,
+  Handshake,
+  Heart,
+  Leaf,
+  Store,
   Users,
   type LucideIcon,
 } from "lucide-react";
 import type { ImpactStat } from "@/lib/types";
 
 const ICONS: Record<ImpactStat["icon"], LucideIcon> = {
-  users: Users,
-  calendar: CalendarDays,
-  box: PackageOpen,
-  heart: HeartHandshake,
+  family: Users,
+  leaf: Leaf,
+  store: Store,
+  partners: Handshake,
   hands: HandHeart,
 };
 
@@ -51,32 +52,46 @@ export function StatsBand({ stats }: { stats: ImpactStat[] }) {
           <div className="pointer-events-none absolute -left-20 -top-24 size-64 rounded-full bg-navy-600/40 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-24 -right-16 size-64 rounded-full bg-amber-500/20 blur-3xl" />
 
-          <div className="relative mb-10 text-center">
-            <span className="text-sm font-medium tracking-wide text-amber-300">
-              IMPACT
+          {/* 標題 + 愛心脈搏裝飾 */}
+          <div className="relative mb-12 flex items-center justify-center gap-3 text-amber-400">
+            <span className="hidden items-center gap-2 sm:flex">
+              <span className="h-px w-12 bg-current/50" />
+              <Heart className="size-4 fill-current" />
             </span>
-            <h2 className="mt-2 font-serif text-3xl font-bold text-white sm:text-4xl">
+            <h2 className="font-serif text-3xl font-bold text-white sm:text-4xl">
               我們的服務成效
             </h2>
+            <span className="hidden items-center gap-2 sm:flex">
+              <Heart className="size-4 fill-current" />
+              <span className="h-px w-12 bg-current/50" />
+            </span>
           </div>
 
-          <dl className="relative grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-5">
+          {/* 數據 */}
+          <dl className="relative grid grid-cols-2 gap-y-10 sm:grid-cols-3 lg:grid-cols-5 lg:gap-y-0">
             {stats.map((s) => {
               const Icon = ICONS[s.icon];
               return (
-                <div key={s.id} className="flex flex-col items-center text-center">
-                  <span className="mb-3 inline-flex size-12 items-center justify-center rounded-2xl bg-white/10 text-amber-300">
-                    <Icon className="size-6" strokeWidth={1.75} />
-                  </span>
-                  <dd className="font-serif text-4xl font-black text-white sm:text-5xl">
-                    {start ? (
-                      <CountUp end={s.value} duration={2} separator="," />
-                    ) : (
-                      0
-                    )}
-                    <span className="text-amber-400">{s.suffix}</span>
-                  </dd>
-                  <dt className="mt-2 text-sm text-navy-100/70">{s.label}</dt>
+                <div
+                  key={s.id}
+                  className="flex items-center justify-center gap-3 px-3 lg:border-l lg:border-white/15 lg:first:border-l-0"
+                >
+                  <Icon
+                    className="size-10 shrink-0 text-white/85"
+                    strokeWidth={1.4}
+                  />
+                  <div className="text-left">
+                    <dt className="text-xs text-navy-100/70">{s.topLabel}</dt>
+                    <dd className="font-serif text-3xl font-black leading-none text-amber-400 sm:text-4xl">
+                      {start ? (
+                        <CountUp end={s.value} duration={2} separator="," />
+                      ) : (
+                        0
+                      )}
+                      {s.suffix}
+                    </dd>
+                    <p className="mt-1 text-xs text-navy-100/70">{s.bottomLabel}</p>
+                  </div>
                 </div>
               );
             })}

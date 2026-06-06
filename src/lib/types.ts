@@ -11,21 +11,34 @@ export type HeroSlide = {
   cta?: { label: string; href: string };
 };
 
+export type ServiceBulletIcon =
+  | "handHeart"
+  | "lifeKit"
+  | "visit"
+  | "collect"
+  | "sort"
+  | "distribute";
+
+export type ServiceBullet = { label: string; icon: ServiceBulletIcon };
+
 export type ServiceFeature = {
   id: string;
   icon: "relief" | "foodbank";
+  accent: "amber" | "navy";
   title: string;
   description: string;
-  bullets: string[];
+  image: string | null;
+  bullets: ServiceBullet[];
   href: string;
 };
 
 export type ImpactStat = {
   id: string;
-  icon: "users" | "calendar" | "box" | "heart" | "hands";
+  icon: "family" | "leaf" | "store" | "partners" | "hands";
+  topLabel: string;
   value: number;
   suffix: string;
-  label: string;
+  bottomLabel: string;
 };
 
 export type NewsCategory = "新聞" | "報導" | "故事" | "活動";
@@ -42,7 +55,7 @@ export type FacebookPost = {
 
 export type TransparencyDoc = {
   id: string;
-  icon: "report" | "financial" | "fundraising" | "donors" | "recipients";
+  icon: "sustainability" | "donors" | "recipients" | "financial" | "fundraising";
   title: string;
   description: string;
   href: string;

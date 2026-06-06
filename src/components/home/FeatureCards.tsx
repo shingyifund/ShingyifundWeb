@@ -1,28 +1,45 @@
 import Link from "next/link";
-import { ArrowRight, HandHeart, ShoppingBasket, Package, Truck, MapPin, HeartHandshake, Soup, Home } from "lucide-react";
+import {
+  ArrowRight,
+  HandHeart,
+  HeartHandshake,
+  PackageOpen,
+  PackageSearch,
+  ShoppingBasket,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 import { getServiceFeatures } from "@/lib/data/queries";
-import type { ServiceFeature } from "@/lib/types";
+import type { ServiceBulletIcon, ServiceFeature } from "@/lib/types";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
+import { ImagePlaceholder } from "@/components/ui/ImagePlaceholder";
 import { cn } from "@/lib/utils";
 
-const ICONS = {
+const BADGE_ICONS: Record<ServiceFeature["icon"], LucideIcon> = {
   relief: HandHeart,
   foodbank: ShoppingBasket,
-} as const;
+};
 
-const BULLET_ICONS = [HeartHandshake, Soup, Home, Package, Truck, MapPin];
+const BULLET_ICONS: Record<ServiceBulletIcon, LucideIcon> = {
+  handHeart: HandHeart,
+  lifeKit: PackageOpen,
+  visit: Users,
+  collect: ShoppingBasket,
+  sort: PackageSearch,
+  distribute: HeartHandshake,
+};
 
 export async function FeatureCards() {
   const features = await getServiceFeatures();
 
   return (
-    <section className="relative -mt-10 pb-8">
+    <section className="relative -mt-8 pb-10 sm:-mt-12">
       <Container>
         <div className="grid gap-6 md:grid-cols-2">
           {features.map((f, i) => (
             <Reveal key={f.id} delay={i * 0.1}>
-              <FeatureCard feature={f} accent={i === 0 ? "amber" : "navy"} />
+              <FeatureCard feature={f} />
             </Reveal>
           ))}
         </div>
@@ -31,75 +48,94 @@ export async function FeatureCards() {
   );
 }
 
-function FeatureCard({
-  feature,
-  accent,
-}: {
-  feature: ServiceFeature;
-  accent: "amber" | "navy";
-}) {
-  const Icon = ICONS[feature.icon];
-  const isAmber = accent === "amber";
+function FeatureCard({ feature }: { feature: ServiceFeature }) {
+  const Badge = BADGE_ICONS[feature.icon];
+  const isAmber = feature.accent === "amber";
+
+  const accent = {
+    badge: isAmber ? "bg-amber-500" : "bg-navy-700",
+    text: isAmber ? "text-amber-600" : "text-navy-700",
+    bullet: isAmber ? "text-amber-500" : "text-navy-600",
+    border: isAmber ? "border-amber-300" : "border-navy-300",
+    surface: isAmber
+      ? "from-white to-amber-50/70 border-amber-100"
+      : "from-white to-navy-50/70 border-navy-100",
+    btnHover: isAmber
+      ? "hover:bg-amber-500 hover:text-white"
+      : "hover:bg-navy-700 hover:text-white",
+  };
 
   return (
     <Link
       href={feature.href}
-      className={cn(
-        "group relative flex h-full flex-col overflow-hidden rounded-3xl border bg-white p-7 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-soft sm:p-8",
-        isAmber ? "border-amber-100" : "border-navy-100",
-      )}
+      className="group block h-full overflow-hidden rounded-[1.75rem] shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-soft"
     >
-      {/* 角落暈光 */}
-      <div
-        className={cn(
-          "pointer-events-none absolute -right-16 -top-16 size-44 rounded-full opacity-60 blur-2xl transition-opacity group-hover:opacity-100",
-          isAmber ? "bg-amber-100" : "bg-navy-100",
-        )}
-      />
-
-      <div className="relative flex items-center gap-4">
-        <span
-          className={cn(
-            "inline-flex size-14 items-center justify-center rounded-2xl text-white shadow-md",
-            isAmber ? "bg-amber-500" : "bg-navy-700",
-          )}
-        >
-          <Icon className="size-7" strokeWidth={1.75} />
-        </span>
-        <h3 className="font-serif text-2xl font-bold text-navy-900">{feature.title}</h3>
+      {/* 照片 */}
+      <div className="relative h-44 overflow-hidden sm:h-52">
+        <ImagePlaceholder
+          src={feature.image}
+          alt={feature.title}
+          tone={isAmber ? "amber" : "navy"}
+          label="示意圖片"
+          sizes="(max-width: 768px) 100vw, 50vw"
+          className="absolute inset-0 size-full transition-transform duration-500 group-hover:scale-105"
+        />
       </div>
 
-      <p className="relative mt-5 text-[15px] leading-relaxed text-ink-soft">
-        {feature.description}
-      </p>
-
-      <ul className="relative mt-6 flex flex-wrap gap-2">
-        {feature.bullets.map((b, i) => {
-          const BIcon = BULLET_ICONS[(isAmber ? 0 : 3) + i] ?? Package;
-          return (
-            <li
-              key={b}
-              className={cn(
-                "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium",
-                isAmber ? "bg-amber-50 text-amber-700" : "bg-navy-50 text-navy-700",
-              )}
-            >
-              <BIcon className="size-4" />
-              {b}
-            </li>
-          );
-        })}
-      </ul>
-
-      <span
+      {/* 內容 */}
+      <div
         className={cn(
-          "relative mt-7 inline-flex items-center gap-1.5 text-sm font-semibold",
-          isAmber ? "text-amber-600" : "text-navy-700",
+          "relative rounded-b-[1.75rem] border border-t-0 bg-gradient-to-b px-7 pb-7 pt-7",
+          accent.surface,
         )}
       >
-        了解更多
-        <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
-      </span>
+        {/* 徽章（往上疊到照片） */}
+        <span
+          className={cn(
+            "absolute -top-9 left-7 inline-flex size-[72px] items-center justify-center rounded-2xl text-white shadow-lg ring-4 ring-white",
+            accent.badge,
+          )}
+        >
+          <Badge className="size-9" strokeWidth={1.75} />
+        </span>
+
+        {/* 標題（在徽章右側） */}
+        <h3 className="ml-[92px] flex min-h-[40px] items-center font-serif text-2xl font-bold text-navy-900">
+          {feature.title}
+        </h3>
+
+        <p className="mt-4 text-[15px] leading-relaxed text-ink-soft">
+          {feature.description}
+        </p>
+
+        {/* 三項服務 */}
+        <div className="mt-6 grid grid-cols-3 gap-2 border-t border-black/5 pt-6">
+          {feature.bullets.map((b) => {
+            const BIcon = BULLET_ICONS[b.icon];
+            return (
+              <div key={b.label} className="flex flex-col items-center gap-2 text-center">
+                <BIcon className={cn("size-7", accent.bullet)} strokeWidth={1.6} />
+                <span className="text-sm font-medium text-navy-800">{b.label}</span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* 了解更多 */}
+        <div className="mt-7 flex justify-center">
+          <span
+            className={cn(
+              "inline-flex items-center gap-2 rounded-full border-2 bg-white/60 px-7 py-2.5 text-sm font-semibold transition-colors",
+              accent.border,
+              accent.text,
+              accent.btnHover,
+            )}
+          >
+            了解更多
+            <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+          </span>
+        </div>
+      </div>
     </Link>
   );
 }
