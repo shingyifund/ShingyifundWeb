@@ -32,7 +32,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
         <div className="flex">
           {slides.map((slide, i) => (
             <div key={slide.id} className="relative min-w-0 flex-[0_0_100%]">
-              <div className="relative h-[82vh] max-h-[760px] min-h-[540px]">
+              <div className="relative h-[80vh] max-h-[720px] min-h-[480px]">
                 {/* 背景大圖 */}
                 <ImagePlaceholder
                   src={slide.image}
@@ -45,7 +45,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
                 />
                 {/* 左側可讀性遮罩 */}
                 <div className="absolute inset-0 bg-gradient-to-r from-cream via-cream/85 to-cream/10 md:to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-cream to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-cream to-transparent" />
 
                 {/* 文字內容 */}
                 <div className="container-x relative flex h-full items-center">
@@ -93,8 +93,8 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
         </div>
       </div>
 
-      {/* 控制列 */}
-      <div className="container-x pointer-events-none absolute inset-x-0 bottom-8 z-10">
+      {/* 控制列（拉高到特色卡重疊區之上，避免卡在接縫） */}
+      <div className="container-x pointer-events-none absolute inset-x-0 bottom-16 z-20">
         <div className="flex items-center justify-between">
           <div className="pointer-events-auto flex gap-2">
             {slides.map((_, i) => (
