@@ -18,6 +18,8 @@ export const siteConfig = {
   registration: {
     approval: "內政部 82年6月29日 台內社第8285270號",
     fundraising: "衛部救字第1141361944號",
+    selfRegulation: "FN0326",
+    foundedDate: "民國 82 年 7 月 16 日",
   },
 
   /** 捐款資訊 */
@@ -34,7 +36,7 @@ export const siteConfig = {
   },
 
   /** 網站版本號（每次改版手動更新） */
-  version: "v0.1.6",
+  version: "v0.1.7",
 } as const;
 
 export type SiteConfig = typeof siteConfig;
