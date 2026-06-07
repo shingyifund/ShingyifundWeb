@@ -104,7 +104,7 @@ export function SiteHeader() {
         {/* 右側 CTA + 漢堡 */}
         <div className="flex items-center gap-2">
           <Button href="/donate" size="sm" className="hidden sm:inline-flex">
-            <Heart className="size-4 fill-current" />
+            <Heart className="size-4 fill-current text-rose-500" />
             立即捐款
           </Button>
           <button
@@ -222,7 +222,7 @@ function MobileDrawer({
 
         <div className="border-t border-navy-100 p-4">
           <Button href="/donate" className="w-full" onClick={onClose}>
-            <Heart className="size-4 fill-current" />
+            <Heart className="size-4 fill-current text-rose-500" />
             立即捐款
           </Button>
         </div>

@@ -56,13 +56,13 @@ export function StatsBand({ stats }: { stats: ImpactStat[] }) {
           <div className="relative mb-12 flex items-center justify-center gap-3 text-amber-400">
             <span className="hidden items-center gap-2 sm:flex">
               <span className="h-px w-12 bg-current/50" />
-              <Heart className="size-4 fill-current" />
+              <Heart className="size-4 fill-current text-rose-500" />
             </span>
             <h2 className="font-serif text-3xl font-bold text-white sm:text-4xl">
               我們的服務成效
             </h2>
             <span className="hidden items-center gap-2 sm:flex">
-              <Heart className="size-4 fill-current" />
+              <Heart className="size-4 fill-current text-rose-500" />
               <span className="h-px w-12 bg-current/50" />
             </span>
           </div>

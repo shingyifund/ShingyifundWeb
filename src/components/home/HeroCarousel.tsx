@@ -63,7 +63,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
                     )}
                   >
                     <span className="inline-flex items-center gap-2 rounded-full bg-amber-100 px-4 py-1.5 text-sm font-medium text-amber-700">
-                      <Heart className="size-3.5 fill-current" />
+                      <Heart className="size-3.5 fill-current text-rose-500" />
                       財團法人興毅社會福利慈善事業基金會
                     </span>
 
@@ -79,7 +79,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
 
                     <div className="mt-8 flex flex-wrap items-center gap-3">
                       <Button href="/donate" size="lg">
-                        <Heart className="size-4 fill-current" />
+                        <Heart className="size-4 fill-current text-rose-500" />
                         立即捐款
                       </Button>
                       <Button

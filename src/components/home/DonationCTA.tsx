@@ -21,13 +21,13 @@ export function DonationCTA() {
             {/* 裝飾 */}
             <div className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-white/20 blur-2xl" />
             <div className="pointer-events-none absolute -bottom-20 -left-10 size-56 rounded-full bg-amber-300/40 blur-2xl" />
-            <Heart className="pointer-events-none absolute right-10 top-8 size-24 rotate-12 fill-white/10 text-white/10" />
+            <Heart className="pointer-events-none absolute right-10 top-8 size-24 rotate-12 fill-rose-500/15 text-rose-500/15" />
 
             <div className="relative grid items-center gap-10 lg:grid-cols-[1fr_1.1fr]">
               {/* 文案 */}
               <div className="text-navy-900">
                 <span className="inline-flex items-center gap-2 rounded-full bg-navy-900/10 px-4 py-1.5 text-sm font-semibold">
-                  <Heart className="size-4 fill-current" />
+                  <Heart className="size-4 fill-current text-rose-500" />
                   您的支持，持續不間斷
                 </span>
                 <h2 className="mt-5 font-serif text-3xl font-black leading-tight sm:text-4xl">
@@ -40,7 +40,7 @@ export function DonationCTA() {
                 </p>
                 <div className="mt-7 flex flex-wrap gap-3">
                   <Button href="/donate" variant="secondary" size="lg">
-                    <Heart className="size-4 fill-current" />
+                    <Heart className="size-4 fill-current text-rose-500" />
                     立即捐款
                   </Button>
                   <Button href="/donate/projects" variant="white" size="lg">
@@ -50,18 +50,19 @@ export function DonationCTA() {
               </div>
 
               {/* 捐款方式卡 */}
-              <div className="grid gap-3 sm:grid-cols-3 lg:gap-4">
+              <div className="grid gap-x-4 gap-y-10 pt-7 sm:grid-cols-3 sm:gap-y-0">
                 {items.map((it) => (
                   <div
                     key={it.label}
-                    className="rounded-2xl bg-white/95 p-5 shadow-md backdrop-blur"
+                    className="relative rounded-2xl bg-white/95 px-5 pb-5 pt-9 shadow-md backdrop-blur"
                   >
-                    <span className="inline-flex size-10 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
-                      <it.icon className="size-5" />
+                    {/* 實心徽章（往上探頭） */}
+                    <span className="absolute -top-7 left-5 inline-flex size-14 items-center justify-center rounded-2xl bg-navy-700 text-white shadow-lg ring-4 ring-white">
+                      <it.icon className="size-7" strokeWidth={1.5} />
                     </span>
-                    <p className="mt-3 text-xs font-medium text-ink-muted">{it.label}</p>
+                    <p className="text-xs font-medium text-ink-muted">{it.label}</p>
                     <p className="mt-1 text-sm font-semibold text-navy-900">{it.value}</p>
-                    <p className="font-mono text-base font-bold tracking-wide text-amber-600">
+                    <p className="whitespace-nowrap font-mono text-[15px] font-bold tabular-nums tracking-tight text-amber-600">
                       {it.sub}
                     </p>
                   </div>
