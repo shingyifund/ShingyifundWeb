@@ -62,7 +62,7 @@ function PostCard({ post }: { post: FacebookPost }) {
   return (
     <Link
       href={post.href}
-      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-navy-100 bg-white shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-soft"
+      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-navy-100 bg-white shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-soft active:scale-[0.99]"
     >
       <div className="relative aspect-[4/3] overflow-hidden">
         <ImagePlaceholder
@@ -71,7 +71,8 @@ function PostCard({ post }: { post: FacebookPost }) {
           tone={post.category === "報導" || post.category === "活動" ? "amber" : "navy"}
           label="貼文圖片"
           sizes="(max-width: 640px) 100vw, 25vw"
-          className="absolute inset-0 size-full transition-transform duration-500 group-hover:scale-105"
+          className="absolute inset-0 size-full"
+          imgClassName="transition-transform duration-500 group-hover:scale-105"
         />
         <span
           className={cn(

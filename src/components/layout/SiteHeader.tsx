@@ -3,14 +3,23 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { ChevronDown, Heart, Menu, X } from "lucide-react";
 import { mainNav } from "@/config/nav";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 
+/** 當前路徑是否落在該選單項目底下 */
+function useIsActive() {
+  const pathname = usePathname();
+  return (href: string) =>
+    href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/");
+}
+
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const isActive = useIsActive();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
@@ -52,11 +61,19 @@ export function SiteHeader() {
 
         {/* 桌機主選單 */}
         <nav className="hidden shrink-0 items-center gap-0.5 xl:flex">
-          {mainNav.map((item) => (
+          {mainNav.map((item) => {
+            const active = isActive(item.href);
+            return (
             <div key={item.href} className="group relative shrink-0">
               <Link
                 href={item.href}
-                className="flex items-center gap-1 whitespace-nowrap rounded-full px-3 py-2 text-[15px] font-medium text-ink-soft transition-colors hover:text-navy-700"
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "flex items-center gap-1 whitespace-nowrap rounded-full px-3 py-2 text-[15px] font-medium transition-colors",
+                  active
+                    ? "bg-amber-50 text-navy-800"
+                    : "text-ink-soft hover:text-navy-700",
+                )}
               >
                 {item.label}
                 {item.children && (
@@ -65,7 +82,7 @@ export function SiteHeader() {
               </Link>
 
               {item.children && (
-                <div className="invisible absolute left-1/2 top-full z-50 w-56 -translate-x-1/2 translate-y-1 pt-2 opacity-0 transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
+                <div className="invisible absolute left-1/2 top-full z-50 w-56 -translate-x-1/2 translate-y-1 pt-2 opacity-0 transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
                   <div className="overflow-hidden rounded-2xl border border-navy-100 bg-white p-2 shadow-[0_18px_44px_-18px_rgb(15_38_71_/_0.35)]">
                     {item.children.map((child) => (
                       <Link
@@ -80,7 +97,8 @@ export function SiteHeader() {
                 </div>
               )}
             </div>
-          ))}
+            );
+          })}
         </nav>
 
         {/* 右側 CTA + 漢堡 */}

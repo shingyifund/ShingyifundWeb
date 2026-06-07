@@ -3,7 +3,6 @@
 import { motion } from "motion/react";
 import type { ReactNode } from "react";
 
-/** 進場淡入上移；滾動到視野時觸發一次 */
 export function Reveal({
   children,
   delay = 0,

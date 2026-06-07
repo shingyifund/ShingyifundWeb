@@ -78,11 +78,11 @@ export function StatsBand({ stats }: { stats: ImpactStat[] }) {
                 >
                   <Icon
                     className="size-10 shrink-0 text-white/85"
-                    strokeWidth={1.4}
+                    strokeWidth={1.5}
                   />
                   <div className="text-left">
                     <dt className="text-xs text-navy-100/70">{s.topLabel}</dt>
-                    <dd className="font-serif text-3xl font-black leading-none text-amber-400 sm:text-4xl">
+                    <dd className="font-serif text-3xl font-black leading-none tabular-nums text-amber-400 sm:text-4xl">
                       {start ? (
                         <CountUp end={s.value} duration={2} separator="," />
                       ) : (

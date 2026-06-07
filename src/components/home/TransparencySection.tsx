@@ -45,11 +45,11 @@ export async function TransparencySection() {
                   href={doc.href}
                   className={cn(
                     "group flex h-full flex-col items-center rounded-2xl border border-navy-100 bg-white px-5 py-7 text-center shadow-card transition-all duration-300",
-                    "hover:-translate-y-1 hover:border-navy-300 hover:shadow-soft",
+                    "hover:-translate-y-1 hover:border-navy-300 hover:shadow-soft active:scale-[0.99]",
                   )}
                 >
                   <span className="inline-flex size-16 items-center justify-center rounded-2xl bg-navy-50 text-navy-600 transition-colors group-hover:bg-navy-700 group-hover:text-white">
-                    <Icon className="size-8" strokeWidth={1.6} />
+                    <Icon className="size-8" strokeWidth={1.5} />
                   </span>
                   <h3 className="mt-4 font-serif text-base font-bold text-navy-900">
                     {doc.title}

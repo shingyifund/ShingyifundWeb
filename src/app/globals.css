@@ -36,7 +36,7 @@
   --color-mist: #eef3f9;
   --color-ink: #1c2b40;
   --color-ink-soft: #46566f;
-  --color-ink-muted: #7a889e;
+  --color-ink-muted: #5b6a80;
 
   /* 字型 — serif 標題(人文) + sans 內文 */
   --font-sans: var(--font-noto-sans-tc), ui-sans-serif, system-ui, sans-serif;
@@ -87,6 +87,19 @@
   ::selection {
     background-color: var(--color-amber-200);
     color: var(--color-navy-900);
+  }
+
+  /* 全站鍵盤焦點環（focus-visible） */
+  a:focus-visible,
+  button:focus-visible,
+  summary:focus-visible,
+  [tabindex]:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 2px solid var(--color-amber-500);
+    outline-offset: 2px;
+    border-radius: 6px;
   }
 
   /* 自訂捲軸 */

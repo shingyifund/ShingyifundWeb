@@ -68,7 +68,7 @@ function FeatureCard({ feature }: { feature: ServiceFeature }) {
   return (
     <Link
       href={feature.href}
-      className="group block h-full overflow-hidden rounded-[1.75rem] shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-soft"
+      className="group block h-full overflow-hidden rounded-[1.75rem] shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-soft active:scale-[0.99]"
     >
       {/* 照片 */}
       <div className="relative h-44 overflow-hidden sm:h-52">
@@ -78,7 +78,8 @@ function FeatureCard({ feature }: { feature: ServiceFeature }) {
           tone={isAmber ? "amber" : "navy"}
           label="示意圖片"
           sizes="(max-width: 768px) 100vw, 50vw"
-          className="absolute inset-0 size-full transition-transform duration-500 group-hover:scale-105"
+          className="absolute inset-0 size-full"
+          imgClassName="transition-transform duration-500 group-hover:scale-105"
         />
       </div>
 
@@ -96,7 +97,7 @@ function FeatureCard({ feature }: { feature: ServiceFeature }) {
             accent.badge,
           )}
         >
-          <Badge className="size-9" strokeWidth={1.75} />
+          <Badge className="size-9" strokeWidth={1.5} />
         </span>
 
         {/* 標題（在徽章右側） */}
@@ -114,7 +115,7 @@ function FeatureCard({ feature }: { feature: ServiceFeature }) {
             const BIcon = BULLET_ICONS[b.icon];
             return (
               <div key={b.label} className="flex flex-col items-center gap-2 text-center">
-                <BIcon className={cn("size-7", accent.bullet)} strokeWidth={1.6} />
+                <BIcon className={cn("size-7", accent.bullet)} strokeWidth={1.5} />
                 <span className="text-sm font-medium text-navy-800">{b.label}</span>
               </div>
             );

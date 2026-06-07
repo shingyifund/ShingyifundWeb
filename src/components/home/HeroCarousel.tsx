@@ -10,9 +10,10 @@ import { Button } from "@/components/ui/Button";
 import { ImagePlaceholder } from "@/components/ui/ImagePlaceholder";
 
 export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "start" }, [
-    Autoplay({ delay: 6000, stopOnInteraction: false }),
-  ]);
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    { loop: true, align: "start" },
+    [Autoplay({ delay: 6000, stopOnInteraction: false })],
+  );
   const [selected, setSelected] = useState(0);
 
   const onSelect = useCallback(() => {
@@ -28,11 +29,15 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
 
   return (
     <section className="relative">
+      {/* 單一語意 h1（視覺標題在各 slide 內以 p 呈現） */}
+      <h1 className="sr-only">
+        財團法人興毅社會福利慈善事業基金會 — 讓愛延續，讓需要被看見
+      </h1>
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex">
           {slides.map((slide, i) => (
             <div key={slide.id} className="relative min-w-0 flex-[0_0_100%]">
-              <div className="relative h-[80vh] max-h-[720px] min-h-[480px]">
+              <div className="relative h-[80dvh] max-h-[720px] min-h-[480px]">
                 {/* 背景大圖 */}
                 <ImagePlaceholder
                   src={slide.image}
@@ -62,9 +67,9 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
                       財團法人興毅社會福利慈善事業基金會
                     </span>
 
-                    <h1 className="mt-5 font-serif text-4xl font-black leading-[1.15] text-navy-900 sm:text-5xl lg:text-6xl">
+                    <p className="mt-5 font-serif text-4xl font-black leading-[1.15] text-navy-900 sm:text-5xl lg:text-6xl">
                       <HeroTitle text={slide.title} />
-                    </h1>
+                    </p>
 
                     {slide.subtitle && (
                       <p className="mt-5 max-w-md text-base leading-relaxed text-ink-soft sm:text-lg">
@@ -96,19 +101,24 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
       {/* 控制列（拉高到特色卡重疊區之上，避免卡在接縫） */}
       <div className="container-x pointer-events-none absolute inset-x-0 bottom-16 z-20">
         <div className="flex items-center justify-between">
-          <div className="pointer-events-auto flex gap-2">
+          <div className="pointer-events-auto flex items-center">
             {slides.map((_, i) => (
               <button
                 key={i}
                 onClick={() => emblaApi?.scrollTo(i)}
                 aria-label={`切換到第 ${i + 1} 張`}
-                className={cn(
-                  "h-2 rounded-full transition-all duration-300",
-                  selected === i
-                    ? "w-8 bg-amber-500"
-                    : "w-2 bg-navy-300 hover:bg-navy-400",
-                )}
-              />
+                aria-current={selected === i ? "true" : undefined}
+                className="group flex h-11 items-center justify-center px-1.5"
+              >
+                <span
+                  className={cn(
+                    "h-2 rounded-full transition-all duration-300",
+                    selected === i
+                      ? "w-8 bg-amber-500"
+                      : "w-2 bg-navy-300 group-hover:bg-navy-400",
+                  )}
+                />
+              </button>
             ))}
           </div>
           <div className="pointer-events-auto hidden gap-2 sm:flex">

@@ -3,6 +3,7 @@ import { Noto_Sans_TC, Noto_Serif_TC } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import { MotionProvider } from "@/components/providers/MotionProvider";
 
 const notoSans = Noto_Sans_TC({
   weight: ["300", "400", "500", "700", "900"],
@@ -55,9 +56,17 @@ export default function RootLayout({
   return (
     <html lang="zh-Hant" className={`${notoSans.variable} ${notoSerif.variable}`}>
       <body className="bg-grain min-h-screen antialiased">
-        <SiteHeader />
-        <main>{children}</main>
-        <SiteFooter />
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-navy-800 focus:px-5 focus:py-2.5 focus:text-sm focus:font-medium focus:text-white"
+        >
+          跳到主要內容
+        </a>
+        <MotionProvider>
+          <SiteHeader />
+          <main id="main">{children}</main>
+          <SiteFooter />
+        </MotionProvider>
       </body>
     </html>
   );
