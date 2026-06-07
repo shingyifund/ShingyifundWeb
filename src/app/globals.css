@@ -64,6 +64,29 @@
   to { transform: translateX(-50%); }
 }
 
+/* 愛心心跳脈動（雙跳，像真實心律） */
+@keyframes heartbeat {
+  0%, 40%, 100% { transform: scale(1); }
+  12% { transform: scale(1.2); }
+  24% { transform: scale(1); }
+  32% { transform: scale(1.12); }
+}
+
+/* 衝擊波擴散環 */
+@keyframes ping-ring {
+  0% { transform: scale(0.9); opacity: 0.55; }
+  70%, 100% { transform: scale(2.1); opacity: 0; }
+}
+
+.animate-heartbeat {
+  animation: heartbeat 1.6s ease-in-out infinite;
+  transform-origin: center;
+}
+.animate-ping-ring {
+  animation: ping-ring 1.6s ease-out infinite;
+  transform-origin: center;
+}
+
 /* ============================================================
    Base
    ============================================================ */

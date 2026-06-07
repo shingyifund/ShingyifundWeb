@@ -108,7 +108,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
                 onClick={() => emblaApi?.scrollTo(i)}
                 aria-label={`切換到第 ${i + 1} 張`}
                 aria-current={selected === i ? "true" : undefined}
-                className="group flex h-11 items-center justify-center px-1.5"
+                className="group flex h-11 cursor-pointer items-center justify-center px-1.5"
               >
                 <span
                   className={cn(
@@ -155,7 +155,7 @@ function ArrowBtn({
     <button
       onClick={onClick}
       aria-label={dir === "prev" ? "上一張" : "下一張"}
-      className="inline-flex size-11 items-center justify-center rounded-full border border-navy-200 bg-white/80 text-navy-700 backdrop-blur transition-all hover:bg-white hover:shadow-md"
+      className="inline-flex size-11 cursor-pointer items-center justify-center rounded-full border border-navy-200 bg-white/80 text-navy-700 backdrop-blur transition-all hover:bg-white hover:shadow-md"
     >
       {dir === "prev" ? (
         <ChevronLeft className="size-5" />

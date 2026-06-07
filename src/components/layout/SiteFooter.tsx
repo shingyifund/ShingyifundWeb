@@ -1,9 +1,8 @@
-import Link from "next/link";
 import Image from "next/image";
 import { Mail, MapPin, Phone, Printer } from "lucide-react";
 import { siteConfig } from "@/config/site";
-import { mainNav } from "@/config/nav";
 import { FacebookIcon, YoutubeIcon } from "@/components/brand/SocialIcons";
+import { CopyButton } from "@/components/layout/CopyButton";
 
 /** 基金會已落實的 SDGs（依原站，跳過 6、14、15） */
 const SDG_NUMBERS = [1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 16, 17];
@@ -60,27 +59,22 @@ export function SiteFooter() {
           </div>
         </div>
 
-        {/* 快速連結 */}
-        <div className="lg:col-span-3">
-          <h3 className="font-serif text-lg font-semibold text-white">網站導覽</h3>
-          <ul className="mt-5 grid grid-cols-2 gap-x-4 gap-y-2.5 text-sm text-navy-100/75">
-            {mainNav.map((item) => (
-              <li key={item.href}>
-                <Link href={item.href} className="transition-colors hover:text-amber-300">
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
         {/* 捐款資訊 */}
-        <div className="lg:col-span-4">
+        <div className="lg:col-span-5 lg:col-start-8">
           <h3 className="font-serif text-lg font-semibold text-white">愛心捐款</h3>
           <dl className="mt-5 space-y-3 text-sm">
-            <Row label="銀行匯款" value={`${donation.bank}　${donation.bankAccount}`} />
-            <Row label="郵政劃撥" value={donation.postal} />
-            <Row label="發票愛心碼" value={donation.loveCode} highlight />
+            <Row
+              label="銀行匯款"
+              value={`${donation.bank}　${donation.bankAccount}`}
+              copyValue={donation.bankAccount}
+            />
+            <Row label="郵政劃撥" value={donation.postal} copyValue={donation.postal} />
+            <Row
+              label="發票愛心碼"
+              value={donation.loveCode}
+              copyValue={donation.loveCode}
+              highlight
+            />
           </dl>
           <p className="mt-5 text-xs leading-relaxed text-navy-100/50">
             勸募字號：{registration.fundraising}
@@ -153,17 +147,22 @@ function SocialLink({
 function Row({
   label,
   value,
+  copyValue,
   highlight,
 }: {
   label: string;
   value: string;
+  copyValue?: string;
   highlight?: boolean;
 }) {
   return (
-    <div className="flex items-baseline justify-between gap-4 rounded-xl bg-white/[0.04] px-4 py-2.5">
+    <div className="flex items-center justify-between gap-3 rounded-xl bg-white/[0.04] px-4 py-2.5">
       <dt className="shrink-0 text-navy-100/60">{label}</dt>
-      <dd className={highlight ? "font-semibold text-amber-300" : "text-white"}>
-        {value}
+      <dd className="flex min-w-0 items-center gap-1.5">
+        <span className={highlight ? "font-semibold text-amber-300" : "text-white"}>
+          {value}
+        </span>
+        {copyValue && <CopyButton value={copyValue} label={label} />}
       </dd>
     </div>
   );

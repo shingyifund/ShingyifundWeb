@@ -101,16 +101,12 @@ export function SiteHeader() {
           })}
         </nav>
 
-        {/* 右側 CTA + 漢堡 */}
+        {/* 右側漢堡（捐款改由右側固定鈕 DonateFab） */}
         <div className="flex items-center gap-2">
-          <Button href="/donate" size="sm" className="hidden sm:inline-flex">
-            <Heart className="size-4 fill-current text-rose-500" />
-            立即捐款
-          </Button>
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="inline-flex size-11 items-center justify-center rounded-full text-navy-700 transition-colors hover:bg-navy-50 xl:hidden"
+            className="inline-flex size-11 cursor-pointer items-center justify-center rounded-full text-navy-700 transition-colors hover:bg-navy-50 xl:hidden"
             aria-label="開啟選單"
           >
             <Menu className="size-6" />
@@ -162,7 +158,7 @@ function MobileDrawer({
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex size-10 items-center justify-center rounded-full text-navy-700 hover:bg-navy-50"
+            className="inline-flex size-10 cursor-pointer items-center justify-center rounded-full text-navy-700 hover:bg-navy-50"
             aria-label="關閉選單"
           >
             <X className="size-6" />
@@ -179,7 +175,7 @@ function MobileDrawer({
                     <button
                       type="button"
                       onClick={() => setExpanded(isOpen ? null : item.href)}
-                      className="flex w-full items-center justify-between py-3.5 text-left text-[15px] font-medium text-navy-800"
+                      className="flex w-full cursor-pointer items-center justify-between py-3.5 text-left text-[15px] font-medium text-navy-800"
                     >
                       {item.label}
                       <ChevronDown

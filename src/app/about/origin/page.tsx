@@ -7,7 +7,6 @@ import { FoodbankSection } from "@/components/about/FoodbankSection";
 import { Milestones } from "@/components/about/Milestones";
 import { AboutStats } from "@/components/about/AboutStats";
 import { CoreValues } from "@/components/about/CoreValues";
-import { DonationCTA } from "@/components/home/DonationCTA";
 
 export const metadata: Metadata = {
   title: "興毅緣起",
@@ -26,7 +25,6 @@ export default function OriginPage() {
       <Milestones />
       <AboutStats />
       <CoreValues />
-      <DonationCTA />
     </>
   );
 }

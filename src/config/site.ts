@@ -36,7 +36,7 @@ export const siteConfig = {
   },
 
   /** 網站版本號（每次改版手動更新） */
-  version: "v0.1.8",
+  version: "v0.1.9",
 } as const;
 
 export type SiteConfig = typeof siteConfig;

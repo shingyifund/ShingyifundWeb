@@ -4,7 +4,6 @@ import { ImpactStats } from "@/components/home/ImpactStats";
 import { VideoShowcase } from "@/components/home/VideoShowcase";
 import { FacebookFeed } from "@/components/home/FacebookFeed";
 import { TransparencySection } from "@/components/home/TransparencySection";
-import { DonationCTA } from "@/components/home/DonationCTA";
 
 export default function HomePage() {
   return (
@@ -15,7 +14,6 @@ export default function HomePage() {
       <VideoShowcase />
       <FacebookFeed />
       <TransparencySection />
-      <DonationCTA />
     </>
   );
 }
