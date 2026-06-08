@@ -65,25 +65,37 @@ export function SiteHeader() {
             const active = isActive(item.href);
             return (
             <div key={item.href} className="group relative shrink-0">
-              <Link
-                href={item.href}
-                aria-current={active ? "page" : undefined}
-                className={cn(
-                  "flex items-center gap-1 whitespace-nowrap rounded-full px-3 py-2 text-[15px] font-medium transition-colors",
-                  active
-                    ? "bg-amber-50 text-navy-800"
-                    : "text-ink-soft hover:text-navy-700",
-                )}
-              >
-                {item.label}
-                {item.children && (
+              {item.children ? (
+                <button
+                  type="button"
+                  className={cn(
+                    "flex cursor-default items-center gap-1 whitespace-nowrap rounded-full px-3 py-2 text-[15px] font-medium transition-colors",
+                    active
+                      ? "bg-amber-50 text-navy-800"
+                      : "text-ink-soft hover:text-navy-700",
+                  )}
+                >
+                  {item.label}
                   <ChevronDown className="size-3.5 opacity-60 transition-transform group-hover:rotate-180" />
-                )}
-              </Link>
+                </button>
+              ) : (
+                <Link
+                  href={item.href}
+                  aria-current={active ? "page" : undefined}
+                  className={cn(
+                    "flex items-center gap-1 whitespace-nowrap rounded-full px-3 py-2 text-[15px] font-medium transition-colors",
+                    active
+                      ? "bg-amber-50 text-navy-800"
+                      : "text-ink-soft hover:text-navy-700",
+                  )}
+                >
+                  {item.label}
+                </Link>
+              )}
 
               {item.children && (
                 <div className="invisible absolute left-1/2 top-full z-50 w-56 -translate-x-1/2 translate-y-1 pt-2 opacity-0 transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
-                  <div className="overflow-hidden rounded-2xl border border-navy-100 bg-white p-2 shadow-[0_18px_44px_-18px_rgb(15_38_71_/_0.35)]">
+                  <div className="overflow-hidden rounded-2xl border border-navy-100 bg-white p-2 shadow-[0_18px_44px_-18px_rgb(15_38_71/0.35)]">
                     {item.children.map((child) => (
                       <Link
                         key={child.href}

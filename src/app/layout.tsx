@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { MotionProvider } from "@/components/providers/MotionProvider";
 import { DonateFab } from "@/components/donate/DonateFab";
+import { BackToTop } from "@/components/ui/BackToTop";
 
 const notoSans = Noto_Sans_TC({
   weight: ["300", "400", "500", "700", "900"],
@@ -68,6 +69,7 @@ export default function RootLayout({
           <main id="main">{children}</main>
           <SiteFooter />
           <DonateFab />
+          <BackToTop />
         </MotionProvider>
       </body>
     </html>
