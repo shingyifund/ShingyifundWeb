@@ -44,21 +44,21 @@ export function DonationModal({
 
   return (
     <div
-      className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+      className="fixed inset-0 z-[200] flex items-start justify-center overflow-y-auto px-4 py-6"
       role="dialog"
       aria-modal="true"
       aria-label="愛心捐款資訊"
     >
       {/* 背景遮罩 */}
       <div
-        className="absolute inset-0 bg-navy-900/55 backdrop-blur-sm"
+        className="fixed inset-0 bg-navy-900/55 backdrop-blur-sm"
         onClick={onClose}
       />
 
       {/* 橘色框（參考首頁 DonationCTA 風格） */}
-      <div className="relative w-full max-w-lg overflow-hidden rounded-3xl bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 p-6 shadow-glow sm:p-8">
+      <div className="relative my-auto w-full max-w-lg overflow-hidden rounded-3xl bg-linear-to-br from-amber-400 via-amber-500 to-amber-600 p-6 shadow-glow sm:p-8 [@media(max-height:680px)]:zoom-[0.85] [@media(max-height:560px)]:zoom-[0.72] [@media(max-height:460px)]:zoom-[0.6]">
         {/* 裝飾 */}
-        <div className="pointer-events-none absolute -right-12 -top-12 size-44 rounded-full bg-white/20 blur-2xl" />
+        <div className="pointer-events-none absolute -right-12 -top-12 size-44 rounded-full bg-white/20 blur-2xl" style={{ transform: "translateZ(0)" }} />
         <Heart className="pointer-events-none absolute right-6 top-5 size-20 rotate-12 fill-rose-500/15 text-rose-500/15" />
 
         {/* 關閉 */}
@@ -88,7 +88,7 @@ export function DonationModal({
             {methods.map((m) => (
               <div
                 key={m.label}
-                className="rounded-2xl bg-white/95 p-4 shadow-md backdrop-blur"
+                className="rounded-2xl bg-white p-4 shadow-md"
               >
                 <div className="flex items-center gap-3">
                   <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl bg-navy-700 text-white">
