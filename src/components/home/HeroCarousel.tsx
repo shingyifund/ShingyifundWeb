@@ -61,6 +61,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
                         ? "translate-y-0 opacity-100"
                         : "translate-y-4 opacity-0",
                     )}
+                    style={{ willChange: "transform, opacity" }}
                   >
                     <span className="inline-flex items-center gap-2 rounded-full bg-amber-100 px-4 py-1.5 text-sm font-medium text-amber-700">
                       <Heart className="size-3.5 fill-current text-rose-500" />

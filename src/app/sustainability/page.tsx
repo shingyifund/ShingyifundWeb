@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FileDown } from "lucide-react";
 import { Container } from "@/components/ui/Container";
+import { PageHero } from "@/components/ui/PageHero";
 
 export const metadata: Metadata = {
   title: "永續興毅",
@@ -17,28 +18,13 @@ const PDF_PATH = "/sustainability.pdf";
 export default function SustainabilityPage() {
   return (
     <>
-      {/* Hero */}
-      <section className="relative h-[45vh] min-h-70 max-h-120 overflow-hidden">
-        <Image
-          src="/images/sustainability-hero.jpg"
-          alt="永續興毅"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center"
-        />
-        <div className="absolute inset-0 bg-navy-900/60" />
-        <div className="relative flex h-full items-center justify-center text-center">
-          <div>
-            <p className="font-serif text-sm font-medium uppercase tracking-[0.3em] text-amber-300">
-              Sustainability
-            </p>
-            <h1 className="mt-3 font-serif text-4xl font-black text-white sm:text-5xl">
-              永續興毅
-            </h1>
-          </div>
-        </div>
-      </section>
+      <PageHero
+        image="/images/sustainability-hero.jpg"
+        eyebrow="Sustainability"
+        title="永續興毅"
+        align="center"
+        overlay="center"
+      />
 
       {/* SDG */}
       <section className="py-14">

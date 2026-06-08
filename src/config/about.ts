@@ -1,6 +1,6 @@
 /**
  * 興毅緣起 — 組織歷史固定內容（單一來源）
- * 內容取自 https://www.shingyifundweb.org/about
+ * 內容取自 https://www.shingyifund.org/about
  * 屬於不常變動的組織資料，故以 config 形式維護（非走 Supabase 資料層）。
  */
 

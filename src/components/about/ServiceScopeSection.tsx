@@ -39,10 +39,10 @@ const ACCENTS: Record<ServiceScope["icon"], Accent> = {
   lifeBuoy: { iconBg: "bg-navy-50", iconText: "text-navy-600", hoverIcon: "group-hover:bg-navy-700" },
   cloudRain: { iconBg: "bg-navy-50", iconText: "text-navy-600", hoverIcon: "group-hover:bg-navy-700" },
   handshake: { iconBg: "bg-navy-50", iconText: "text-navy-600", hoverIcon: "group-hover:bg-navy-700" },
-  // 培育類 — emerald
-  graduation: { iconBg: "bg-emerald-50", iconText: "text-emerald-600", hoverIcon: "group-hover:bg-emerald-600" },
-  userCheck: { iconBg: "bg-emerald-50", iconText: "text-emerald-600", hoverIcon: "group-hover:bg-emerald-600" },
-  bookOpen: { iconBg: "bg-emerald-50", iconText: "text-emerald-600", hoverIcon: "group-hover:bg-emerald-600" },
+  // 培育類 — amber
+  graduation: { iconBg: "bg-amber-50", iconText: "text-amber-700", hoverIcon: "group-hover:bg-amber-600" },
+  userCheck: { iconBg: "bg-amber-50", iconText: "text-amber-700", hoverIcon: "group-hover:bg-amber-600" },
+  bookOpen: { iconBg: "bg-amber-50", iconText: "text-amber-700", hoverIcon: "group-hover:bg-amber-600" },
 };
 
 export function ServiceScopeSection() {

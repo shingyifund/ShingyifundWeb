@@ -29,16 +29,16 @@ const ACCENTS: Record<
   { iconBg: string; iconText: string; hoverIcon: string; glow: string }
 > = {
   sustainability: {
-    iconBg: "bg-emerald-50",
-    iconText: "text-emerald-600",
-    hoverIcon: "group-hover:bg-emerald-600",
-    glow: "bg-emerald-500/10",
+    iconBg: "bg-amber-50",
+    iconText: "text-amber-700",
+    hoverIcon: "group-hover:bg-amber-600",
+    glow: "bg-amber-500/10",
   },
   donors: {
-    iconBg: "bg-rose-50",
-    iconText: "text-rose-600",
-    hoverIcon: "group-hover:bg-rose-600",
-    glow: "bg-rose-500/10",
+    iconBg: "bg-amber-100",
+    iconText: "text-amber-800",
+    hoverIcon: "group-hover:bg-amber-700",
+    glow: "bg-amber-600/10",
   },
   recipients: {
     iconBg: "bg-navy-50",
@@ -47,16 +47,16 @@ const ACCENTS: Record<
     glow: "bg-navy-600/10",
   },
   financial: {
-    iconBg: "bg-amber-50",
-    iconText: "text-amber-600",
-    hoverIcon: "group-hover:bg-amber-600",
-    glow: "bg-amber-500/10",
+    iconBg: "bg-navy-100",
+    iconText: "text-navy-700",
+    hoverIcon: "group-hover:bg-navy-800",
+    glow: "bg-navy-700/10",
   },
   fundraising: {
-    iconBg: "bg-sky-50",
-    iconText: "text-sky-600",
-    hoverIcon: "group-hover:bg-sky-600",
-    glow: "bg-sky-500/10",
+    iconBg: "bg-amber-50",
+    iconText: "text-amber-600",
+    hoverIcon: "group-hover:bg-amber-500",
+    glow: "bg-amber-400/10",
   },
 };
 

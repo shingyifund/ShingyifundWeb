@@ -22,7 +22,7 @@ const notoSerif = Noto_Serif_TC({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.shingyifundweb.org"),
+  metadataBase: new URL("https://www.shingyifund.org"),
   title: {
     default: "財團法人興毅社會福利慈善事業基金會",
     template: "%s｜興毅基金會",
@@ -43,6 +43,14 @@ export const metadata: Metadata = {
     siteName: "興毅基金會",
     title: "財團法人興毅社會福利慈善事業基金會",
     description: "讓愛延續，讓需要被看見。",
+    images: [
+      {
+        url: "/images/about-hero-bg.jpg",
+        width: 1200,
+        height: 630,
+        alt: "興毅基金會",
+      },
+    ],
   },
 };
 

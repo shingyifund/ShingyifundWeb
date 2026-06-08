@@ -1,6 +1,6 @@
 /**
  * 聯絡我們 — 五個服務據點固定資料（單一來源）
- * 內容取自 https://www.shingyifundweb.org/contact
+ * 內容取自 https://www.shingyifund.org/contact
  * 地圖以 Google Maps 官方 iframe 用地址查詢呈現（中文、位置準、合規）。
  */
 

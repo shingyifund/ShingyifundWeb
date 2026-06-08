@@ -13,8 +13,8 @@ import { cn } from "@/lib/utils";
 const CATEGORY_STYLE: Record<FacebookPost["category"], string> = {
   新聞: "bg-navy-100 text-navy-700",
   報導: "bg-amber-100 text-amber-700",
-  故事: "bg-emerald-100 text-emerald-700",
-  活動: "bg-rose-100 text-rose-700",
+  故事: "bg-amber-200 text-amber-800",
+  活動: "bg-navy-200 text-navy-800",
 };
 
 export async function FacebookFeed() {
@@ -64,7 +64,7 @@ function PostCard({ post }: { post: FacebookPost }) {
       href={post.href}
       className="group flex h-full flex-col overflow-hidden rounded-2xl border border-navy-100 bg-white shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-soft active:scale-[0.99]"
     >
-      <div className="relative aspect-[4/3] overflow-hidden">
+      <div className="relative aspect-4/3 overflow-hidden">
         <ImagePlaceholder
           src={post.image}
           alt={post.title}

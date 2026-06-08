@@ -5,7 +5,7 @@ export const siteConfig = {
   enName: "Shing Yi Charity Foundation",
   slogan: "讓愛延續，讓需要被看見",
   description: "透過社會救助與食物銀行服務，陪伴弱勢家庭度過難關。",
-  url: "https://www.shingyifundweb.org",
+  url: "https://www.shingyifund.org",
 
   contact: {
     address: "100033 臺北市中正區師大路160號",
@@ -36,7 +36,7 @@ export const siteConfig = {
   },
 
   /** 網站版本號（每次改版手動更新） */
-  version: "v0.1.9",
+  version: "v0.1.11",
 } as const;
 
 export type SiteConfig = typeof siteConfig;
