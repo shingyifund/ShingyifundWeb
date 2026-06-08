@@ -16,7 +16,7 @@ const variants: Record<Variant, string> = {
     "bg-navy-700 text-white shadow-[0_10px_28px_-12px_rgb(15_38_71_/_0.6)] hover:bg-navy-600 hover:-translate-y-0.5",
   // 白底描邊
   white:
-    "bg-white/90 text-navy-700 ring-1 ring-navy-200 backdrop-blur hover:bg-white hover:ring-navy-300 hover:-translate-y-0.5",
+    "bg-white text-navy-700 ring-1 ring-navy-200 hover:bg-white hover:ring-navy-300 hover:-translate-y-0.5",
   // 透明
   ghost: "text-navy-700 hover:bg-navy-50",
 };

@@ -53,7 +53,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
                 <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-cream to-transparent" />
 
                 {/* 文字內容 */}
-                <div className="container-x relative flex h-full items-center">
+                <div className="container-x relative flex h-full items-center pb-20">
                   <div
                     className={cn(
                       "max-w-xl transition-all duration-700",
@@ -155,7 +155,7 @@ function ArrowBtn({
     <button
       onClick={onClick}
       aria-label={dir === "prev" ? "上一張" : "下一張"}
-      className="inline-flex size-11 cursor-pointer items-center justify-center rounded-full border border-navy-200 bg-white/80 text-navy-700 backdrop-blur transition-all hover:bg-white hover:shadow-md"
+      className="inline-flex size-11 cursor-pointer items-center justify-center rounded-full border border-navy-200 bg-white/90 text-navy-700 transition-all hover:bg-white hover:shadow-md"
     >
       {dir === "prev" ? (
         <ChevronLeft className="size-5" />

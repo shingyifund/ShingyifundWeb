@@ -24,8 +24,8 @@ export function AboutStats() {
       <Container>
         <Reveal>
           <div className="relative overflow-hidden rounded-3xl bg-navy-800 px-6 py-12 shadow-soft sm:px-10">
-            <div className="pointer-events-none absolute -left-20 -top-24 size-64 rounded-full bg-navy-600/40 blur-3xl" />
-            <div className="pointer-events-none absolute -bottom-24 -right-16 size-64 rounded-full bg-amber-500/20 blur-3xl" />
+            <div className="pointer-events-none absolute -left-20 -top-24 size-64 rounded-full bg-navy-600/40 blur-2xl" style={{ transform: "translateZ(0)" }} />
+            <div className="pointer-events-none absolute -bottom-24 -right-16 size-64 rounded-full bg-amber-500/20 blur-2xl" style={{ transform: "translateZ(0)" }} />
 
             <dl className="relative grid grid-cols-2 gap-y-10 lg:grid-cols-4 lg:gap-y-0">
               {stats.map((s) => {

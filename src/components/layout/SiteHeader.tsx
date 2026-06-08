@@ -42,8 +42,8 @@ export function SiteHeader() {
       className={cn(
         "sticky top-0 z-50 transition-all duration-300",
         scrolled
-          ? "border-b border-navy-100 bg-cream/85 shadow-[0_4px_20px_-12px_rgb(15_38_71_/_0.25)] backdrop-blur-md"
-          : "border-b border-transparent bg-cream/40 backdrop-blur-sm",
+          ? "border-b border-navy-100 bg-cream/95 shadow-[0_4px_20px_-12px_rgb(15_38_71_/_0.25)]"
+          : "border-b border-transparent bg-cream/80",
       )}
     >
       <div className="container-x flex h-18 items-center justify-between gap-4">

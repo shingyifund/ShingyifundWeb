@@ -49,8 +49,8 @@ export function StatsBand({ stats }: { stats: ImpactStat[] }) {
           className="relative overflow-hidden rounded-3xl bg-navy-800 px-6 py-12 shadow-soft sm:px-10"
         >
           {/* 裝飾光暈 */}
-          <div className="pointer-events-none absolute -left-20 -top-24 size-64 rounded-full bg-navy-600/40 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-24 -right-16 size-64 rounded-full bg-amber-500/20 blur-3xl" />
+          <div className="pointer-events-none absolute -left-20 -top-24 size-64 rounded-full bg-navy-600/40 blur-2xl will-change-transform" style={{ transform: "translateZ(0)" }} />
+          <div className="pointer-events-none absolute -bottom-24 -right-16 size-64 rounded-full bg-amber-500/20 blur-2xl will-change-transform" style={{ transform: "translateZ(0)" }} />
 
           {/* 標題 + 愛心脈搏裝飾 */}
           <div className="relative mb-12 flex items-center justify-center gap-3 text-amber-400">

@@ -42,7 +42,7 @@ export async function VideoShowcase() {
 
             {/* 文案 */}
             <div className="relative flex flex-col justify-center bg-navy-700 p-8 text-white sm:p-10">
-              <div className="pointer-events-none absolute -right-10 -top-10 size-40 rounded-full bg-amber-500/15 blur-2xl" />
+              <div className="pointer-events-none absolute -right-10 -top-10 size-40 rounded-full bg-amber-500/15 blur-xl" style={{ transform: "translateZ(0)" }} />
               <span className="text-sm font-medium tracking-wide text-amber-300">
                 影音專區
               </span>

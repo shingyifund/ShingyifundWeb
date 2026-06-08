@@ -81,10 +81,12 @@
 .animate-heartbeat {
   animation: heartbeat 1.6s ease-in-out infinite;
   transform-origin: center;
+  will-change: transform;
 }
 .animate-ping-ring {
   animation: ping-ring 1.6s ease-out infinite;
   transform-origin: center;
+  will-change: transform, opacity;
 }
 
 /* ============================================================
@@ -104,7 +106,6 @@
     color: var(--color-ink);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
   }
 
   ::selection {

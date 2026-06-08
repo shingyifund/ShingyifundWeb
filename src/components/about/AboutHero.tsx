@@ -20,7 +20,7 @@ export function AboutHero() {
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-navy-900 via-navy-900/55 to-transparent" />
 
       {/* 裝飾光暈 */}
-      <div className="pointer-events-none absolute -left-24 -top-24 size-72 rounded-full bg-navy-600/40 blur-3xl" />
+      <div className="pointer-events-none absolute -left-24 -top-24 size-72 rounded-full bg-navy-600/40 blur-2xl" style={{ transform: "translateZ(0)" }} />
       {/* 細格紋 */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgb(255_255_255_/_0.06)_1px,transparent_0)] [background-size:28px_28px]" />
 

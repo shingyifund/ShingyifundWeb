@@ -101,9 +101,10 @@ function DocCard({ doc }: { doc: TransparencyDoc }) {
       {/* hover 光暈 */}
       <span
         className={cn(
-          "pointer-events-none absolute -top-10 left-1/2 size-32 -translate-x-1/2 rounded-full opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100",
+          "pointer-events-none absolute -top-10 left-1/2 size-32 -translate-x-1/2 rounded-full opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-100",
           a.glow,
         )}
+        style={{ willChange: "opacity" }}
       />
 
       {/* icon */}

@@ -4,10 +4,10 @@ export function ContactHero() {
   return (
     <section className="relative overflow-hidden bg-navy-900 py-16 text-white sm:py-20">
       {/* 裝飾光暈 */}
-      <div className="pointer-events-none absolute -left-24 -top-24 size-72 rounded-full bg-navy-600/40 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-28 -right-20 size-72 rounded-full bg-amber-500/15 blur-3xl" />
+      <div className="pointer-events-none absolute -left-24 -top-24 size-72 rounded-full bg-navy-600/40 blur-2xl" style={{ transform: "translateZ(0)" }} />
+      <div className="pointer-events-none absolute -bottom-28 -right-20 size-72 rounded-full bg-amber-500/15 blur-2xl" style={{ transform: "translateZ(0)" }} />
       {/* 細格紋 */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgb(255_255_255_/_0.06)_1px,transparent_0)] [background-size:28px_28px]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgb(255_255_255/0.06)_1px,transparent_0)] bg-size-[28px_28px]" />
 
       <Container className="relative text-center">
         <p className="font-serif text-sm font-medium uppercase tracking-[0.3em] text-amber-300">
