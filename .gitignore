@@ -29,3 +29,9 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# agent skills
+.agents/
+.claude/
+skills-lock.json
+bun.lock
