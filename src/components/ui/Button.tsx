@@ -34,6 +34,10 @@ type CommonProps = {
   children: React.ReactNode;
 };
 
+type ButtonProps =
+  | (CommonProps & { href: string } & React.ComponentProps<typeof Link>)
+  | (CommonProps & { href?: undefined } & React.ButtonHTMLAttributes<HTMLButtonElement>);
+
 export function Button({
   href,
   variant = "primary",
@@ -41,14 +45,18 @@ export function Button({
   className,
   children,
   ...rest
-}: CommonProps & { href: string } & React.ComponentProps<typeof Link>) {
+}: ButtonProps) {
+  const cls = cn(base, variants[variant], sizes[size], className);
+  if (href) {
+    return (
+      <Link href={href} className={cls} {...(rest as React.ComponentProps<typeof Link>)}>
+        {children}
+      </Link>
+    );
+  }
   return (
-    <Link
-      href={href}
-      className={cn(base, variants[variant], sizes[size], className)}
-      {...rest}
-    >
+    <button className={cls} {...(rest as React.ButtonHTMLAttributes<HTMLButtonElement>)}>
       {children}
-    </Link>
+    </button>
   );
 }

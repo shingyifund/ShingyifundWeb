@@ -78,19 +78,17 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
                       </p>
                     )}
 
-                    <div className="mt-8 flex flex-wrap items-center gap-3">
-                      <Button href="/donate" size="lg">
-                        <Heart className="size-4 fill-current text-rose-500" />
-                        立即捐款
-                      </Button>
-                      <Button
-                        href={slide.cta?.href ?? "/services"}
-                        size="lg"
-                        variant="white"
-                      >
-                        {slide.cta?.label ?? "了解服務"}
-                      </Button>
-                    </div>
+                    {slide.cta?.href && (
+                      <div className="mt-8 flex flex-wrap items-center gap-3">
+                        <Button
+                          href={slide.cta.href}
+                          size="lg"
+                          variant="white"
+                        >
+                          {slide.cta.label ?? "了解服務"}
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
