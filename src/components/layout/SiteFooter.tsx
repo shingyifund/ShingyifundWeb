@@ -62,12 +62,17 @@ export function SiteFooter() {
         {/* 捐款資訊 */}
         <div className="lg:col-span-5 lg:col-start-8">
           <h3 className="font-serif text-lg font-semibold text-white">愛心捐款</h3>
-          <dl className="mt-5 space-y-3 text-sm">
-            <Row
-              label="銀行匯款"
-              value={`${donation.bank}　${donation.bankAccount}`}
-              copyValue={donation.bankAccount}
-            />
+          <dl className="mt-5 space-y-3 pr-12 text-sm lg:pr-0">
+            <div className="flex items-center justify-between gap-3 rounded-xl bg-white/4 px-4 py-2.5">
+              <dt className="shrink-0 text-navy-100/60">銀行匯款</dt>
+              <dd className="flex items-center gap-1.5">
+                <div className="text-right">
+                  <p className="text-xs text-navy-100/60">{donation.bank}</p>
+                  <p className="text-white">{donation.bankAccount}</p>
+                </div>
+                <CopyButton value={donation.bankAccount} label="銀行匯款" />
+              </dd>
+            </div>
             <Row label="郵政劃撥" value={donation.postal} copyValue={donation.postal} />
             <Row
               label="發票愛心碼"
@@ -156,7 +161,7 @@ function Row({
   highlight?: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-xl bg-white/[0.04] px-4 py-2.5">
+    <div className="flex items-center justify-between gap-3 rounded-xl bg-white/4 px-4 py-2.5">
       <dt className="shrink-0 text-navy-100/60">{label}</dt>
       <dd className="flex min-w-0 items-center gap-1.5">
         <span className={highlight ? "font-semibold text-amber-300" : "text-white"}>
