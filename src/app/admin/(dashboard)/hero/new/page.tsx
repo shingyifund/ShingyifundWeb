@@ -1,21 +1,24 @@
-import Link from "next/link";
-import { SlideForm } from "../SlideForm";
+import { Button } from "@/components/ui/Button";
+import { ArrowLeft } from "lucide-react";
+import { HeroForm } from "../_components/hero-form";
 
 export default function NewSlidePage() {
   return (
-    <div className="mx-auto max-w-2xl">
-      <div className="mb-6">
-        <Link href="/admin/hero" className="text-sm text-gray-400 hover:text-gray-600">
-          首頁輪播
-        </Link>
-        <span className="mx-1.5 text-gray-300">/</span>
-        <span className="text-sm font-medium text-gray-700">新增 Slide</span>
-      </div>
+    <div className="space-y-6">
+      <Button href="/admin/hero" variant="ghost" size="sm">
+        <ArrowLeft />
+        返回列表
+      </Button>
 
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-        <h1 className="mb-6 text-lg font-bold text-gray-900">新增 Slide</h1>
-        <SlideForm />
-      </div>
+      <section className="rounded-lg border bg-white p-6">
+        <div className="mb-6">
+          <p className="text-sm font-medium text-muted-foreground">新增 slide</p>
+          <h1 className="mt-1 text-2xl font-semibold text-foreground">
+            建立首頁輪播
+          </h1>
+        </div>
+        <HeroForm />
+      </section>
     </div>
   );
 }

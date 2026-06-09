@@ -1,24 +1,44 @@
-import Link from "next/link";
-import { Images } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ImageIcon, ArrowRight } from "lucide-react";
+
+const modules = [
+  {
+    title: "首頁 Hero 輪播",
+    description: "維護首頁主視覺圖片、標題、按鈕連結、顯示狀態與排序。",
+    href: "/admin/hero",
+    icon: ImageIcon,
+  },
+];
 
 export default function AdminPage() {
   return (
-    <div>
-      <h1 className="mb-6 text-2xl font-bold text-gray-900">管理後台</h1>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <Link
-          href="/admin/hero"
-          className="flex items-center gap-4 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:border-amber-300 hover:shadow-md"
-        >
-          <div className="flex size-12 items-center justify-center rounded-xl bg-amber-50">
-            <Images className="size-6 text-amber-600" />
-          </div>
-          <div>
-            <p className="font-semibold text-gray-900">首頁輪播</p>
-            <p className="text-sm text-gray-500">管理 Banner 內容</p>
-          </div>
-        </Link>
-      </div>
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {modules.map((module) => {
+          const Icon = module.icon;
+
+          return (
+            <Card key={module.href} className="rounded-lg bg-white">
+              <CardHeader className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <span className="flex size-10 items-center justify-center rounded-lg bg-navy-50 text-navy-700">
+                    <Icon className="size-5" />
+                  </span>
+                </div>
+                <CardTitle className="text-lg">{module.title}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm leading-6 text-muted-foreground">
+                  {module.description}
+                </p>
+                <Button href={module.href} variant="outline" className="w-full">
+                  進入管理
+                  <ArrowRight />
+                </Button>
+              </CardContent>
+            </Card>
+          );
+        })}
     </div>
   );
 }

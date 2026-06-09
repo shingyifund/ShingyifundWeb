@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Noto_Sans_TC, Noto_Serif_TC } from "next/font/google";
 import "./globals.css";
+import { cn } from "@/lib/utils";
 
 const notoSans = Noto_Sans_TC({
   weight: ["300", "400", "500", "700", "900"],
@@ -59,7 +60,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="zh-Hant" className={`${notoSans.variable} ${notoSerif.variable}`}>
+    <html lang="zh-Hant" className={cn(notoSans.variable, notoSerif.variable, "font-sans")}>
       <body className="bg-grain min-h-screen antialiased">
         {children}
       </body>

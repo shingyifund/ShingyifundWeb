@@ -1,33 +1,35 @@
-import { createClient } from "@/lib/supabase/server";
+import { Button } from "@/components/ui/Button";
+import { ArrowLeft } from "lucide-react";
 import { notFound } from "next/navigation";
-import Link from "next/link";
-import { SlideForm } from "../SlideForm";
+import { HeroForm } from "../_components/hero-form";
+import { getSlideById } from "../actions";
 
-export default async function EditSlidePage({ params }: { params: Promise<{ id: string }> }) {
+export default async function EditSlidePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
-  const supabase = await createClient();
-  const { data: slide } = await supabase
-    .from("hero_slides")
-    .select("*")
-    .eq("id", id)
-    .single();
+  const slide = await getSlideById(id);
 
   if (!slide) notFound();
 
   return (
-    <div className="mx-auto max-w-2xl">
-      <div className="mb-6">
-        <Link href="/admin/hero" className="text-sm text-gray-400 hover:text-gray-600">
-          首頁輪播
-        </Link>
-        <span className="mx-1.5 text-gray-300">/</span>
-        <span className="text-sm font-medium text-gray-700">編輯 Slide</span>
-      </div>
+    <div className="space-y-6">
+      <Button href="/admin/hero" variant="ghost" size="sm">
+        <ArrowLeft />
+        返回列表
+      </Button>
 
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-        <h1 className="mb-6 text-lg font-bold text-gray-900">編輯 Slide</h1>
-        <SlideForm slide={slide} />
-      </div>
+      <section className="rounded-lg border bg-white p-6">
+        <div className="mb-6">
+          <p className="text-sm font-medium text-muted-foreground">編輯 slide</p>
+          <h1 className="mt-1 text-2xl font-semibold text-foreground">
+            {slide.title}
+          </h1>
+        </div>
+        <HeroForm slide={slide} />
+      </section>
     </div>
   );
 }
