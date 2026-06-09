@@ -2,13 +2,19 @@
 
 export type HeroSlide = {
   id: string;
-  title: string;
-  subtitle?: string;
-  /** 圖片網址；null 時顯示品牌色塊 placeholder */
-  image: string | null;
-  /** 主題色，影響 placeholder 與遮罩 */
-  tone?: "navy" | "amber";
-  cta?: { label: string; href: string };
+  content_type: "image" | "image_text" | "youtube";
+  has_title: boolean;
+  title: string | null;
+  has_subtitle: boolean;
+  subtitle: string | null;
+  image_url: string | null;
+  poster_image_url: string | null;
+  youtube_url: string | null;
+  youtube_video_id: string | null;
+  has_cta: boolean;
+  cta_label: string | null;
+  cta_href: string | null;
+  tone: "navy" | "amber";
 };
 
 export type ServiceBulletIcon =

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { ArrowDown, ArrowUp, Edit3, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Switch } from "@/components/ui/switch";
@@ -23,9 +23,11 @@ export function HeroRowActions({
   isFirst: boolean;
   isLast: boolean;
 }) {
+  const [localActive, setLocalActive] = useState(isActive);
   const [isPending, startTransition] = useTransition();
 
   function toggle(nextValue: boolean) {
+    setLocalActive(nextValue);
     startTransition(async () => {
       await toggleSlideActive(id, nextValue);
     });
@@ -40,7 +42,10 @@ export function HeroRowActions({
   return (
     <div className="flex items-center justify-end gap-2">
       {isPending && <Loader2 className="size-4 animate-spin text-muted-foreground" />}
-      <Switch checked={isActive} onCheckedChange={toggle} aria-label="切換顯示狀態" />
+      <label className="flex cursor-pointer items-center gap-1.5 text-xs text-muted-foreground select-none">
+        <Switch checked={localActive} onCheckedChange={toggle} aria-label="切換顯示狀態" />
+        {localActive ? "顯示" : "停用"}
+      </label>
       <Button
         type="button"
         variant="ghost"

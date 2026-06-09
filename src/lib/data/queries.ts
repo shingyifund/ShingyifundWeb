@@ -19,27 +19,32 @@ export async function getHeroSlides(): Promise<HeroSlide[]> {
     const supabase = await createClient();
     const { data, error } = await supabase
       .from("hero_slides")
-      .select("id, title, subtitle, image, tone, cta_label, cta_href")
+      .select(
+        "id, content_type, has_title, title, has_subtitle, subtitle, image_url, poster_image_url, youtube_url, youtube_video_id, has_cta, cta_label, cta_href, tone",
+      )
       .eq("is_active", true)
-      .order("sort");
+      .order("sort_order");
 
     if (error || !data) throw error;
 
     return data.map((row) => ({
       id: row.id,
+      content_type: row.content_type as "image" | "image_text" | "youtube",
+      has_title: row.has_title,
       title: row.title,
-      subtitle: row.subtitle ?? undefined,
-      image: row.image,
+      has_subtitle: row.has_subtitle,
+      subtitle: row.subtitle,
+      image_url: row.image_url,
+      poster_image_url: row.poster_image_url,
+      youtube_url: row.youtube_url,
+      youtube_video_id: row.youtube_video_id,
+      has_cta: row.has_cta,
+      cta_label: row.cta_label,
+      cta_href: row.cta_href,
       tone: row.tone as "navy" | "amber",
-      cta:
-        row.cta_label && row.cta_href
-          ? { label: row.cta_label, href: row.cta_href }
-          : undefined,
     }));
   } catch {
-    // fallback to mock if DB unavailable
-    const { heroSlides } = await import("./mock");
-    return heroSlides;
+    return [];
   }
 }
 

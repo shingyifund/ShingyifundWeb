@@ -14,6 +14,14 @@ const nextConfig = {
         protocol: "https",
         hostname: "dmywjaisllbfucmthgdn.supabase.co",
       },
+      {
+        protocol: "https",
+        hostname: "placehold.co",
+      },
+      {
+        protocol: "https",
+        hostname: "img.youtube.com",
+      },
     ],
   },
 };

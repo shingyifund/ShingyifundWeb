@@ -6,13 +6,20 @@ import { revalidatePath } from "next/cache";
 
 export type HeroSlideRecord = {
   id: string;
-  title: string;
+  content_type: "image" | "image_text" | "youtube";
+  has_title: boolean;
+  title: string | null;
+  has_subtitle: boolean;
   subtitle: string | null;
-  image: string | null;
-  tone: "navy" | "amber";
+  image_url: string | null;
+  poster_image_url: string | null;
+  youtube_url: string | null;
+  youtube_video_id: string | null;
+  has_cta: boolean;
   cta_label: string | null;
   cta_href: string | null;
-  sort: number;
+  tone: "navy" | "amber";
+  sort_order: number;
   is_active: boolean;
   updated_at: string | null;
 };
@@ -36,31 +43,76 @@ async function assertAdmin() {
 function textValue(formData: FormData, key: string) {
   const value = formData.get(key);
   if (typeof value !== "string") return null;
-
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : null;
 }
 
 function slidePayload(formData: FormData) {
-  const title = textValue(formData, "title");
-
-  if (!title) {
-    return { error: "請輸入標題" as const };
+  const content_type = textValue(formData, "content_type");
+  if (!content_type || !["image", "image_text", "youtube"].includes(content_type)) {
+    return { error: "請選擇 Hero 型態" as const };
   }
 
+  const has_title = formData.get("has_title") === "true";
+  const has_subtitle = formData.get("has_subtitle") === "true";
+  const has_cta = formData.get("has_cta") === "true";
   const tone = textValue(formData, "tone");
 
+  const base = {
+    content_type,
+    has_title,
+    title: has_title ? textValue(formData, "title") : null,
+    has_subtitle,
+    subtitle: has_subtitle ? textValue(formData, "subtitle") : null,
+    image_url: null as string | null,
+    poster_image_url: null as string | null,
+    youtube_url: null as string | null,
+    youtube_video_id: null as string | null,
+    has_cta: false,
+    cta_label: null as string | null,
+    cta_href: null as string | null,
+    tone: tone === "amber" ? "amber" : ("navy" as "navy" | "amber"),
+    is_active: formData.get("is_active") === "true",
+  };
+
+  if (content_type === "image") {
+    base.image_url = textValue(formData, "image_url");
+  } else if (content_type === "image_text") {
+    base.image_url = textValue(formData, "image_url");
+    base.has_cta = has_cta;
+    base.cta_label = has_cta ? textValue(formData, "cta_label") : null;
+    base.cta_href = has_cta ? textValue(formData, "cta_href") : null;
+  } else if (content_type === "youtube") {
+    base.youtube_url = textValue(formData, "youtube_url");
+    base.youtube_video_id = textValue(formData, "youtube_video_id");
+    base.poster_image_url = textValue(formData, "poster_image_url");
+  }
+
+  return { data: base };
+}
+
+const SELECT_COLS =
+  "id, content_type, has_title, title, has_subtitle, subtitle, image_url, poster_image_url, youtube_url, youtube_video_id, has_cta, cta_label, cta_href, tone, sort_order, is_active, updated_at";
+
+function mapRow(row: Record<string, unknown>): HeroSlideRecord {
   return {
-    data: {
-      title,
-      subtitle: textValue(formData, "subtitle"),
-      image: textValue(formData, "image"),
-      tone: tone === "amber" ? "amber" : "navy",
-      cta_label: textValue(formData, "cta_label"),
-      cta_href: textValue(formData, "cta_href"),
-      is_active: formData.get("is_active") === "true",
-      updated_at: new Date().toISOString(),
-    },
+    id: row.id as string,
+    content_type: row.content_type as "image" | "image_text" | "youtube",
+    has_title: row.has_title as boolean,
+    title: row.title as string | null,
+    has_subtitle: row.has_subtitle as boolean,
+    subtitle: row.subtitle as string | null,
+    image_url: row.image_url as string | null,
+    poster_image_url: row.poster_image_url as string | null,
+    youtube_url: row.youtube_url as string | null,
+    youtube_video_id: row.youtube_video_id as string | null,
+    has_cta: row.has_cta as boolean,
+    cta_label: row.cta_label as string | null,
+    cta_href: row.cta_href as string | null,
+    tone: row.tone === "amber" ? "amber" : "navy",
+    sort_order: row.sort_order as number,
+    is_active: row.is_active as boolean,
+    updated_at: row.updated_at as string | null,
   };
 }
 
@@ -75,23 +127,12 @@ export async function listSlides(): Promise<HeroSlideRecord[]> {
   const supabase = await createAdminClient();
   const { data, error } = await supabase
     .from("hero_slides")
-    .select("id, title, subtitle, image, tone, cta_label, cta_href, sort, is_active, updated_at")
-    .order("sort", { ascending: true });
+    .select(SELECT_COLS)
+    .order("sort_order", { ascending: true });
 
   if (error) throw new Error(error.message);
 
-  return (data ?? []).map((row) => ({
-    id: row.id,
-    title: row.title,
-    subtitle: row.subtitle,
-    image: row.image,
-    tone: row.tone === "amber" ? "amber" : "navy",
-    cta_label: row.cta_label,
-    cta_href: row.cta_href,
-    sort: row.sort,
-    is_active: row.is_active,
-    updated_at: row.updated_at,
-  }));
+  return (data ?? []).map(mapRow);
 }
 
 export async function getSlideById(id: string): Promise<HeroSlideRecord | null> {
@@ -100,25 +141,14 @@ export async function getSlideById(id: string): Promise<HeroSlideRecord | null> 
   const supabase = await createAdminClient();
   const { data, error } = await supabase
     .from("hero_slides")
-    .select("id, title, subtitle, image, tone, cta_label, cta_href, sort, is_active, updated_at")
+    .select(SELECT_COLS)
     .eq("id", id)
     .maybeSingle();
 
   if (error) throw new Error(error.message);
   if (!data) return null;
 
-  return {
-    id: data.id,
-    title: data.title,
-    subtitle: data.subtitle,
-    image: data.image,
-    tone: data.tone === "amber" ? "amber" : "navy",
-    cta_label: data.cta_label,
-    cta_href: data.cta_href,
-    sort: data.sort,
-    is_active: data.is_active,
-    updated_at: data.updated_at,
-  };
+  return mapRow(data);
 }
 
 export async function uploadHeroImage(formData: FormData): Promise<
@@ -166,7 +196,7 @@ export async function createSlide(formData: FormData): Promise<ActionResult> {
 
   const { error } = await supabase.from("hero_slides").insert({
     ...payload.data,
-    sort: count ?? 0,
+    sort_order: count ?? 0,
   });
 
   if (error) return { ok: false, message: error.message };
@@ -225,7 +255,7 @@ export async function toggleSlideActive(
   const supabase = await createAdminClient();
   const { error } = await supabase
     .from("hero_slides")
-    .update({ is_active: isActive, updated_at: new Date().toISOString() })
+    .update({ is_active: isActive })
     .eq("id", id);
 
   if (error) return { ok: false, message: error.message };
@@ -240,8 +270,17 @@ export async function moveSlide(
 ): Promise<ActionResult> {
   await assertAdmin();
 
-  const slides = await listSlides();
-  const index = slides.findIndex((slide) => slide.id === id);
+  const supabase = await createAdminClient();
+
+  const { data, error: fetchError } = await supabase
+    .from("hero_slides")
+    .select("id, sort_order")
+    .order("sort_order", { ascending: true });
+
+  if (fetchError) return { ok: false, message: fetchError.message };
+
+  const slides = data ?? [];
+  const index = slides.findIndex((s) => s.id === id);
   const targetIndex = direction === "up" ? index - 1 : index + 1;
 
   if (index < 0 || targetIndex < 0 || targetIndex >= slides.length) {
@@ -252,18 +291,13 @@ export async function moveSlide(
   const [item] = reordered.splice(index, 1);
   reordered.splice(targetIndex, 0, item);
 
-  const supabase = await createAdminClient();
-  const updates = reordered.map((slide, sort) =>
-    supabase
+  for (let i = 0; i < reordered.length; i++) {
+    const { error } = await supabase
       .from("hero_slides")
-      .update({ sort, updated_at: new Date().toISOString() })
-      .eq("id", slide.id),
-  );
-
-  const results = await Promise.all(updates);
-  const failed = results.find((result) => result.error);
-
-  if (failed?.error) return { ok: false, message: failed.error.message };
+      .update({ sort_order: i })
+      .eq("id", reordered[i].id);
+    if (error) return { ok: false, message: error.message };
+  }
 
   revalidateHero();
   return { ok: true };
