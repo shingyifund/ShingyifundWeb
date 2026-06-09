@@ -1,9 +1,23 @@
 "use server";
 
-import { createAdminClient } from "@/lib/supabase/server";
+import { isAuthorizedAdminEmail } from "@/lib/admin-auth";
+import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
+async function assertAdmin() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!isAuthorizedAdminEmail(user?.email)) {
+    throw new Error("Unauthorized");
+  }
+}
+
 export async function uploadImage(formData: FormData) {
+  await assertAdmin();
+
   const file = formData.get("file") as File;
   if (!file || !file.size) return { error: "No file", url: null };
 
@@ -26,7 +40,13 @@ export async function uploadImage(formData: FormData) {
 }
 
 export async function createSlide(formData: FormData) {
+  await assertAdmin();
+
   const supabase = await createAdminClient();
+  const { count } = await supabase
+    .from("hero_slides")
+    .select("*", { count: "exact", head: true });
+
   await supabase.from("hero_slides").insert({
     title: formData.get("title") as string,
     subtitle: (formData.get("subtitle") as string) || null,
@@ -34,7 +54,7 @@ export async function createSlide(formData: FormData) {
     tone: formData.get("tone") as string,
     cta_label: (formData.get("cta_label") as string) || null,
     cta_href: (formData.get("cta_href") as string) || null,
-    sort: Number(formData.get("sort") ?? 0),
+    sort: count ?? 0,
     is_active: formData.get("is_active") === "true",
   });
   revalidatePath("/admin/hero");
@@ -42,6 +62,8 @@ export async function createSlide(formData: FormData) {
 }
 
 export async function updateSlide(id: string, formData: FormData) {
+  await assertAdmin();
+
   const supabase = await createAdminClient();
   await supabase
     .from("hero_slides")
@@ -52,7 +74,6 @@ export async function updateSlide(id: string, formData: FormData) {
       tone: formData.get("tone") as string,
       cta_label: (formData.get("cta_label") as string) || null,
       cta_href: (formData.get("cta_href") as string) || null,
-      sort: Number(formData.get("sort") ?? 0),
       is_active: formData.get("is_active") === "true",
       updated_at: new Date().toISOString(),
     })
@@ -62,6 +83,8 @@ export async function updateSlide(id: string, formData: FormData) {
 }
 
 export async function deleteSlide(id: string, imageUrl?: string | null) {
+  await assertAdmin();
+
   const supabase = await createAdminClient();
   await supabase.from("hero_slides").delete().eq("id", id);
 
@@ -76,6 +99,8 @@ export async function deleteSlide(id: string, imageUrl?: string | null) {
 }
 
 export async function toggleActive(id: string, current: boolean) {
+  await assertAdmin();
+
   const supabase = await createAdminClient();
   await supabase
     .from("hero_slides")

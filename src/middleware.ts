@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { isAuthorizedAdminEmail } from "@/lib/admin-auth";
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -30,14 +31,7 @@ export async function middleware(request: NextRequest) {
   const isAdminPath = request.nextUrl.pathname.startsWith("/admin");
   const isLoginPage = request.nextUrl.pathname === "/admin/login";
 
-  // 允許的管理員信箱（逗號分隔，存於環境變數）
-  const allowedEmails = (process.env.ADMIN_EMAILS ?? "")
-    .split(",")
-    .map((e) => e.trim())
-    .filter(Boolean);
-
-  const isAuthorized =
-    user && (allowedEmails.length === 0 || allowedEmails.includes(user.email ?? ""));
+  const isAuthorized = user && isAuthorizedAdminEmail(user.email);
 
   // 未登入或不在白名單 → 導回 login
   if (isAdminPath && !isLoginPage && !isAuthorized) {

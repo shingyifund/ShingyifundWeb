@@ -34,9 +34,15 @@ type CommonProps = {
   children: React.ReactNode;
 };
 
-type ButtonProps =
-  | (CommonProps & { href: string } & React.ComponentProps<typeof Link>)
-  | (CommonProps & { href?: undefined } & React.ButtonHTMLAttributes<HTMLButtonElement>);
+type LinkButtonProps = CommonProps & {
+  href: string;
+} & Omit<React.ComponentProps<typeof Link>, "href" | "className" | "children">;
+
+type NativeButtonProps = CommonProps & {
+  href?: undefined;
+} & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "className" | "children">;
+
+type ButtonProps = LinkButtonProps | NativeButtonProps;
 
 export function Button({
   href,
@@ -48,14 +54,22 @@ export function Button({
 }: ButtonProps) {
   const cls = cn(base, variants[variant], sizes[size], className);
   if (href) {
+    const linkProps = rest as Omit<
+      React.ComponentProps<typeof Link>,
+      "href" | "className" | "children"
+    >;
     return (
-      <Link href={href} className={cls} {...(rest as React.ComponentProps<typeof Link>)}>
+      <Link href={href} className={cls} {...linkProps}>
         {children}
       </Link>
     );
   }
+  const buttonProps = rest as Omit<
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
+    "className" | "children"
+  >;
   return (
-    <button className={cls} {...(rest as React.ButtonHTMLAttributes<HTMLButtonElement>)}>
+    <button className={cls} {...buttonProps}>
       {children}
     </button>
   );
