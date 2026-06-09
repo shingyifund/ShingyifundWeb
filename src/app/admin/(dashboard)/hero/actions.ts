@@ -215,12 +215,37 @@ export async function updateSlide(
   if ("error" in payload) return { ok: false, message: payload.error };
 
   const supabase = await createAdminClient();
+
+  // 取得舊的圖片網址，若新圖片不同則清除舊檔
+  const { data: existing } = await supabase
+    .from("hero_slides")
+    .select("image_url, poster_image_url")
+    .eq("id", id)
+    .maybeSingle();
+
   const { error } = await supabase
     .from("hero_slides")
     .update(payload.data)
     .eq("id", id);
 
   if (error) return { ok: false, message: error.message };
+
+  // 清除被取代的舊圖（只刪 hero-images bucket 裡的檔案）
+  const toDelete: string[] = [];
+  for (const oldUrl of [existing?.image_url, existing?.poster_image_url]) {
+    if (oldUrl?.includes("/storage/v1/object/public/hero-images/")) {
+      const isStillUsed =
+        oldUrl === payload.data.image_url ||
+        oldUrl === payload.data.poster_image_url;
+      if (!isStillUsed) {
+        const path = oldUrl.split("/hero-images/")[1];
+        if (path) toDelete.push(path);
+      }
+    }
+  }
+  if (toDelete.length > 0) {
+    await supabase.storage.from("hero-images").remove(toDelete);
+  }
 
   revalidateHero();
   return { ok: true };

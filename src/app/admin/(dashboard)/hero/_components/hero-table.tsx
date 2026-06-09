@@ -45,7 +45,7 @@ export function HeroTable({ slides }: { slides: HeroSlideRecord[] }) {
             const thumbSrc =
               slide.image_url ??
               (slide.youtube_video_id
-                ? `https://img.youtube.com/vi/${slide.youtube_video_id}/mqdefault.jpg`
+                ? `https://img.youtube.com/vi/${slide.youtube_video_id}/hqdefault.jpg`
                 : null);
 
             return (

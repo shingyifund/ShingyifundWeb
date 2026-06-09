@@ -308,7 +308,7 @@ export function HeroForm({ slide }: { slide?: HeroSlideRecord }) {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="group relative flex aspect-16/10 w-full items-center justify-center overflow-hidden rounded-lg border border-dashed border-border bg-muted text-muted-foreground transition hover:border-amber-400 hover:bg-amber-50"
+              className="group relative flex aspect-video w-full items-center justify-center overflow-hidden rounded-lg border border-dashed border-border bg-muted text-muted-foreground transition hover:border-amber-400 hover:bg-amber-50"
             >
               {previewUrl ? (
                 <img
@@ -357,7 +357,7 @@ export function HeroForm({ slide }: { slide?: HeroSlideRecord }) {
             <button
               type="button"
               onClick={() => posterFileInputRef.current?.click()}
-              className="group relative flex aspect-16/10 w-full items-center justify-center overflow-hidden rounded-lg border border-dashed border-border bg-muted text-muted-foreground transition hover:border-amber-400 hover:bg-amber-50"
+              className="group relative flex aspect-video w-full items-center justify-center overflow-hidden rounded-lg border border-dashed border-border bg-muted text-muted-foreground transition hover:border-amber-400 hover:bg-amber-50"
             >
               {posterPreviewUrl ? (
                 <img
@@ -367,7 +367,7 @@ export function HeroForm({ slide }: { slide?: HeroSlideRecord }) {
                 />
               ) : youtubeVideoId ? (
                 <img
-                  src={`https://img.youtube.com/vi/${youtubeVideoId}/maxresdefault.jpg`}
+                  src={`https://img.youtube.com/vi/${youtubeVideoId}/hqdefault.jpg`}
                   alt=""
                   className="absolute inset-0 size-full object-cover opacity-50"
                 />

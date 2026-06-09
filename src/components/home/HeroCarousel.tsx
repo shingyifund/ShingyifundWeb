@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
-import { ChevronLeft, ChevronRight, Heart, Play } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 import type { HeroSlide } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
@@ -28,56 +28,59 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
   }, [emblaApi, onSelect]);
 
   return (
-    <section className="relative">
+    <section className="pt-4 pb-14 sm:pb-16">
       <h1 className="sr-only">
         財團法人興毅社會福利慈善事業基金會 — 讓愛延續，讓需要被看見
       </h1>
-      <div className="overflow-hidden" ref={emblaRef}>
-        <div className="flex">
-          {slides.map((slide, i) => (
-            <div key={slide.id} className="relative min-w-0 flex-[0_0_100%]">
-              <div className="relative h-[80dvh] max-h-180 min-h-120">
-                {slide.content_type === "image" && (
-                  <ImageSlide slide={slide} priority={i === 0} />
-                )}
-                {slide.content_type === "image_text" && (
-                  <ImageTextSlide slide={slide} priority={i === 0} selected={selected === i} />
-                )}
-                {slide.content_type === "youtube" && (
-                  <YoutubeSlide slide={slide} selected={selected === i} />
-                )}
+
+      {/* 16:9 圖片框，container-x 限制最大寬度 */}
+      <div className="container-x">
+        <div className="overflow-hidden rounded-2xl" ref={emblaRef}>
+          <div className="flex">
+            {slides.map((slide, i) => (
+              <div key={slide.id} className="relative min-w-0 flex-[0_0_100%]">
+                <div className="relative w-full aspect-video">
+                  {slide.content_type === "image" && (
+                    <ImageSlide slide={slide} priority={i === 0} />
+                  )}
+                  {slide.content_type === "image_text" && (
+                    <ImageTextSlide slide={slide} priority={i === 0} selected={selected === i} />
+                  )}
+                  {slide.content_type === "youtube" && (
+                    <YoutubeSlide slide={slide} selected={selected === i} />
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className="container-x pointer-events-none absolute inset-x-0 bottom-16 z-20">
-        <div className="flex items-center justify-between">
-          <div className="pointer-events-auto flex items-center">
-            {slides.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => emblaApi?.scrollTo(i)}
-                aria-label={`切換到第 ${i + 1} 張`}
-                aria-current={selected === i ? "true" : undefined}
-                className="group flex h-11 cursor-pointer items-center justify-center px-1.5"
-              >
-                <span
-                  className={cn(
-                    "h-2 rounded-full transition-all duration-300",
-                    selected === i
-                      ? "w-8 bg-amber-500"
-                      : "w-2 bg-navy-300 group-hover:bg-navy-400",
-                  )}
-                />
-              </button>
-            ))}
-          </div>
-          <div className="pointer-events-auto hidden gap-2 sm:flex">
-            <ArrowBtn dir="prev" onClick={() => emblaApi?.scrollPrev()} />
-            <ArrowBtn dir="next" onClick={() => emblaApi?.scrollNext()} />
-          </div>
+      {/* 控制列：z-10 確保在 FeatureCards 疊卡之上 */}
+      <div className="container-x relative z-10 mt-4 flex items-center justify-between">
+        <div className="flex items-center">
+          {slides.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => emblaApi?.scrollTo(i)}
+              aria-label={`切換到第 ${i + 1} 張`}
+              aria-current={selected === i ? "true" : undefined}
+              className="group flex h-8 cursor-pointer items-center justify-center px-1.5"
+            >
+              <span
+                className={cn(
+                  "h-2 rounded-full transition-all duration-300",
+                  selected === i
+                    ? "w-8 bg-amber-500"
+                    : "w-2 bg-navy-300 group-hover:bg-navy-400",
+                )}
+              />
+            </button>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <ArrowBtn dir="prev" onClick={() => emblaApi?.scrollPrev()} />
+          <ArrowBtn dir="next" onClick={() => emblaApi?.scrollNext()} />
         </div>
       </div>
     </section>
@@ -96,7 +99,7 @@ function ImageSlide({ slide, priority }: { slide: HeroSlide; priority: boolean }
         sizes="100vw"
         className="absolute inset-0 size-full"
       />
-      <div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-cream to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-black/20 to-transparent" />
     </>
   );
 }
@@ -124,7 +127,7 @@ function ImageTextSlide({
       <div className="absolute inset-0 bg-linear-to-r from-cream via-cream/85 to-cream/10 md:to-transparent" />
       <div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-cream to-transparent" />
 
-      <div className="container-x relative flex h-full items-center pb-20">
+      <div className="container-x relative flex h-full items-center pb-8">
         <div
           className={cn(
             "max-w-xl transition-all duration-700",
@@ -132,11 +135,6 @@ function ImageTextSlide({
           )}
           style={{ willChange: "transform, opacity" }}
         >
-          <span className="inline-flex items-center gap-2 rounded-full bg-amber-100 px-4 py-1.5 text-sm font-medium text-amber-700">
-            <Heart className="size-3.5 fill-current text-rose-500" />
-            財團法人興毅社會福利慈善事業基金會
-          </span>
-
           {slide.has_title && slide.title && (
             <p className="mt-5 font-serif text-4xl font-black leading-[1.15] text-navy-900 sm:text-5xl lg:text-6xl">
               <HeroTitle text={slide.title} />
@@ -166,7 +164,7 @@ function YoutubeSlide({ slide, selected }: { slide: HeroSlide; selected: boolean
   const posterSrc =
     slide.poster_image_url ??
     (slide.youtube_video_id
-      ? `https://img.youtube.com/vi/${slide.youtube_video_id}/maxresdefault.jpg`
+      ? `https://img.youtube.com/vi/${slide.youtube_video_id}/hqdefault.jpg`
       : null);
 
   return (
@@ -185,7 +183,6 @@ function YoutubeSlide({ slide, selected }: { slide: HeroSlide; selected: boolean
       <div className="absolute inset-0 bg-black/40" />
       <div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-black/60 to-transparent" />
 
-      {/* 播放按鈕 */}
       {slide.youtube_url && (
         <a
           href={slide.youtube_url}
@@ -200,9 +197,8 @@ function YoutubeSlide({ slide, selected }: { slide: HeroSlide; selected: boolean
         </a>
       )}
 
-      {/* 文字（選填） */}
       {(slide.has_title || slide.has_subtitle) && (
-        <div className="container-x absolute inset-x-0 bottom-20 z-10">
+        <div className="container-x absolute inset-x-0 bottom-12 z-10">
           <div
             className={cn(
               "max-w-xl transition-all duration-700",
@@ -244,12 +240,12 @@ function ArrowBtn({ dir, onClick }: { dir: "prev" | "next"; onClick: () => void 
     <button
       onClick={onClick}
       aria-label={dir === "prev" ? "上一張" : "下一張"}
-      className="inline-flex size-11 cursor-pointer items-center justify-center rounded-full border border-navy-200 bg-white/90 text-navy-700 transition-all hover:bg-white hover:shadow-md"
+      className="inline-flex size-9 cursor-pointer items-center justify-center rounded-full border border-navy-200 bg-white text-navy-700 transition-all hover:bg-navy-50 hover:shadow-md"
     >
       {dir === "prev" ? (
-        <ChevronLeft className="size-5" />
+        <ChevronLeft className="size-4" />
       ) : (
-        <ChevronRight className="size-5" />
+        <ChevronRight className="size-4" />
       )}
     </button>
   );
