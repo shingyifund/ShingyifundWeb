@@ -33,13 +33,13 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
         財團法人興毅社會福利慈善事業基金會 — 讓愛延續，讓需要被看見
       </h1>
 
-      {/* 16:9 圖片框，container-x 限制最大寬度 */}
+      {/* 手機保留 16:9，桌機以 16:7 稍微壓低高度，同一輪播內高度固定避免跳動。 */}
       <div className="container-x">
         <div className="overflow-hidden rounded-2xl" ref={emblaRef}>
           <div className="flex">
             {slides.map((slide, i) => (
               <div key={slide.id} className="relative min-w-0 flex-[0_0_100%]">
-                <div className="relative w-full aspect-video">
+                <div className="relative aspect-video w-full lg:aspect-[16/7]">
                   {slide.content_type === "image" && (
                     <ImageSlide slide={slide} priority={i === 0} />
                   )}
@@ -98,6 +98,7 @@ function ImageSlide({ slide, priority }: { slide: HeroSlide; priority: boolean }
         priority={priority}
         sizes="100vw"
         className="absolute inset-0 size-full"
+        imgClassName="object-contain"
       />
       <div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-black/20 to-transparent" />
     </>
@@ -186,7 +187,7 @@ function YoutubeSlide({ slide, selected }: { slide: HeroSlide; selected: boolean
         />
       )}
       <div className="absolute inset-0 bg-black/35" />
-      <div className="absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-black/75 via-black/30 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-44 bg-linear-to-t from-black/85 via-black/45 to-transparent" />
 
       {slide.youtube_url && (
         <a

@@ -12,7 +12,7 @@ export function HeroStaticSlide({ slide }: { slide: HeroSlide }) {
       </h1>
       <div className="container-x">
         <div className="overflow-hidden rounded-2xl">
-          <div className="relative w-full aspect-video">
+          <div className="relative aspect-video w-full lg:aspect-[16/7]">
             {slide.content_type === "image" && <StaticImageSlide slide={slide} />}
             {slide.content_type === "image_text" && <StaticImageTextSlide slide={slide} />}
             {slide.content_type === "youtube" && <StaticYoutubeSlide slide={slide} />}
@@ -34,6 +34,7 @@ function StaticImageSlide({ slide }: { slide: HeroSlide }) {
         priority
         sizes="100vw"
         className="absolute inset-0 size-full"
+        imgClassName="object-contain"
       />
       <div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-black/20 to-transparent" />
     </>
@@ -106,7 +107,7 @@ function StaticYoutubeSlide({ slide }: { slide: HeroSlide }) {
         />
       )}
       <div className="absolute inset-0 bg-black/35" />
-      <div className="absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-black/75 via-black/30 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-44 bg-linear-to-t from-black/85 via-black/45 to-transparent" />
 
       {slide.youtube_url && (
         <a
