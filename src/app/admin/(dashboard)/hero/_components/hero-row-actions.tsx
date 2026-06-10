@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { ArrowDown, ArrowUp, Edit3, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { moveSlide, toggleSlideActive } from "../actions";
 import { DeleteSlideDialog } from "./delete-slide-dialog";
@@ -42,10 +43,12 @@ export function HeroRowActions({
   return (
     <div className="flex items-center justify-end gap-2">
       {isPending && <Loader2 className="size-4 animate-spin text-muted-foreground" />}
-      <label className="flex cursor-pointer items-center gap-1.5 text-xs text-muted-foreground select-none">
-        <Switch checked={localActive} onCheckedChange={toggle} aria-label="切換顯示狀態" />
-        {localActive ? "顯示" : "停用"}
-      </label>
+      <div className="flex items-center gap-1.5 select-none">
+        <Switch id={`switch-${id}`} checked={localActive} onCheckedChange={toggle} />
+        <Label htmlFor={`switch-${id}`} className="cursor-pointer text-xs text-muted-foreground">
+          {localActive ? "顯示" : "停用"}
+        </Label>
+      </div>
       <Button
         type="button"
         variant="ghost"

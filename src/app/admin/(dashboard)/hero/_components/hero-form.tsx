@@ -1,13 +1,17 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { ImagePlus, Loader2, Save, X } from "lucide-react";
+import { Loader2, Save, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { FileUploadField } from "./file-upload-field";
 import {
   createSlide,
   type HeroSlideRecord,
@@ -38,8 +42,6 @@ function parseYouTubeId(url: string): string | null {
 
 export function HeroForm({ slide }: { slide?: HeroSlideRecord }) {
   const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const posterFileInputRef = useRef<HTMLInputElement>(null);
   const isEdit = Boolean(slide);
 
   const [contentType, setContentType] = useState<ContentType>(
@@ -134,22 +136,20 @@ export function HeroForm({ slide }: { slide?: HeroSlideRecord }) {
         {/* Hero 型態 */}
         <div className="space-y-2">
           <Label>Hero 型態</Label>
-          <div className="grid grid-cols-3 gap-2">
+          <ToggleGroup
+            type="single"
+            value={contentType}
+            onValueChange={(v) => { if (v) setContentType(v as ContentType); }}
+            spacing={0}
+            variant="outline"
+            className="w-full"
+          >
             {(["image", "image_text", "youtube"] as ContentType[]).map((type) => (
-              <button
-                key={type}
-                type="button"
-                onClick={() => setContentType(type)}
-                className={`rounded-lg border px-3 py-2.5 text-center text-sm transition ${
-                  contentType === type
-                    ? "border-navy-700 bg-navy-50 font-medium text-navy-900"
-                    : "border-border bg-white text-muted-foreground hover:bg-muted"
-                }`}
-              >
+              <ToggleGroupItem key={type} value={type} className="flex-1 text-sm">
                 {TYPE_LABELS[type]}
-              </button>
+              </ToggleGroupItem>
             ))}
-          </div>
+          </ToggleGroup>
         </div>
 
         {/* YouTube 網址 */}
@@ -177,8 +177,13 @@ export function HeroForm({ slide }: { slide?: HeroSlideRecord }) {
         {showTextFields && (
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label>主標題</Label>
-              <Switch checked={hasTitle} onCheckedChange={setHasTitle} />
+              <Label htmlFor="has_title">主標題</Label>
+              <div className="flex items-center gap-1.5">
+                <Label htmlFor="has_title" className="cursor-pointer text-xs text-muted-foreground">
+                  {hasTitle ? "顯示" : "隱藏"}
+                </Label>
+                <Switch id="has_title" checked={hasTitle} onCheckedChange={setHasTitle} />
+              </div>
             </div>
             {hasTitle && (
               <Input
@@ -194,8 +199,13 @@ export function HeroForm({ slide }: { slide?: HeroSlideRecord }) {
         {showTextFields && (
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label>副標題</Label>
-              <Switch checked={hasSubtitle} onCheckedChange={setHasSubtitle} />
+              <Label htmlFor="has_subtitle">副標題</Label>
+              <div className="flex items-center gap-1.5">
+                <Label htmlFor="has_subtitle" className="cursor-pointer text-xs text-muted-foreground">
+                  {hasSubtitle ? "顯示" : "隱藏"}
+                </Label>
+                <Switch id="has_subtitle" checked={hasSubtitle} onCheckedChange={setHasSubtitle} />
+              </div>
             </div>
             {hasSubtitle && (
               <Textarea
@@ -212,8 +222,13 @@ export function HeroForm({ slide }: { slide?: HeroSlideRecord }) {
         {contentType === "image_text" && (
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label>CTA 按鈕</Label>
-              <Switch checked={hasCta} onCheckedChange={setHasCta} />
+              <Label htmlFor="has_cta">CTA 按鈕</Label>
+              <div className="flex items-center gap-1.5">
+                <Label htmlFor="has_cta" className="cursor-pointer text-xs text-muted-foreground">
+                  {hasCta ? "顯示" : "隱藏"}
+                </Label>
+                <Switch id="has_cta" checked={hasCta} onCheckedChange={setHasCta} />
+              </div>
             </div>
             {hasCta && (
               <div className="grid gap-3 sm:grid-cols-2">
@@ -244,24 +259,30 @@ export function HeroForm({ slide }: { slide?: HeroSlideRecord }) {
         {contentType === "image_text" && (
           <div className="space-y-2">
             <Label>視覺色調</Label>
-            <div className="grid grid-cols-2 gap-2">
+            <RadioGroup
+              value={tone}
+              onValueChange={(v) => setTone(v as "navy" | "amber")}
+              className="grid grid-cols-2 gap-2"
+            >
               {(["navy", "amber"] as const).map((t) => (
-                <button
-                  key={t}
-                  type="button"
-                  onClick={() => setTone(t)}
-                  className={`rounded-lg border px-3 py-3 text-left text-sm transition ${
-                    tone === t
-                      ? t === "navy"
-                        ? "border-navy-700 bg-navy-50 text-navy-900"
-                        : "border-amber-500 bg-amber-50 text-amber-800"
-                      : "border-border bg-white text-muted-foreground hover:bg-muted"
-                  }`}
-                >
-                  {t === "navy" ? "深藍" : "琥珀"}
-                </button>
+                <div key={t}>
+                  <RadioGroupItem value={t} id={`tone-${t}`} className="sr-only" />
+                  <Label
+                    htmlFor={`tone-${t}`}
+                    className={cn(
+                      "flex cursor-pointer rounded-lg border px-3 py-3 text-sm transition",
+                      tone === t
+                        ? t === "navy"
+                          ? "border-navy-700 bg-navy-50 font-medium text-navy-900"
+                          : "border-amber-500 bg-amber-50 font-medium text-amber-800"
+                        : "border-border bg-white font-normal text-muted-foreground hover:bg-muted",
+                    )}
+                  >
+                    {t === "navy" ? "深藍" : "琥珀"}
+                  </Label>
+                </div>
               ))}
-            </div>
+            </RadioGroup>
           </div>
         )}
 
@@ -301,106 +322,37 @@ export function HeroForm({ slide }: { slide?: HeroSlideRecord }) {
 
       {/* 側欄 */}
       <aside className="space-y-4">
-        {/* 圖片上傳（image + image_text） */}
         {showImageUpload && (
           <div className="space-y-3">
             <Label>Hero 圖片</Label>
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="group relative flex aspect-video w-full items-center justify-center overflow-hidden rounded-lg border border-dashed border-border bg-muted text-muted-foreground transition hover:border-amber-400 hover:bg-amber-50"
-            >
-              {previewUrl ? (
-                <img
-                  src={previewUrl}
-                  alt=""
-                  className="absolute inset-0 size-full object-cover"
-                />
-              ) : (
-                <span className="flex flex-col items-center gap-2 text-sm">
-                  <ImagePlus className="size-7" />
-                  上傳圖片
-                </span>
-              )}
-              {uploading && (
-                <span className="absolute inset-0 flex items-center justify-center bg-white/75 text-sm">
-                  <Loader2 className="mr-2 size-4 animate-spin" />
-                  上傳中
-                </span>
-              )}
-            </button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) void handleUpload(f, "image");
-              }}
-            />
-            <Input
-              value={imageUrl}
-              onChange={(e) => {
-                setImageUrl(e.target.value);
-                setPreviewUrl(e.target.value);
-              }}
-              placeholder="或直接輸入圖片網址"
+            <FileUploadField
+              previewUrl={previewUrl}
+              urlValue={imageUrl}
+              uploading={uploading}
+              onFileSelect={(f) => handleUpload(f, "image")}
+              onUrlChange={(url) => { setImageUrl(url); setPreviewUrl(url); }}
+              emptyLabel="上傳圖片"
+              urlPlaceholder="或直接輸入圖片網址"
             />
           </div>
         )}
 
-        {/* 封面圖（youtube） */}
         {contentType === "youtube" && (
           <div className="space-y-3">
             <Label>封面圖（選填）</Label>
-            <button
-              type="button"
-              onClick={() => posterFileInputRef.current?.click()}
-              className="group relative flex aspect-video w-full items-center justify-center overflow-hidden rounded-lg border border-dashed border-border bg-muted text-muted-foreground transition hover:border-amber-400 hover:bg-amber-50"
-            >
-              {posterPreviewUrl ? (
-                <img
-                  src={posterPreviewUrl}
-                  alt=""
-                  className="absolute inset-0 size-full object-cover"
-                />
-              ) : youtubeVideoId ? (
-                <img
-                  src={`https://img.youtube.com/vi/${youtubeVideoId}/hqdefault.jpg`}
-                  alt=""
-                  className="absolute inset-0 size-full object-cover opacity-50"
-                />
-              ) : (
-                <span className="flex flex-col items-center gap-2 text-sm">
-                  <ImagePlus className="size-7" />
-                  封面圖（選填）
-                </span>
-              )}
-              {uploading && (
-                <span className="absolute inset-0 flex items-center justify-center bg-white/75 text-sm">
-                  <Loader2 className="mr-2 size-4 animate-spin" />
-                  上傳中
-                </span>
-              )}
-            </button>
-            <input
-              ref={posterFileInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) void handleUpload(f, "poster");
-              }}
-            />
-            <Input
-              value={posterImageUrl}
-              onChange={(e) => {
-                setPosterImageUrl(e.target.value);
-                setPosterPreviewUrl(e.target.value);
-              }}
-              placeholder="或直接輸入封面圖網址"
+            <FileUploadField
+              previewUrl={posterPreviewUrl}
+              urlValue={posterImageUrl}
+              uploading={uploading}
+              onFileSelect={(f) => handleUpload(f, "poster")}
+              onUrlChange={(url) => { setPosterImageUrl(url); setPosterPreviewUrl(url); }}
+              emptyLabel="封面圖（選填）"
+              urlPlaceholder="或直接輸入封面圖網址"
+              fallbackSrc={
+                youtubeVideoId
+                  ? `https://img.youtube.com/vi/${youtubeVideoId}/hqdefault.jpg`
+                  : undefined
+              }
             />
           </div>
         )}
