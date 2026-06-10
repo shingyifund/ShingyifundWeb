@@ -58,7 +58,7 @@ function StaticImageTextSlide({ slide }: { slide: HeroSlide }) {
       <div className="container-x relative flex h-full items-center pb-8">
         <div className="max-w-xl">
           {slide.has_title && slide.title && (
-            <p className="mt-5 font-serif text-4xl font-black leading-[1.15] text-navy-900 sm:text-5xl lg:text-6xl">
+            <p className="mt-5 line-clamp-2 max-w-[min(34rem,calc(100vw-3rem))] font-serif text-3xl font-black leading-[1.15] text-navy-900 sm:text-4xl lg:text-5xl">
               <HeroTitle text={slide.title} />
             </p>
           )}
@@ -100,8 +100,8 @@ function StaticYoutubeSlide({ slide }: { slide: HeroSlide }) {
           className="absolute inset-0 size-full"
         />
       )}
-      <div className="absolute inset-0 bg-black/40" />
-      <div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-black/60 to-transparent" />
+      <div className="absolute inset-0 bg-black/35" />
+      <div className="absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-black/75 via-black/30 to-transparent" />
 
       {slide.youtube_url && (
         <a
@@ -111,22 +111,22 @@ function StaticYoutubeSlide({ slide }: { slide: HeroSlide }) {
           className="absolute inset-0 flex items-center justify-center"
           aria-label="在 YouTube 觀看影片"
         >
-          <span className="flex size-20 items-center justify-center rounded-full bg-white/90 text-red-600 shadow-lg transition hover:scale-105 hover:bg-white">
-            <Play className="size-8 translate-x-0.5 fill-current" />
+          <span className="flex size-14 items-center justify-center rounded-full bg-white/90 text-red-600 shadow-lg transition hover:scale-105 hover:bg-white sm:size-16">
+            <Play className="size-6 translate-x-0.5 fill-current sm:size-7" />
           </span>
         </a>
       )}
 
       {(slide.has_title || slide.has_subtitle) && (
-        <div className="container-x absolute inset-x-0 bottom-12 z-10">
-          <div className="max-w-xl">
+        <div className="container-x absolute inset-x-0 bottom-5 z-10 sm:bottom-8">
+          <div className="max-w-[min(30rem,calc(100vw-3rem))]">
             {slide.has_title && slide.title && (
-              <p className="font-serif text-3xl font-black leading-tight text-white drop-shadow-lg sm:text-4xl lg:text-5xl">
+              <p className="line-clamp-2 font-serif text-xl font-black leading-tight text-white drop-shadow-lg sm:text-2xl lg:text-3xl">
                 {slide.title}
               </p>
             )}
             {slide.has_subtitle && slide.subtitle && (
-              <p className="mt-3 max-w-md text-base leading-relaxed text-white/90 drop-shadow sm:text-lg">
+              <p className="mt-2 line-clamp-1 max-w-md text-sm leading-relaxed text-white/90 drop-shadow sm:text-base">
                 {slide.subtitle}
               </p>
             )}
