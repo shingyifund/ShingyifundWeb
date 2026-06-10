@@ -5,7 +5,7 @@
  * Phase 2（當前）：hero_slides 由 Supabase 提供，其餘仍用 mock。
  */
 import { createClient } from "@/lib/supabase/server";
-import type { HeroSlide } from "@/lib/types";
+import type { HeroSlide, ImpactStat } from "@/lib/types";
 import {
   facebookPosts,
   featuredVideo,
@@ -53,8 +53,27 @@ export async function getServiceFeatures() {
   return serviceFeatures;
 }
 
-export async function getImpactStats() {
-  return impactStats;
+export async function getImpactStats(): Promise<ImpactStat[]> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("impact_stats")
+      .select("id, icon, top_label, value, suffix, bottom_label")
+      .order("sort_order");
+
+    if (error || !data) throw error;
+
+    return data.map((row) => ({
+      id: row.id,
+      icon: row.icon as ImpactStat["icon"],
+      topLabel: row.top_label,
+      value: row.value,
+      suffix: row.suffix,
+      bottomLabel: row.bottom_label,
+    }));
+  } catch {
+    return impactStats;
+  }
 }
 
 export async function getFacebookPosts() {

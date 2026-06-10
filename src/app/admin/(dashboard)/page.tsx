@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ImageIcon, ArrowRight } from "lucide-react";
+import { ImageIcon, BarChart3, ArrowRight } from "lucide-react";
 
 const modules = [
   {
@@ -8,6 +8,12 @@ const modules = [
     description: "維護首頁主視覺圖片、標題、按鈕連結、顯示狀態與排序。",
     href: "/admin/hero",
     icon: ImageIcon,
+  },
+  {
+    title: "服務成效",
+    description: "維護首頁「我們的服務成效」區塊的五項指標數字與標籤。",
+    href: "/admin/stats",
+    icon: BarChart3,
   },
 ];
 
