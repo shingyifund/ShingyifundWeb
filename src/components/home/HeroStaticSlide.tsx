@@ -58,18 +58,23 @@ function StaticImageTextSlide({ slide }: { slide: HeroSlide }) {
       <div className="container-x relative flex h-full items-center pb-8">
         <div className="max-w-xl">
           {slide.has_title && slide.title && (
-            <p className="mt-5 line-clamp-2 max-w-[min(34rem,calc(100vw-3rem))] font-serif text-3xl font-black leading-[1.15] text-navy-900 sm:text-4xl lg:text-5xl">
+            <p className="mt-4 line-clamp-2 max-w-[min(34rem,calc(100vw-3rem))] font-serif text-2xl font-black leading-[1.15] text-navy-900 sm:mt-5 sm:text-3xl lg:text-5xl">
               <HeroTitle text={slide.title} />
             </p>
           )}
           {slide.has_subtitle && slide.subtitle && (
-            <p className="mt-5 max-w-md text-base leading-relaxed text-ink-soft sm:text-lg">
+            <p className="mt-3 max-w-md text-base leading-relaxed text-ink-soft sm:mt-5 sm:text-lg">
               {slide.subtitle}
             </p>
           )}
           {slide.has_cta && slide.cta_href && (
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Button href={slide.cta_href} size="lg" variant="white">
+            <div className="mt-5 flex flex-wrap items-center gap-3 sm:mt-8">
+              <Button
+                href={slide.cta_href}
+                size="md"
+                variant="white"
+                className="h-11 px-6 text-base sm:h-12 sm:px-8"
+              >
                 {slide.cta_label ?? "了解服務"}
               </Button>
             </div>
