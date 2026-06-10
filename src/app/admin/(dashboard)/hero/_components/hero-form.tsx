@@ -193,20 +193,26 @@ export function HeroForm({ slide }: { slide?: HeroSlideRecord }) {
         {/* Hero 型態 */}
         <div className="space-y-2">
           <Label>Hero 型態</Label>
-          <ToggleGroup
-            type="single"
-            value={contentType}
-            onValueChange={(v) => { if (v) setContentType(v as ContentType); }}
-            spacing={0}
-            variant="outline"
-            className="w-full"
-          >
-            {(["image", "image_text", "youtube"] as ContentType[]).map((type) => (
-              <ToggleGroupItem key={type} value={type} className="flex-1 text-sm">
-                {TYPE_LABELS[type]}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
+          {isEdit ? (
+            <div className="inline-flex items-center rounded-md border bg-muted px-3 py-2 text-sm text-muted-foreground">
+              {TYPE_LABELS[contentType]}
+            </div>
+          ) : (
+            <ToggleGroup
+              type="single"
+              value={contentType}
+              onValueChange={(v) => { if (v) setContentType(v as ContentType); }}
+              spacing={0}
+              variant="outline"
+              className="w-full"
+            >
+              {(["image", "image_text", "youtube"] as ContentType[]).map((type) => (
+                <ToggleGroupItem key={type} value={type} className="flex-1 text-sm">
+                  {TYPE_LABELS[type]}
+                </ToggleGroupItem>
+              ))}
+            </ToggleGroup>
+          )}
         </div>
 
         {/* YouTube 網址 */}

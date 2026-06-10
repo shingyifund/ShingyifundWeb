@@ -130,19 +130,30 @@ function ImageTextSlide({
   priority: boolean;
   selected: boolean;
 }) {
+  const isNavy = slide.tone === "navy";
+
   return (
     <>
       <ImagePlaceholder
         src={slide.image_url}
         alt={slide.title ?? ""}
-        tone={slide.tone === "amber" ? "navy" : "mist"}
+        tone={isNavy ? "navy" : "mist"}
         label="主視覺圖片"
         priority={priority}
         sizes="100vw"
         className="absolute inset-0 size-full"
       />
-      <div className="absolute inset-0 bg-linear-to-r from-cream via-cream/85 to-cream/10 md:to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-cream to-transparent" />
+      {isNavy ? (
+        <>
+          <div className="absolute inset-0 bg-linear-to-r from-navy-950 via-navy-950/85 to-navy-950/10 md:to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-navy-950 to-transparent" />
+        </>
+      ) : (
+        <>
+          <div className="absolute inset-0 bg-linear-to-r from-cream via-cream/85 to-cream/10 md:to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-cream to-transparent" />
+        </>
+      )}
 
       <div className="container-x relative flex h-full items-center pb-8">
         <div
@@ -153,13 +164,23 @@ function ImageTextSlide({
           style={{ willChange: "transform, opacity" }}
         >
           {slide.has_title && slide.title && (
-            <p className="mt-4 line-clamp-2 max-w-[min(34rem,calc(100vw-3rem))] font-serif text-2xl font-black leading-[1.15] text-navy-900 sm:mt-5 sm:text-3xl lg:text-5xl">
+            <p
+              className={cn(
+                "mt-4 line-clamp-2 max-w-[min(34rem,calc(100vw-3rem))] font-serif text-2xl font-black leading-[1.15] sm:mt-5 sm:text-3xl lg:text-5xl",
+                isNavy ? "text-white" : "text-navy-900",
+              )}
+            >
               <HeroTitle text={slide.title} />
             </p>
           )}
 
           {slide.has_subtitle && slide.subtitle && (
-            <p className="mt-3 max-w-md text-base leading-relaxed text-ink-soft sm:mt-5 sm:text-lg">
+            <p
+              className={cn(
+                "mt-3 max-w-md text-base leading-relaxed sm:mt-5 sm:text-lg",
+                isNavy ? "text-cream/90" : "text-ink-soft",
+              )}
+            >
               {slide.subtitle}
             </p>
           )}
@@ -203,7 +224,7 @@ function YoutubeSlide({ slide, selected }: { slide: HeroSlide; selected: boolean
         />
       )}
       <div className="absolute inset-0 bg-black/35" />
-      <div className="absolute inset-x-0 bottom-0 h-44 bg-linear-to-t from-black/85 via-black/45 to-transparent" />
+      <div className="absolute inset-x-0 top-0 h-44 bg-linear-to-b from-black/85 via-black/45 to-transparent" />
 
       {slide.youtube_url && (
         <a
@@ -220,7 +241,7 @@ function YoutubeSlide({ slide, selected }: { slide: HeroSlide; selected: boolean
       )}
 
       {(slide.has_title || slide.has_subtitle) && (
-        <div className="container-x absolute inset-x-0 bottom-5 z-10 sm:bottom-8">
+        <div className="container-x pointer-events-none absolute inset-x-0 top-5 z-10 sm:top-8">
           <div
             className={cn(
               "max-w-[min(30rem,calc(100vw-3rem))] transition-all duration-700",
