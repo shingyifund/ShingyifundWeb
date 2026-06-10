@@ -24,9 +24,6 @@ export default async function EditSlidePage({
       <section className="rounded-lg border bg-white p-6">
         <div className="mb-6">
           <p className="text-sm font-medium text-muted-foreground">編輯 slide</p>
-          <h1 className="mt-1 text-2xl font-semibold text-foreground">
-            {slide.title}
-          </h1>
         </div>
         <HeroForm slide={slide} />
       </section>

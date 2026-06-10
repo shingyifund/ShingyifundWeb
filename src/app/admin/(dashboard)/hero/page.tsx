@@ -11,9 +11,8 @@ export default async function HeroAdminPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-sm font-medium text-muted-foreground">Hero 輪播</p>
           <h1 className="mt-1 text-3xl font-semibold text-foreground">
-            首頁主視覺管理
+            Hero輪播
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
             共 {slides.length} 張 slide，{activeCount} 張正在首頁顯示。

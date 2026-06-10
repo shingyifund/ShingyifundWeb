@@ -312,17 +312,21 @@ export async function moveSlide(
     return { ok: true };
   }
 
-  const reordered = [...slides];
-  const [item] = reordered.splice(index, 1);
-  reordered.splice(targetIndex, 0, item);
+  const current = slides[index];
+  const target = slides[targetIndex];
 
-  const { error } = await supabase
-    .from("hero_slides")
-    .upsert(
-      reordered.map((slide, i) => ({ id: slide.id, sort_order: i })),
-      { onConflict: "id" },
-    );
+  const [currentResult, targetResult] = await Promise.all([
+    supabase
+      .from("hero_slides")
+      .update({ sort_order: target.sort_order })
+      .eq("id", current.id),
+    supabase
+      .from("hero_slides")
+      .update({ sort_order: current.sort_order })
+      .eq("id", target.id),
+  ]);
 
+  const error = currentResult.error ?? targetResult.error;
   if (error) return { ok: false, message: error.message };
 
   revalidateHero();

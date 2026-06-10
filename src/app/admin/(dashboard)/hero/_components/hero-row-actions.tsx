@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { ArrowDown, ArrowUp, Edit3, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Label } from "@/components/ui/label";
@@ -24,19 +25,30 @@ export function HeroRowActions({
   isFirst: boolean;
   isLast: boolean;
 }) {
+  const router = useRouter();
   const [localActive, setLocalActive] = useState(isActive);
   const [isPending, startTransition] = useTransition();
 
   function toggle(nextValue: boolean) {
     setLocalActive(nextValue);
     startTransition(async () => {
-      await toggleSlideActive(id, nextValue);
+      const result = await toggleSlideActive(id, nextValue);
+      if (!result.ok) {
+        setLocalActive(isActive);
+        return;
+      }
+      router.refresh();
     });
   }
 
   function move(direction: "up" | "down") {
     startTransition(async () => {
-      await moveSlide(id, direction);
+      const result = await moveSlide(id, direction);
+      if (!result.ok) {
+        console.error(result.message ?? "Move slide failed");
+        return;
+      }
+      router.refresh();
     });
   }
 
