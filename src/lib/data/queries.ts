@@ -20,7 +20,7 @@ export async function getHeroSlides(): Promise<HeroSlide[]> {
     const { data, error } = await supabase
       .from("hero_slides")
       .select(
-        "id, content_type, has_title, title, has_subtitle, subtitle, image_url, poster_image_url, youtube_url, youtube_video_id, has_cta, cta_label, cta_href, tone",
+        "id, content_type, has_title, title, has_subtitle, subtitle, image_url, poster_image_url, youtube_url, youtube_video_id, has_cta, cta_label, cta_href, link_url, tone",
       )
       .eq("is_active", true)
       .order("sort_order");
@@ -41,6 +41,7 @@ export async function getHeroSlides(): Promise<HeroSlide[]> {
       has_cta: row.has_cta,
       cta_label: row.cta_label,
       cta_href: row.cta_href,
+      link_url: row.link_url,
       tone: row.tone as "navy" | "amber",
     }));
   } catch {

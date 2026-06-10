@@ -27,6 +27,7 @@ export const heroSlides: HeroSlide[] = [
     has_cta: true,
     cta_label: "了解服務",
     cta_href: "/services",
+    link_url: null,
     tone: "amber",
   },
   {
@@ -43,6 +44,7 @@ export const heroSlides: HeroSlide[] = [
     has_cta: true,
     cta_label: "了解食物銀行",
     cta_href: "/foodbank",
+    link_url: null,
     tone: "navy",
   },
   {
@@ -59,6 +61,7 @@ export const heroSlides: HeroSlide[] = [
     has_cta: true,
     cta_label: "認識興毅服務",
     cta_href: "/services",
+    link_url: null,
     tone: "amber",
   },
 ];

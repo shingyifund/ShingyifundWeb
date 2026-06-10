@@ -16,7 +16,6 @@ import {
   createSlide,
   type HeroSlideRecord,
   updateSlide,
-  uploadHeroImage,
 } from "../actions";
 
 type ContentType = "image" | "image_text" | "youtube";
@@ -26,6 +25,11 @@ const TYPE_LABELS: Record<ContentType, string> = {
   image_text: "圖片加文字",
   youtube: "YouTube 影片",
 };
+
+const MAX_UPLOAD_WIDTH = 1600;
+const MAX_UPLOAD_HEIGHT = 900;
+const UPLOAD_QUALITY = 0.72;
+const MAX_ACTION_FILE_BYTES = 900 * 1024;
 
 function parseYouTubeId(url: string): string | null {
   try {
@@ -40,6 +44,45 @@ function parseYouTubeId(url: string): string | null {
   }
 }
 
+function canvasToBlob(
+  canvas: HTMLCanvasElement,
+  type: string,
+  quality: number,
+) {
+  return new Promise<Blob | null>((resolve) => {
+    canvas.toBlob(resolve, type, quality);
+  });
+}
+
+async function resizeImageForUpload(file: File) {
+  const image = await createImageBitmap(file);
+  const scale = Math.min(
+    1,
+    MAX_UPLOAD_WIDTH / image.width,
+    MAX_UPLOAD_HEIGHT / image.height,
+  );
+  const width = Math.max(1, Math.round(image.width * scale));
+  const height = Math.max(1, Math.round(image.height * scale));
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+
+  if (!ctx) {
+    image.close();
+    return file;
+  }
+
+  ctx.drawImage(image, 0, 0, width, height);
+  image.close();
+
+  const blob = await canvasToBlob(canvas, "image/webp", UPLOAD_QUALITY);
+  if (!blob || blob.size >= file.size) return file;
+
+  const filename = file.name.replace(/\.[^.]+$/, "") || "hero-image";
+  return new File([blob], `${filename}.webp`, { type: "image/webp" });
+}
+
 export function HeroForm({ slide }: { slide?: HeroSlideRecord }) {
   const router = useRouter();
   const isEdit = Boolean(slide);
@@ -49,8 +92,11 @@ export function HeroForm({ slide }: { slide?: HeroSlideRecord }) {
   );
   const [imageUrl, setImageUrl] = useState(slide?.image_url ?? "");
   const [previewUrl, setPreviewUrl] = useState(slide?.image_url ?? "");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [linkUrl, setLinkUrl] = useState(slide?.link_url ?? "");
   const [posterImageUrl, setPosterImageUrl] = useState(slide?.poster_image_url ?? "");
   const [posterPreviewUrl, setPosterPreviewUrl] = useState(slide?.poster_image_url ?? "");
+  const [posterFile, setPosterFile] = useState<File | null>(null);
   const [youtubeUrl, setYoutubeUrl] = useState(slide?.youtube_url ?? "");
   const [youtubeVideoId, setYoutubeVideoId] = useState(slide?.youtube_video_id ?? "");
   const [hasTitle, setHasTitle] = useState(slide?.has_title ?? false);
@@ -59,7 +105,7 @@ export function HeroForm({ slide }: { slide?: HeroSlideRecord }) {
   const [tone, setTone] = useState<"navy" | "amber">(slide?.tone ?? "navy");
   const [isActive, setIsActive] = useState(slide?.is_active ?? true);
   const [message, setMessage] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
+  const [processingImage, setProcessingImage] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   function handleYoutubeUrlChange(url: string) {
@@ -67,31 +113,37 @@ export function HeroForm({ slide }: { slide?: HeroSlideRecord }) {
     setYoutubeVideoId(parseYouTubeId(url) ?? "");
   }
 
-  async function handleUpload(file: File, target: "image" | "poster") {
+  async function handleFileSelect(file: File, target: "image" | "poster") {
     setMessage(null);
-    setUploading(true);
-    const blob = URL.createObjectURL(file);
-    if (target === "image") setPreviewUrl(blob);
-    else setPosterPreviewUrl(blob);
+    setProcessingImage(true);
 
-    const fd = new FormData();
-    fd.append("file", file);
-    const result = await uploadHeroImage(fd);
+    try {
+      const uploadFile = await resizeImageForUpload(file);
 
-    if (result.ok) {
-      if (target === "image") {
-        setImageUrl(result.url);
-        setPreviewUrl(result.url);
-      } else {
-        setPosterImageUrl(result.url);
-        setPosterPreviewUrl(result.url);
+      if (uploadFile.size > MAX_ACTION_FILE_BYTES) {
+        setMessage("圖片壓縮後仍超過 900KB，請換較小圖片。");
+        return;
       }
-    } else {
-      setMessage(result.message);
+
+      const blob = URL.createObjectURL(uploadFile);
+      if (target === "image") {
+        if (previewUrl.startsWith("blob:")) URL.revokeObjectURL(previewUrl);
+        setImageFile(uploadFile);
+        setImageUrl("");
+        setPreviewUrl(blob);
+      } else {
+        if (posterPreviewUrl.startsWith("blob:")) URL.revokeObjectURL(posterPreviewUrl);
+        setPosterFile(uploadFile);
+        setPosterImageUrl("");
+        setPosterPreviewUrl(blob);
+      }
+    } catch {
+      setMessage("圖片壓縮失敗，請換一張圖片或直接輸入圖片網址");
       if (target === "image") setPreviewUrl(slide?.image_url ?? "");
       else setPosterPreviewUrl(slide?.poster_image_url ?? "");
+    } finally {
+      setProcessingImage(false);
     }
-    setUploading(false);
   }
 
   function handleSubmit(formData: FormData) {
@@ -103,7 +155,12 @@ export function HeroForm({ slide }: { slide?: HeroSlideRecord }) {
 
     formData.set("content_type", contentType);
     formData.set("image_url", imageUrl);
+    formData.set("link_url", linkUrl);
     formData.set("poster_image_url", posterImageUrl);
+    if (showImageUpload && imageFile) formData.set("image_file", imageFile);
+    if (contentType === "youtube" && posterFile) {
+      formData.set("poster_file", posterFile);
+    }
     formData.set("youtube_url", youtubeUrl);
     formData.set("youtube_video_id", youtubeVideoId);
     formData.set("has_title", String(hasTitle));
@@ -304,7 +361,7 @@ export function HeroForm({ slide }: { slide?: HeroSlideRecord }) {
         )}
 
         <div className="flex flex-wrap gap-2">
-          <Button type="submit" disabled={isPending || uploading}>
+          <Button type="submit" disabled={isPending || processingImage}>
             {isPending ? <Loader2 className="size-4 animate-spin" /> : <Save />}
             {isEdit ? "儲存變更" : "建立 slide"}
           </Button>
@@ -328,12 +385,30 @@ export function HeroForm({ slide }: { slide?: HeroSlideRecord }) {
             <FileUploadField
               previewUrl={previewUrl}
               urlValue={imageUrl}
-              uploading={uploading}
-              onFileSelect={(f) => handleUpload(f, "image")}
-              onUrlChange={(url) => { setImageUrl(url); setPreviewUrl(url); }}
+              uploading={processingImage}
+              onFileSelect={(f) => handleFileSelect(f, "image")}
+              onUrlChange={(url) => {
+                if (previewUrl.startsWith("blob:")) URL.revokeObjectURL(previewUrl);
+                setImageFile(null);
+                setImageUrl(url);
+                setPreviewUrl(url);
+              }}
               emptyLabel="上傳圖片"
               urlPlaceholder="或直接輸入圖片網址"
+              showUrlInput={!isEdit}
             />
+            {contentType === "image" && (
+              <div className="space-y-1.5">
+                <Label htmlFor="link_url">點擊連結（選填）</Label>
+                <Input
+                  id="link_url"
+                  value={linkUrl}
+                  onChange={(e) => setLinkUrl(e.target.value)}
+                  placeholder="https://..."
+                />
+                <p className="text-xs text-muted-foreground">填入後點擊圖片會開新視窗前往此連結</p>
+              </div>
+            )}
           </div>
         )}
 
@@ -343,11 +418,17 @@ export function HeroForm({ slide }: { slide?: HeroSlideRecord }) {
             <FileUploadField
               previewUrl={posterPreviewUrl}
               urlValue={posterImageUrl}
-              uploading={uploading}
-              onFileSelect={(f) => handleUpload(f, "poster")}
-              onUrlChange={(url) => { setPosterImageUrl(url); setPosterPreviewUrl(url); }}
+              uploading={processingImage}
+              onFileSelect={(f) => handleFileSelect(f, "poster")}
+              onUrlChange={(url) => {
+                if (posterPreviewUrl.startsWith("blob:")) URL.revokeObjectURL(posterPreviewUrl);
+                setPosterFile(null);
+                setPosterImageUrl(url);
+                setPosterPreviewUrl(url);
+              }}
               emptyLabel="封面圖（選填）"
               urlPlaceholder="或直接輸入封面圖網址"
+              showUrlInput={!isEdit}
               fallbackSrc={
                 youtubeVideoId
                   ? `https://img.youtube.com/vi/${youtubeVideoId}/hqdefault.jpg`

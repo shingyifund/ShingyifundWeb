@@ -88,7 +88,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
 }
 
 function ImageSlide({ slide, priority }: { slide: HeroSlide; priority: boolean }) {
-  return (
+  const inner = (
     <>
       <ImagePlaceholder
         src={slide.image_url}
@@ -103,6 +103,22 @@ function ImageSlide({ slide, priority }: { slide: HeroSlide; priority: boolean }
       <div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-black/20 to-transparent" />
     </>
   );
+
+  if (slide.link_url) {
+    return (
+      <a
+        href={slide.link_url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="absolute inset-0"
+        aria-label="查看詳情"
+      >
+        {inner}
+      </a>
+    );
+  }
+
+  return <>{inner}</>;
 }
 
 function ImageTextSlide({

@@ -14,6 +14,7 @@ type Props = {
   emptyLabel?: string;
   urlPlaceholder?: string;
   fallbackSrc?: string;
+  showUrlInput?: boolean;
 };
 
 export function FileUploadField({
@@ -25,6 +26,7 @@ export function FileUploadField({
   emptyLabel = "上傳圖片",
   urlPlaceholder = "或直接輸入圖片網址",
   fallbackSrc,
+  showUrlInput = true,
 }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -66,11 +68,13 @@ export function FileUploadField({
         }}
       />
 
-      <Input
-        value={urlValue}
-        onChange={(e) => onUrlChange(e.target.value)}
-        placeholder={urlPlaceholder}
-      />
+      {showUrlInput && (
+        <Input
+          value={urlValue}
+          onChange={(e) => onUrlChange(e.target.value)}
+          placeholder={urlPlaceholder}
+        />
+      )}
     </div>
   );
 }

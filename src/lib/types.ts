@@ -14,6 +14,7 @@ export type HeroSlide = {
   has_cta: boolean;
   cta_label: string | null;
   cta_href: string | null;
+  link_url: string | null;
   tone: "navy" | "amber";
 };
 

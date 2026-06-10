@@ -14,31 +14,31 @@ const modules = [
 export default function AdminPage() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {modules.map((module) => {
-          const Icon = module.icon;
+      {modules.map((module) => {
+        const Icon = module.icon;
 
-          return (
-            <Card key={module.href} className="rounded-lg bg-white">
-              <CardHeader className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <span className="flex size-10 items-center justify-center rounded-lg bg-navy-50 text-navy-700">
-                    <Icon className="size-5" />
-                  </span>
-                </div>
+        return (
+          <Card key={module.href} className="rounded-lg bg-white">
+            <CardHeader>
+              <div className="flex items-center gap-4">
+                <span className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-navy-50 text-navy-700">
+                  <Icon className="size-6" />
+                </span>
                 <CardTitle className="text-lg">{module.title}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-sm leading-6 text-muted-foreground">
-                  {module.description}
-                </p>
-                <Button href={module.href} variant="outline" className="w-full">
-                  進入管理
-                  <ArrowRight />
-                </Button>
-              </CardContent>
-            </Card>
-          );
-        })}
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm leading-6 text-muted-foreground">
+                {module.description}
+              </p>
+              <Button href={module.href} variant="outline" className="w-full">
+                進入管理
+                <ArrowRight />
+              </Button>
+            </CardContent>
+          </Card>
+        );
+      })}
     </div>
   );
 }
