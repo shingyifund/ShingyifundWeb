@@ -316,13 +316,14 @@ export async function moveSlide(
   const [item] = reordered.splice(index, 1);
   reordered.splice(targetIndex, 0, item);
 
-  for (let i = 0; i < reordered.length; i++) {
-    const { error } = await supabase
-      .from("hero_slides")
-      .update({ sort_order: i })
-      .eq("id", reordered[i].id);
-    if (error) return { ok: false, message: error.message };
-  }
+  const { error } = await supabase
+    .from("hero_slides")
+    .upsert(
+      reordered.map((slide, i) => ({ id: slide.id, sort_order: i })),
+      { onConflict: "id" },
+    );
+
+  if (error) return { ok: false, message: error.message };
 
   revalidateHero();
   return { ok: true };

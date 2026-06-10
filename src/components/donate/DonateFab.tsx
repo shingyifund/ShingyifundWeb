@@ -1,8 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { Heart } from "lucide-react";
-import { DonationModal } from "./DonationModal";
+
+const DonationModal = dynamic(() =>
+  import("./DonationModal").then((m) => m.DonationModal),
+);
 
 /** 全站右側固定「愛心捐款」按鈕，點擊彈出捐款資訊 Modal */
 export function DonateFab() {

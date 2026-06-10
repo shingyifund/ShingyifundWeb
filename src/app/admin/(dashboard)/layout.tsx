@@ -1,8 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { isAuthorizedAdminEmail } from "@/lib/admin-auth";
-import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { getAdminUser } from "@/lib/admin-auth-server";
 import { LogoutButton } from "./LogoutButton";
 
 export default async function AdminLayout({
@@ -10,14 +9,8 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!isAuthorizedAdminEmail(user?.email)) {
-    redirect("/admin/login");
-  }
+  const user = await getAdminUser();
+  if (!user) redirect("/admin/login");
 
   return (
     <div className="min-h-screen bg-[#f5f7f4] text-foreground">

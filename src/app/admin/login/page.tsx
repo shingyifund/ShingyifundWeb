@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { getAdminUser } from "@/lib/admin-auth-server";
 import { LoginButton } from "./LoginButton";
 
 export default async function LoginPage({
@@ -8,11 +8,7 @@ export default async function LoginPage({
 }: {
   searchParams: Promise<{ error?: string }>;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const user = await getAdminUser();
   if (user) redirect("/admin");
 
   const { error } = await searchParams;
