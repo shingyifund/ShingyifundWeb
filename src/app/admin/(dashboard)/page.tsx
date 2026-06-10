@@ -30,7 +30,7 @@ export default function AdminPage() {
         const Icon = module.icon;
 
         return (
-          <Card key={module.href} className="rounded-lg bg-white">
+          <Card key={module.href} className="flex flex-col rounded-lg bg-white">
             <CardHeader>
               <div className="flex items-center gap-4">
                 <span className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-navy-50 text-navy-700">
@@ -39,8 +39,8 @@ export default function AdminPage() {
                 <CardTitle className="text-lg">{module.title}</CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm leading-6 text-muted-foreground">
+            <CardContent className="flex flex-1 flex-col gap-4">
+              <p className="flex-1 text-sm leading-6 text-muted-foreground">
                 {module.description}
               </p>
               <Button href={module.href} variant="outline" className="w-full">
