@@ -78,7 +78,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
             </button>
           ))}
         </div>
-        <div className="flex gap-2">
+        <div className="mr-20 flex gap-2 sm:mr-24 2xl:mr-0">
           <ArrowBtn dir="prev" onClick={() => emblaApi?.scrollPrev()} />
           <ArrowBtn dir="next" onClick={() => emblaApi?.scrollNext()} />
         </div>
