@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { getAdminUser } from "@/lib/admin-auth-server";
+import { FormAlert } from "@/components/ui/form-alert";
 import { LoginButton } from "./LoginButton";
 
 export default async function LoginPage({
@@ -28,16 +29,16 @@ export default async function LoginPage({
           <h1 className="mt-2 text-2xl font-semibold text-foreground">後台管理</h1>
         </div>
 
-        {error === "unauthorized" && (
-          <p className="mb-4 rounded-lg border border-destructive/20 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-            這個 Google 帳號沒有後台權限。
-          </p>
-        )}
-        {error === "auth_failed" && (
-          <p className="mb-4 rounded-lg border border-destructive/20 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-            登入失敗，請重新嘗試。
-          </p>
-        )}
+        <FormAlert
+          message={
+            error === "unauthorized"
+              ? "這個 Google 帳號沒有後台權限。"
+              : error === "auth_failed"
+                ? "登入失敗，請重新嘗試。"
+                : null
+          }
+          className="mb-4"
+        />
 
         <LoginButton />
       </section>

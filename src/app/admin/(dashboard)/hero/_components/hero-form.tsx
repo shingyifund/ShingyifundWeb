@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Loader2, Save, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
+import { FormAlert } from "@/components/ui/form-alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -360,11 +361,7 @@ export function HeroForm({ slide }: { slide?: HeroSlideRecord }) {
           <Switch id="is_active" checked={isActive} onCheckedChange={setIsActive} />
         </div>
 
-        {message && (
-          <p className="rounded-lg border border-destructive/20 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-            {message}
-          </p>
-        )}
+        <FormAlert message={message} />
 
         <div className="flex flex-wrap gap-2">
           <Button type="submit" disabled={isPending || processingImage}>

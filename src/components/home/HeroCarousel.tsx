@@ -223,8 +223,8 @@ function YoutubeSlide({ slide, selected }: { slide: HeroSlide; selected: boolean
           className="absolute inset-0 size-full"
         />
       )}
-      <div className="absolute inset-0 bg-black/35" />
-      <div className="absolute inset-x-0 top-0 h-44 bg-linear-to-b from-black/85 via-black/45 to-transparent" />
+      <div className="absolute inset-0 bg-black/15" />
+      <div className="absolute inset-x-0 top-0 h-40 bg-linear-to-b from-black/65 via-black/25 to-transparent" />
 
       {slide.youtube_url && (
         <a

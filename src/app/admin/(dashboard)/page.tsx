@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ImageIcon, BarChart3, ArrowRight, FileBarChart } from "lucide-react";
+import { ImageIcon, BarChart3, FileBarChart } from "lucide-react";
+import { ModuleLinkButton } from "./_components/module-link-button";
 
 const modules = [
   {
@@ -43,10 +43,7 @@ export default function AdminPage() {
               <p className="flex-1 text-sm leading-6 text-muted-foreground">
                 {module.description}
               </p>
-              <Button href={module.href} variant="outline" className="w-full">
-                進入管理
-                <ArrowRight />
-              </Button>
+              <ModuleLinkButton href={module.href} />
             </CardContent>
           </Card>
         );

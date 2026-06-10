@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/input";
+import { FormAlert } from "@/components/ui/form-alert";
 import { updateAllStats } from "../actions";
 import type { ImpactStatRecord } from "../actions";
 
@@ -13,13 +14,15 @@ export function StatsEditor({ stats }: { stats: ImpactStatRecord[] }) {
     Object.fromEntries(stats.map((s) => [s.id, String(s.value)])),
   );
   const [isPending, startTransition] = useTransition();
+  const [message, setMessage] = useState<string | null>(null);
 
   function handleSave() {
+    setMessage(null);
     const updates: { id: string; value: number }[] = [];
     for (const stat of stats) {
       const value = Number.parseInt(values[stat.id] ?? "", 10);
       if (!Number.isInteger(value) || value < 0) {
-        alert("請確認所有指標數值皆為有效數字");
+        setMessage("請確認所有指標數值皆為有效數字");
         return;
       }
       updates.push({ id: stat.id, value });
@@ -30,7 +33,7 @@ export function StatsEditor({ stats }: { stats: ImpactStatRecord[] }) {
       if (result.ok) {
         router.refresh();
       } else {
-        alert(result.message ?? "儲存失敗");
+        setMessage(result.message ?? "儲存失敗");
       }
     });
   }
@@ -55,7 +58,9 @@ export function StatsEditor({ stats }: { stats: ImpactStatRecord[] }) {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 gap-px overflow-hidden rounded-lg border bg-border sm:grid-cols-2 lg:grid-cols-5">
+      <FormAlert message={message} className="mt-4" />
+
+      <div className="mt-4 grid grid-cols-1 gap-px overflow-hidden rounded-lg border bg-border sm:grid-cols-2 lg:grid-cols-5">
         {stats.map((stat) => (
           <div
             key={stat.id}

@@ -43,7 +43,7 @@ export const heroSlides: HeroSlide[] = [
     youtube_video_id: null,
     has_cta: true,
     cta_label: "了解食物銀行",
-    cta_href: "/foodbank",
+    cta_href: "/services/foodbank",
     link_url: null,
     tone: "navy",
   },
@@ -93,7 +93,7 @@ export const serviceFeatures: ServiceFeature[] = [
       { label: "物資整理", icon: "sort" },
       { label: "物資發放", icon: "distribute" },
     ],
-    href: "/foodbank",
+    href: "/services/foodbank",
   },
 ];
 
@@ -121,7 +121,7 @@ export const facebookPosts: FacebookPost[] = [
     title: "捐物不費力，讓愛更永續",
     excerpt: "線上捐物平台上線，動動手指就能把物資送到需要的人手中。",
     image: IMG_A,
-    href: "/foodbank/needs",
+    href: "/transparency/needs",
     postedAt: "2026-05-20",
   },
   {
@@ -130,7 +130,7 @@ export const facebookPosts: FacebookPost[] = [
     title: "志工隊捐血活動花絮",
     excerpt: "捲起袖子、伸出手臂，興毅志工以熱血傳遞生命的溫度。",
     image: IMG_B,
-    href: "/news/reports",
+    href: "/",
     postedAt: "2026-05-12",
   },
   {
@@ -139,7 +139,7 @@ export const facebookPosts: FacebookPost[] = [
     title: "世界糧食日：珍惜每一份食物",
     excerpt: "從惜食到分享，我們一起讓剩食變成滿滿的愛。",
     image: IMG_A,
-    href: "/news/stories",
+    href: "/",
     postedAt: "2026-05-04",
   },
 ];
@@ -189,5 +189,5 @@ export const featuredVideo = {
     "從社會救助到食物銀行，每一次出發都是為了讓需要的人被看見。一起走進興毅的服務現場。",
   youtubeId: "",
   poster: IMG_B,
-  href: "/news/reports",
+  href: "/",
 };
