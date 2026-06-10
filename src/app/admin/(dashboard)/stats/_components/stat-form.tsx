@@ -19,7 +19,6 @@ export function StatForm({ stat }: { stat: ImpactStatRecord }) {
       const result = await updateStat(stat.id, formData);
       if (result.ok) {
         router.push("/admin/stats");
-        router.refresh();
       } else {
         alert(result.message ?? "儲存失敗");
       }

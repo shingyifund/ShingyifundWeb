@@ -5,7 +5,7 @@
  * Phase 2（當前）：hero_slides 由 Supabase 提供，其餘仍用 mock。
  */
 import { createClient } from "@/lib/supabase/server";
-import type { HeroSlide, ImpactStat } from "@/lib/types";
+import type { FinancialReport, HeroSlide, ImpactStat } from "@/lib/types";
 import {
   facebookPosts,
   featuredVideo,
@@ -86,4 +86,33 @@ export async function getTransparencyDocs() {
 
 export async function getFeaturedVideo() {
   return featuredVideo;
+}
+
+export async function getFinancialReports(): Promise<FinancialReport[]> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("financial_reports")
+      .select(
+        "id, title, fiscal_year, comparison_year, file_url, file_path, file_name, file_size, created_at, updated_at",
+      )
+      .order("fiscal_year", { ascending: false });
+
+    if (error || !data) throw error;
+
+    return data.map((row) => ({
+      id: row.id,
+      title: row.title,
+      fiscalYear: row.fiscal_year,
+      comparisonYear: row.comparison_year,
+      fileUrl: row.file_url,
+      filePath: row.file_path,
+      fileName: row.file_name,
+      fileSize: row.file_size,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    }));
+  } catch {
+    return [];
+  }
 }

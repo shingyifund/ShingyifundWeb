@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ImageIcon, BarChart3, ArrowRight } from "lucide-react";
+import { ImageIcon, BarChart3, ArrowRight, FileBarChart } from "lucide-react";
 
 const modules = [
   {
@@ -11,9 +11,15 @@ const modules = [
   },
   {
     title: "服務成效",
-    description: "維護首頁「我們的服務成效」區塊的五項指標數字與標籤。",
+    description: "維護首頁「我們的服務成效」區塊的五項指標數字。",
     href: "/admin/stats",
     icon: BarChart3,
+  },
+  {
+    title: "財務報告",
+    description: "上傳與管理徵信明細中的年度財務報告 PDF。",
+    href: "/admin/financial-reports",
+    icon: FileBarChart,
   },
 ];
 

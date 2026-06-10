@@ -67,3 +67,16 @@ export type TransparencyDoc = {
   description: string;
   href: string;
 };
+
+export type FinancialReport = {
+  id: string;
+  title: string;
+  fiscalYear: number;
+  comparisonYear: number | null;
+  fileUrl: string;
+  filePath: string;
+  fileName: string | null;
+  fileSize: number | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+};
