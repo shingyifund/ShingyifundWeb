@@ -1,4 +1,8 @@
 import { Pencil } from "lucide-react";
+import {
+  AdminDataList,
+  AdminDataListRow,
+} from "@/components/admin/admin-data-list";
 import { Button } from "@/components/ui/Button";
 import {
   getMonthlyDonationDonorTypeLabel,
@@ -7,6 +11,9 @@ import {
 import type { MonthlyDonationReportRecord } from "../actions";
 import { DeleteMonthlyDonationDialog } from "./delete-monthly-donation-dialog";
 import { MonthlyDonationPublishSwitch } from "./monthly-donation-publish-switch";
+
+const GRID_CLASS =
+  "lg:grid-cols-[120px_90px_90px_minmax(0,1fr)_100px_130px]";
 
 export function MonthlyDonationsTable({
   reports,
@@ -25,22 +32,24 @@ export function MonthlyDonationsTable({
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border bg-white">
-      <div className="hidden grid-cols-[120px_90px_90px_minmax(0,1fr)_100px_130px] border-b bg-muted/50 px-4 py-3 text-xs font-medium text-muted-foreground lg:grid">
-        <span>年月</span>
-        <span>區域</span>
-        <span>分類</span>
-        <span>標題</span>
-        <span>狀態</span>
-        <span className="text-right">操作</span>
-      </div>
-
-      <div className="divide-y">
-        {reports.map((report) => (
-          <div
-            key={report.id}
-            className="grid gap-3 px-4 py-4 lg:grid-cols-[120px_90px_90px_minmax(0,1fr)_100px_130px] lg:items-center"
-          >
+    <AdminDataList
+      columns={[
+        { label: "年月" },
+        { label: "區域" },
+        { label: "分類" },
+        { label: "標題" },
+        { label: "狀態" },
+        { label: "操作", className: "text-right" },
+      ]}
+      gridClassName={GRID_CLASS}
+      headerVisibleClassName="lg:grid"
+    >
+      {reports.map((report) => (
+        <AdminDataListRow
+          key={report.id}
+          gridClassName={GRID_CLASS}
+          itemAlignClassName="lg:items-center"
+        >
             <div className="text-sm font-semibold text-navy-800">
               {report.western_year}年{String(report.month).padStart(2, "0")}月
             </div>
@@ -74,9 +83,8 @@ export function MonthlyDonationsTable({
               </Button>
               <DeleteMonthlyDonationDialog id={report.id} title={report.title} />
             </div>
-          </div>
-        ))}
-      </div>
-    </div>
+        </AdminDataListRow>
+      ))}
+    </AdminDataList>
   );
 }

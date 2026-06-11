@@ -1,7 +1,13 @@
 import { ExternalLink, Pencil } from "lucide-react";
+import {
+  AdminDataList,
+  AdminDataListRow,
+} from "@/components/admin/admin-data-list";
 import { Button } from "@/components/ui/Button";
 import type { FinancialReportRecord } from "../actions";
 import { DeleteFinancialReportDialog } from "./delete-financial-report-dialog";
+
+const GRID_CLASS = "md:grid-cols-[120px_minmax(0,1fr)_150px_150px]";
 
 export function FinancialReportsTable({
   reports,
@@ -20,20 +26,17 @@ export function FinancialReportsTable({
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border bg-white">
-      <div className="hidden grid-cols-[120px_minmax(0,1fr)_150px_150px] border-b bg-muted/50 px-4 py-3 text-xs font-medium text-muted-foreground md:grid">
-        <span>年度</span>
-        <span>標題</span>
-        <span>檔案</span>
-        <span className="text-right">操作</span>
-      </div>
-
-      <div className="divide-y">
-        {reports.map((report) => (
-          <div
-            key={report.id}
-            className="grid gap-3 px-4 py-4 md:grid-cols-[120px_minmax(0,1fr)_150px_150px] md:items-center"
-          >
+    <AdminDataList
+      columns={[
+        { label: "年度" },
+        { label: "標題" },
+        { label: "檔案" },
+        { label: "操作", className: "text-right" },
+      ]}
+      gridClassName={GRID_CLASS}
+    >
+      {reports.map((report) => (
+        <AdminDataListRow key={report.id} gridClassName={GRID_CLASS}>
             <div className="text-sm font-semibold text-navy-800">
               {report.fiscal_year}
               {report.comparison_year ? ` / ${report.comparison_year}` : ""}
@@ -74,10 +77,9 @@ export function FinancialReportsTable({
                 title={report.title}
               />
             </div>
-          </div>
-        ))}
-      </div>
-    </div>
+        </AdminDataListRow>
+      ))}
+    </AdminDataList>
   );
 }
 
