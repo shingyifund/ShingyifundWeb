@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ImageIcon, BarChart3, FileBarChart } from "lucide-react";
+import { ImageIcon, BarChart3, FileBarChart, TrendingUp } from "lucide-react";
 import { ModuleLinkButton } from "./_components/module-link-button";
 
 const modules = [
@@ -20,6 +20,12 @@ const modules = [
     description: "上傳與管理徵信明細中的年度財務報告 PDF。",
     href: "/admin/financial-reports",
     icon: FileBarChart,
+  },
+  {
+    title: "勸募成果報告",
+    description: "上傳與管理徵信明細中的年度勸募成果報告 PDF。",
+    href: "/admin/fundraising-reports",
+    icon: TrendingUp,
   },
 ];
 

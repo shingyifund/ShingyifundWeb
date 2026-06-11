@@ -80,3 +80,15 @@ export type FinancialReport = {
   createdAt: string | null;
   updatedAt: string | null;
 };
+
+export type FundraisingReport = {
+  id: string;
+  title: string;
+  fiscalYear: number;
+  fileUrl: string;
+  filePath: string;
+  fileName: string | null;
+  fileSize: number | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+};

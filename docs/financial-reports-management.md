@@ -72,10 +72,33 @@ create policy "Admin full access" on financial_reports
   with check (true);
 ```
 
+### Storage RLS（不可省略）
+
+table 建好還不夠。上傳流程是「先傳 PDF 到 Storage、再寫 table」，`storage.objects` 有獨立 RLS，缺這段上傳會噴 `new row violates row-level security policy`：
+
+```sql
+create policy "public read financial report files" on storage.objects
+  for select to public
+  using (bucket_id = 'financial-reports');
+
+create policy "admin upload financial report files" on storage.objects
+  for insert to authenticated
+  with check (bucket_id = 'financial-reports');
+
+create policy "admin update financial report files" on storage.objects
+  for update to authenticated
+  using (bucket_id = 'financial-reports');
+
+create policy "admin delete financial report files" on storage.objects
+  for delete to authenticated
+  using (bucket_id = 'financial-reports');
+```
+
 權限沿用 Hero 模式：
 
 - 前台：`anon` 只可 `select`
 - 後台：`authenticated` 透過 `Admin full access` policy 新增、更新、刪除
+- 切勿新增 `with_check=false` 的「防禦性」policy，會擋住後台寫入（後台實際以 authenticated 角色操作，並未繞過 RLS）
 
 ## 如果已建立舊版雙年度欄位
 
