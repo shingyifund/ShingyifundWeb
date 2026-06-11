@@ -5,6 +5,7 @@ import {
   ClipboardCheck,
   FileBarChart,
   HeartHandshake,
+  PackageOpen,
   Users,
   type LucideIcon,
 } from "lucide-react";
@@ -19,6 +20,7 @@ const ICONS: Record<TransparencyDoc["icon"], LucideIcon> = {
   sustainability: BookOpen,
   donors: HeartHandshake,
   recipients: Users,
+  monthlyDonations: PackageOpen,
   financial: FileBarChart,
   fundraising: ClipboardCheck,
 };
@@ -45,6 +47,12 @@ const ACCENTS: Record<
     iconText: "text-navy-600",
     hoverIcon: "group-hover:bg-navy-700",
     glow: "bg-navy-600/10",
+  },
+  monthlyDonations: {
+    iconBg: "bg-amber-50",
+    iconText: "text-amber-700",
+    hoverIcon: "group-hover:bg-amber-600",
+    glow: "bg-amber-500/10",
   },
   financial: {
     iconBg: "bg-navy-100",
@@ -74,7 +82,7 @@ export async function TransparencySection() {
           className="mb-12"
         />
 
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
           {docs.map((doc, i) => (
             <Reveal key={doc.id} delay={i * 0.07}>
               <DocCard doc={doc} />

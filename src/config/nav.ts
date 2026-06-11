@@ -38,7 +38,7 @@ export const mainNav: NavItem[] = [
     children: [
       { label: "捐款芳名錄", href: "/transparency/donors" },
       { label: "受贈者名單", href: "/transparency/recipients" },
-      { label: "每月捐物清單", href: "/transparency/needs" },
+      { label: "每月捐物清單", href: "/transparency/monthly-donations" },
       { label: "財務報告", href: "/transparency/financial" },
       { label: "勸募成果報告", href: "/transparency/fundraising" },
     ],

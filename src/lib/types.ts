@@ -62,7 +62,13 @@ export type FacebookPost = {
 
 export type TransparencyDoc = {
   id: string;
-  icon: "sustainability" | "donors" | "recipients" | "financial" | "fundraising";
+  icon:
+    | "sustainability"
+    | "donors"
+    | "recipients"
+    | "monthlyDonations"
+    | "financial"
+    | "fundraising";
   title: string;
   description: string;
   href: string;
@@ -91,4 +97,39 @@ export type FundraisingReport = {
   fileSize: number | null;
   createdAt: string | null;
   updatedAt: string | null;
+};
+
+export type MonthlyDonationRegion =
+  | "taipei"
+  | "new_taipei"
+  | "taoyuan"
+  | "tainan";
+
+export type MonthlyDonationDonorType = "individual" | "organization";
+
+export type MonthlyDonationImage = {
+  id: string;
+  reportId: string;
+  publicId: string;
+  imageUrl: string;
+  fileName: string | null;
+  fileSize: number | null;
+  width: number | null;
+  height: number | null;
+  sortOrder: number;
+  createdAt: string | null;
+};
+
+export type MonthlyDonationReport = {
+  id: string;
+  title: string;
+  westernYear: number;
+  month: number;
+  region: MonthlyDonationRegion;
+  donorType: MonthlyDonationDonorType;
+  contentText: string;
+  isPublished: boolean;
+  createdAt: string | null;
+  updatedAt: string | null;
+  images: MonthlyDonationImage[];
 };

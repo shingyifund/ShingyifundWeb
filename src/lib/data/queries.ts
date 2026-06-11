@@ -5,7 +5,14 @@
  * Phase 2（當前）：hero_slides 由 Supabase 提供，其餘仍用 mock。
  */
 import { createClient } from "@/lib/supabase/server";
-import type { FinancialReport, FundraisingReport, HeroSlide, ImpactStat } from "@/lib/types";
+import type {
+  FinancialReport,
+  FundraisingReport,
+  HeroSlide,
+  ImpactStat,
+  MonthlyDonationImage,
+  MonthlyDonationReport,
+} from "@/lib/types";
 import {
   facebookPosts,
   featuredVideo,
@@ -140,6 +147,159 @@ export async function getFinancialReports(): Promise<FinancialReport[]> {
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     }));
+  } catch {
+    return [];
+  }
+}
+
+const MONTHLY_DONATION_REPORT_COLS =
+  "id, title, western_year, month, region, donor_type, content_text, is_published, created_at, updated_at";
+
+const MONTHLY_DONATION_IMAGE_COLS =
+  "id, report_id, public_id, image_url, file_name, file_size, width, height, sort_order, created_at";
+
+type MonthlyDonationReportRow = {
+  id: string;
+  title: string;
+  western_year: number;
+  month: number;
+  region: MonthlyDonationReport["region"];
+  donor_type: MonthlyDonationReport["donorType"];
+  content_text: string;
+  is_published: boolean;
+  created_at: string | null;
+  updated_at: string | null;
+};
+
+type MonthlyDonationImageRow = {
+  id: string;
+  report_id: string;
+  public_id: string;
+  image_url: string;
+  file_name: string | null;
+  file_size: number | null;
+  width: number | null;
+  height: number | null;
+  sort_order: number;
+  created_at: string | null;
+};
+
+function mapMonthlyDonationImage(row: MonthlyDonationImageRow): MonthlyDonationImage {
+  return {
+    id: row.id,
+    reportId: row.report_id,
+    publicId: row.public_id,
+    imageUrl: row.image_url,
+    fileName: row.file_name,
+    fileSize: row.file_size,
+    width: row.width,
+    height: row.height,
+    sortOrder: row.sort_order,
+    createdAt: row.created_at,
+  };
+}
+
+function mapMonthlyDonationReport(
+  row: MonthlyDonationReportRow,
+  images: MonthlyDonationImage[],
+): MonthlyDonationReport {
+  return {
+    id: row.id,
+    title: row.title,
+    westernYear: row.western_year,
+    month: row.month,
+    region: row.region,
+    donorType: row.donor_type,
+    contentText: row.content_text,
+    isPublished: row.is_published,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    images,
+  };
+}
+
+async function getMonthlyDonationImagesByReportIds(reportIds: string[]) {
+  if (reportIds.length === 0) return new Map<string, MonthlyDonationImage[]>();
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("monthly_donation_images")
+    .select(MONTHLY_DONATION_IMAGE_COLS)
+    .in("report_id", reportIds)
+    .order("sort_order", { ascending: true });
+
+  if (error || !data) throw error;
+
+  const map = new Map<string, MonthlyDonationImage[]>();
+  for (const row of data as MonthlyDonationImageRow[]) {
+    const image = mapMonthlyDonationImage(row);
+    const images = map.get(image.reportId) ?? [];
+    images.push(image);
+    map.set(image.reportId, images);
+  }
+
+  return map;
+}
+
+export async function getMonthlyDonationReports(): Promise<
+  MonthlyDonationReport[]
+> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("monthly_donation_reports")
+      .select(MONTHLY_DONATION_REPORT_COLS)
+      .eq("is_published", true)
+      .order("western_year", { ascending: false })
+      .order("month", { ascending: false })
+      .order("region", { ascending: true })
+      .order("donor_type", { ascending: true });
+
+    if (error || !data) throw error;
+
+    const rows = data as MonthlyDonationReportRow[];
+    const imagesByReportId = await getMonthlyDonationImagesByReportIds(
+      rows.map((row) => row.id),
+    );
+
+    return rows.map((row) =>
+      mapMonthlyDonationReport(row, imagesByReportId.get(row.id) ?? []),
+    );
+  } catch {
+    return [];
+  }
+}
+
+export async function getMonthlyDonationReportsByArchive({
+  westernYear,
+  month,
+  region,
+}: {
+  westernYear: number;
+  month: number;
+  region: MonthlyDonationReport["region"];
+}): Promise<MonthlyDonationReport[]> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("monthly_donation_reports")
+      .select(MONTHLY_DONATION_REPORT_COLS)
+      .eq("is_published", true)
+      .eq("western_year", westernYear)
+      .eq("month", month)
+      .eq("region", region)
+      .order("donor_type", { ascending: true });
+
+    if (error || !data) throw error;
+
+    const rows = data as MonthlyDonationReportRow[];
+    const imagesByReportId = await getMonthlyDonationImagesByReportIds(
+      rows.map((row) => row.id),
+    );
+
+    return rows.map((row) =>
+      mapMonthlyDonationReport(row, imagesByReportId.get(row.id) ?? []),
+    );
   } catch {
     return [];
   }

@@ -121,7 +121,7 @@ export const facebookPosts: FacebookPost[] = [
     title: "捐物不費力，讓愛更永續",
     excerpt: "線上捐物平台上線，動動手指就能把物資送到需要的人手中。",
     image: IMG_A,
-    href: "/transparency/needs",
+    href: "/transparency/monthly-donations",
     postedAt: "2026-05-20",
   },
   {
@@ -168,13 +168,20 @@ export const transparencyDocs: TransparencyDoc[] = [
   },
   {
     id: "t4",
+    icon: "monthlyDonations",
+    title: "每月捐物清單",
+    description: "公開每月物資捐贈明細與照片。",
+    href: "/transparency/monthly-donations",
+  },
+  {
+    id: "t5",
     icon: "financial",
     title: "財務報告",
     description: "年度財務報表與會計師查核。",
     href: "/transparency/financial",
   },
   {
-    id: "t5",
+    id: "t6",
     icon: "fundraising",
     title: "勸募成果報告",
     description: "公開每期勸募金額與運用明細。",

@@ -1,0 +1,449 @@
+"use client";
+
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { Loader2, Save, X } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { FormAlert } from "@/components/ui/form-alert";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  MONTHLY_DONATION_DONOR_TYPES,
+  MONTHLY_DONATION_REGIONS,
+  getMonthlyDonationDonorTypeLabel,
+  getMonthlyDonationRegionLabel,
+} from "@/lib/monthly-donations";
+import {
+  createMonthlyDonationReport,
+  type MonthlyDonationReportRecord,
+  updateMonthlyDonationReport,
+} from "../actions";
+
+const MAX_UPLOAD_WIDTH = 1200;
+const MAX_UPLOAD_HEIGHT = 900;
+const UPLOAD_QUALITY = 0.62;
+const MAX_ACTION_FILE_BYTES = 500 * 1024;
+const MAX_IMAGE_COUNT = 40;
+
+function canvasToBlob(
+  canvas: HTMLCanvasElement,
+  type: string,
+  quality: number,
+) {
+  return new Promise<Blob | null>((resolve) => {
+    canvas.toBlob(resolve, type, quality);
+  });
+}
+
+async function resizeImageForUpload(file: File) {
+  const image = await createImageBitmap(file);
+  const scale = Math.min(
+    1,
+    MAX_UPLOAD_WIDTH / image.width,
+    MAX_UPLOAD_HEIGHT / image.height,
+  );
+  const width = Math.max(1, Math.round(image.width * scale));
+  const height = Math.max(1, Math.round(image.height * scale));
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+
+  if (!ctx) {
+    image.close();
+    return file;
+  }
+
+  ctx.drawImage(image, 0, 0, width, height);
+  image.close();
+
+  const blob = await canvasToBlob(canvas, "image/webp", UPLOAD_QUALITY);
+  if (!blob) return file;
+
+  const filename = file.name.replace(/\.[^.]+$/, "") || "donation-image";
+  return new File([blob], `${filename}.webp`, { type: "image/webp" });
+}
+
+function defaultTitle({
+  period,
+  month,
+  region,
+  donorType,
+}: {
+  period: string;
+  month: string;
+  region: MonthlyDonationReportRecord["region"];
+  donorType: MonthlyDonationReportRecord["donor_type"];
+}) {
+  const westernYear = period.slice(0, 4);
+  if (!westernYear || !month) return "";
+  return `${westernYear}年${String(Number(month)).padStart(2, "0")}月${getMonthlyDonationRegionLabel(region)}${getMonthlyDonationDonorTypeLabel(donorType)}捐贈明細`;
+}
+
+function toPeriodValue(report?: MonthlyDonationReportRecord) {
+  if (!report) return "";
+  return `${report.western_year}-${String(report.month).padStart(2, "0")}`;
+}
+
+function periodMonth(period: string) {
+  return period.split("-")[1] ?? "";
+}
+
+export function MonthlyDonationForm({
+  report,
+}: {
+  report?: MonthlyDonationReportRecord;
+}) {
+  const router = useRouter();
+  const [period, setPeriod] = useState(toPeriodValue(report));
+  const [region, setRegion] = useState<MonthlyDonationReportRecord["region"]>(
+    report?.region ?? "taipei",
+  );
+  const [donorType, setDonorType] = useState<
+    MonthlyDonationReportRecord["donor_type"]
+  >(report?.donor_type ?? "individual");
+  const [isPublished, setIsPublished] = useState(report?.is_published ?? true);
+  const [customTitle, setCustomTitle] = useState<string | null>(() => {
+    if (!report?.title) return null;
+    return report.title !==
+      defaultTitle({
+        period: toPeriodValue(report),
+        month: String(report.month),
+        region: report.region,
+        donorType: report.donor_type,
+      })
+      ? report.title
+      : null;
+  });
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [deleteImageIds, setDeleteImageIds] = useState<Set<string>>(
+    () => new Set(),
+  );
+  const [message, setMessage] = useState<string | null>(null);
+  const submittingRef = useRef(false);
+  const [submitStarted, setSubmitStarted] = useState(false);
+  const [processingImages, setProcessingImages] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const title = useMemo(
+    () =>
+      customTitle ??
+      defaultTitle({
+        period,
+        month: periodMonth(period),
+        region,
+        donorType,
+      }),
+    [customTitle, donorType, period, region],
+  );
+  const busy = submitStarted || isPending || processingImages;
+  const busyText = processingImages ? "正在壓縮圖片..." : "正在儲存...";
+  const selectedPreviews = useMemo(
+    () =>
+      selectedFiles.map((file) => ({
+        file,
+        url: URL.createObjectURL(file),
+      })),
+    [selectedFiles],
+  );
+
+  useEffect(() => {
+    return () => {
+      selectedPreviews.forEach((preview) => URL.revokeObjectURL(preview.url));
+    };
+  }, [selectedPreviews]);
+
+  function removeSelectedFile(index: number) {
+    setSelectedFiles((current) => current.filter((_, i) => i !== index));
+  }
+
+  function resetSubmitState() {
+    submittingRef.current = false;
+    setSubmitStarted(false);
+    setProcessingImages(false);
+  }
+
+  async function handleSubmit(formData: FormData) {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
+    setSubmitStarted(true);
+    setMessage(null);
+
+    if (selectedFiles.length > MAX_IMAGE_COUNT) {
+      setMessage(`每筆最多上傳 ${MAX_IMAGE_COUNT} 張圖片`);
+      resetSubmitState();
+      return;
+    }
+
+    setProcessingImages(true);
+    const uploadFiles: File[] = [];
+
+    try {
+      for (const file of selectedFiles) {
+        const uploadFile = await resizeImageForUpload(file);
+        if (uploadFile.size > MAX_ACTION_FILE_BYTES) {
+          setMessage("圖片壓縮後仍超過 500KB，請換較小圖片。");
+          resetSubmitState();
+          return;
+        }
+        uploadFiles.push(uploadFile);
+      }
+    } catch {
+      setMessage("圖片壓縮失敗，請換一張圖片。");
+      resetSubmitState();
+      return;
+    } finally {
+      setProcessingImages(false);
+    }
+
+    formData.set("period", period);
+    formData.set("region", region);
+    formData.set("donor_type", donorType);
+    formData.set("title", title);
+    formData.set("is_published", String(isPublished));
+    formData.delete("images");
+    for (const file of uploadFiles) formData.append("images", file);
+    for (const id of deleteImageIds) formData.append("delete_image_ids", id);
+
+    startTransition(async () => {
+      const result = await (report
+        ? updateMonthlyDonationReport(report.id, formData)
+        : createMonthlyDonationReport(formData)).catch((error) => ({
+        ok: false,
+        message: error instanceof Error ? error.message : "儲存失敗",
+      }));
+
+      if (!result.ok) {
+        setMessage(result.message ?? "儲存失敗");
+        resetSubmitState();
+        return;
+      }
+
+      router.push("/admin/monthly-donations");
+    });
+  }
+
+  return (
+    <form action={handleSubmit} className="space-y-5">
+      <div className="space-y-2">
+        <Label htmlFor="period">年月</Label>
+        <Input
+          id="period"
+          type="month"
+          min="1912-01"
+          max="2999-12"
+          value={period}
+          onChange={(event) => setPeriod(event.target.value)}
+          required
+        />
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="region">區域</Label>
+          <select
+            id="region"
+            value={region}
+            onChange={(event) =>
+              setRegion(event.target.value as MonthlyDonationReportRecord["region"])
+            }
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
+            {MONTHLY_DONATION_REGIONS.map((item) => (
+              <option key={item.value} value={item.value}>
+                {item.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="donor_type">分類</Label>
+          <select
+            id="donor_type"
+            value={donorType}
+            onChange={(event) =>
+              setDonorType(
+                event.target.value as MonthlyDonationReportRecord["donor_type"],
+              )
+            }
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
+            {MONTHLY_DONATION_DONOR_TYPES.map((item) => (
+              <option key={item.value} value={item.value}>
+                {item.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="title">標題</Label>
+        <Input
+          id="title"
+          value={title}
+          onChange={(event) => setCustomTitle(event.target.value)}
+          placeholder="2026年02月桃園個人捐贈明細"
+          required
+        />
+        <p className="text-xs text-muted-foreground">
+          標題會依年度、月份、區域與分類自動產生，也可手動修改。
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="content_text">捐贈明細</Label>
+        <Textarea
+          id="content_text"
+          name="content_text"
+          defaultValue={report?.content_text ?? ""}
+          rows={12}
+          placeholder="貼上 txt 檔案中的捐贈明細內容"
+          required
+        />
+      </div>
+
+      {report?.images.length ? (
+        <div className="space-y-3">
+          <Label>目前圖片</Label>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {report.images.map((image) => {
+              const deleting = deleteImageIds.has(image.id);
+              return (
+                <label
+                  key={image.id}
+                  className="group overflow-hidden rounded-lg border bg-white"
+                >
+                  <div className="relative aspect-[4/3] bg-muted">
+                    <Image
+                      src={image.image_url}
+                      alt={image.file_name ?? "捐贈物資照片"}
+                      fill
+                      sizes="(min-width: 1024px) 240px, 50vw"
+                      className="object-cover"
+                    />
+                    {deleting && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-destructive/70 text-sm font-semibold text-white">
+                        將刪除
+                      </div>
+                    )}
+                  </div>
+                  <span className="flex items-center gap-2 px-3 py-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={deleting}
+                      onChange={(event) => {
+                        setDeleteImageIds((current) => {
+                          const next = new Set(current);
+                          if (event.target.checked) next.add(image.id);
+                          else next.delete(image.id);
+                          return next;
+                        });
+                      }}
+                    />
+                    刪除此圖片
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
+
+      <div className="space-y-2">
+        <Label htmlFor="images">新增圖片</Label>
+        <Input
+          id="images"
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={(event) =>
+            setSelectedFiles(Array.from(event.target.files ?? []))
+          }
+        />
+        <p className="text-xs text-muted-foreground">
+          可多選圖片；送出前會自動壓縮，每張壓縮後需小於 500KB。
+        </p>
+        {selectedPreviews.length > 0 && (
+          <div className="space-y-3 rounded-lg border bg-muted/30 p-3">
+            <p className="text-sm text-muted-foreground">
+              已選擇 {selectedPreviews.length} 張圖片
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {selectedPreviews.map((preview, index) => (
+                <div
+                  key={`${preview.file.name}-${preview.file.lastModified}-${index}`}
+                  className="overflow-hidden rounded-lg border bg-white"
+                >
+                  <div className="relative aspect-[4/3] bg-muted">
+                    <img
+                      src={preview.url}
+                      alt={preview.file.name}
+                      className="size-full object-cover"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between gap-2 px-3 py-2">
+                    <p className="min-w-0 truncate text-sm text-foreground">
+                      {preview.file.name}
+                    </p>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
+                      aria-label={`移除 ${preview.file.name}`}
+                      onClick={() => removeSelectedFile(index)}
+                    >
+                      <X />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="flex items-center justify-between rounded-lg border bg-muted/30 px-4 py-3">
+        <div>
+          <Label htmlFor="is_published">公開顯示</Label>
+          <p className="mt-1 text-xs text-muted-foreground">
+            關閉後只會留在後台，不會顯示在前台。
+          </p>
+        </div>
+        <Switch
+          id="is_published"
+          checked={isPublished}
+          onCheckedChange={setIsPublished}
+        />
+      </div>
+
+      <FormAlert message={message} />
+
+      <div className="flex flex-wrap items-center gap-3 pt-2">
+        <Button type="submit" disabled={busy}>
+          {busy && <Loader2 className="size-4 animate-spin" />}
+          {busy ? "儲存中..." : "儲存"}
+          {!busy && <Save />}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          disabled={busy}
+          onClick={() => router.back()}
+        >
+          <X />
+          取消
+        </Button>
+        {busy && (
+          <span className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground">
+            <Loader2 className="size-4 animate-spin text-navy-700" />
+            {busyText}
+          </span>
+        )}
+      </div>
+    </form>
+  );
+}
