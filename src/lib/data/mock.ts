@@ -148,13 +148,3 @@ export const transparencyDocs: TransparencyDoc[] = [
     href: "/transparency/fundraising",
   },
 ];
-
-/** 影音專區 — 先放佔位 YouTube 連結 */
-export const featuredVideo = {
-  title: "看見興毅的行動現場",
-  description:
-    "從社會救助到食物銀行，每一次出發都是為了讓需要的人被看見。一起走進興毅的服務現場。",
-  youtubeId: "",
-  poster: IMG_B,
-  href: "/",
-};

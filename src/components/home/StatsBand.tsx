@@ -42,7 +42,7 @@ export function StatsBand({ stats }: { stats: ImpactStat[] }) {
   }, []);
 
   return (
-    <section className="py-5 sm:py-6">
+    <section>
       <div className="container-x">
         <div
           ref={ref}

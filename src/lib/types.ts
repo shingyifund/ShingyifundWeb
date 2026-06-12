@@ -49,6 +49,12 @@ export type ImpactStat = {
 };
 
 
+export type YouTubeVideo = {
+  id: string;
+  title: string;
+  publishedAt: string; // ISO date
+};
+
 export type TransparencyDoc = {
   id: string;
   icon:

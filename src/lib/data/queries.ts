@@ -12,9 +12,9 @@ import type {
   ImpactStat,
   MonthlyDonationImage,
   MonthlyDonationReport,
+  YouTubeVideo,
 } from "@/lib/types";
 import {
-  featuredVideo,
   impactStats,
   serviceFeatures,
   transparencyDocs,
@@ -86,8 +86,48 @@ export async function getTransparencyDocs() {
   return transparencyDocs;
 }
 
-export async function getFeaturedVideo() {
-  return featuredVideo;
+const YOUTUBE_CHANNEL_ID = "UCQgUmF4zZ8t8hWmgCXAFv2w"; // @shingyifund
+
+function decodeXmlEntities(text: string) {
+  return text
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'");
+}
+
+/** 從 YouTube 頻道 RSS 取最新影片（免 API key，無配額）。每小時快取一次。 */
+export async function getYouTubeVideos(limit = 4): Promise<YouTubeVideo[]> {
+  try {
+    const res = await fetch(
+      `https://www.youtube.com/feeds/videos.xml?channel_id=${YOUTUBE_CHANNEL_ID}`,
+      { next: { revalidate: 3600 } },
+    );
+    if (!res.ok) return [];
+
+    const xml = await res.text();
+    const entries = [...xml.matchAll(/<entry>([\s\S]*?)<\/entry>/g)];
+
+    return entries
+      .map((match) => {
+        const block = match[1];
+        const id = block.match(/<yt:videoId>(.*?)<\/yt:videoId>/)?.[1];
+        const title = block.match(/<title>([\s\S]*?)<\/title>/)?.[1];
+        const publishedAt = block.match(/<published>(.*?)<\/published>/)?.[1];
+        if (!id || !title || !publishedAt) return null;
+        return {
+          id,
+          title: decodeXmlEntities(title.trim()),
+          publishedAt,
+        };
+      })
+      .filter((video): video is YouTubeVideo => video !== null)
+      .slice(0, limit);
+  } catch {
+    return [];
+  }
 }
 
 export async function getFundraisingReports(): Promise<FundraisingReport[]> {
