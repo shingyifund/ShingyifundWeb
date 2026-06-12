@@ -4,6 +4,7 @@ import {
   FileBarChart,
   ImageIcon,
   PackageOpen,
+  Plus,
   TrendingUp,
 } from "lucide-react";
 import { ModuleLinkButton } from "./_components/module-link-button";
@@ -44,6 +45,29 @@ const modules = [
 export default function AdminPage() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {/* 快速新增捐物清單（強調卡） */}
+      <Card className="flex flex-col rounded-lg border-amber-300 bg-amber-50">
+        <CardHeader>
+          <div className="flex items-center gap-4">
+            <span className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-amber-500 text-white">
+              <Plus className="size-6" />
+            </span>
+            <CardTitle className="text-lg text-amber-900">快速新增捐物</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="flex flex-1 flex-col gap-4">
+          <p className="flex-1 text-sm leading-6 text-amber-800/80">
+            直接建立一筆每月捐物清單，省去先進入管理頁的步驟。
+          </p>
+          <ModuleLinkButton
+            href="/admin/monthly-donations/new"
+            label="新增捐物清單"
+            variant="default"
+            icon="plus"
+          />
+        </CardContent>
+      </Card>
+
       {modules.map((module) => {
         const Icon = module.icon;
 
