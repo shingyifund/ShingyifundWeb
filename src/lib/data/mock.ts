@@ -1,5 +1,4 @@
 import type {
-  FacebookPost,
   HeroSlide,
   ImpactStat,
   ServiceFeature,
@@ -103,45 +102,6 @@ export const impactStats: ImpactStat[] = [
   { id: "s3", icon: "store", topLabel: "串聯", value: 128, suffix: "+", bottomLabel: "家合作店家" },
   { id: "s4", icon: "partners", topLabel: "分享", value: 160, suffix: "+", bottomLabel: "個社福團體與里長" },
   { id: "s5", icon: "hands", topLabel: "每月服務", value: 1000, suffix: "+", bottomLabel: "人次" },
-];
-
-export const facebookPosts: FacebookPost[] = [
-  {
-    id: "fb-1",
-    category: "新聞",
-    title: "113年勸募成果報告出爐",
-    excerpt: "感謝每一位善心人士的支持，讓愛心化為實際行動，陪伴更多家庭。",
-    image: IMG_B,
-    href: "/transparency/fundraising",
-    postedAt: "2026-05-28",
-  },
-  {
-    id: "fb-2",
-    category: "活動",
-    title: "捐物不費力，讓愛更永續",
-    excerpt: "線上捐物平台上線，動動手指就能把物資送到需要的人手中。",
-    image: IMG_A,
-    href: "/transparency/monthly-donations",
-    postedAt: "2026-05-20",
-  },
-  {
-    id: "fb-3",
-    category: "報導",
-    title: "志工隊捐血活動花絮",
-    excerpt: "捲起袖子、伸出手臂，興毅志工以熱血傳遞生命的溫度。",
-    image: IMG_B,
-    href: "/",
-    postedAt: "2026-05-12",
-  },
-  {
-    id: "fb-4",
-    category: "故事",
-    title: "世界糧食日：珍惜每一份食物",
-    excerpt: "從惜食到分享，我們一起讓剩食變成滿滿的愛。",
-    image: IMG_A,
-    href: "/",
-    postedAt: "2026-05-04",
-  },
 ];
 
 export const transparencyDocs: TransparencyDoc[] = [

@@ -14,7 +14,6 @@ import type {
   MonthlyDonationReport,
 } from "@/lib/types";
 import {
-  facebookPosts,
   featuredVideo,
   impactStats,
   serviceFeatures,
@@ -81,10 +80,6 @@ export async function getImpactStats(): Promise<ImpactStat[]> {
   } catch {
     return impactStats;
   }
-}
-
-export async function getFacebookPosts() {
-  return facebookPosts;
 }
 
 export async function getTransparencyDocs() {

@@ -48,17 +48,6 @@ export type ImpactStat = {
   bottomLabel: string;
 };
 
-export type NewsCategory = "新聞" | "報導" | "故事" | "活動";
-
-export type FacebookPost = {
-  id: string;
-  category: NewsCategory;
-  title: string;
-  excerpt: string;
-  image: string | null;
-  href: string;
-  postedAt: string; // ISO date
-};
 
 export type TransparencyDoc = {
   id: string;
