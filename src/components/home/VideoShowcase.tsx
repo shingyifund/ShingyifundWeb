@@ -15,7 +15,7 @@ export async function VideoShowcase() {
     : video.href;
 
   return (
-    <section className="py-12">
+    <section className="py-8 sm:py-10">
       <Container>
         <Reveal>
           <div className="grid overflow-hidden rounded-3xl shadow-soft lg:grid-cols-[1.15fr_1fr]">

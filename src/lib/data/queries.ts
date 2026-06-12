@@ -247,6 +247,31 @@ async function getMonthlyDonationImagesByReportIds(reportIds: string[]) {
   return map;
 }
 
+/** 首頁跑馬燈用：最新捐贈者資訊，不帶圖片以省查詢 */
+export async function getRecentMonthlyDonors(
+  limit = 20,
+): Promise<MonthlyDonationReport[]> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("monthly_donation_reports")
+      .select(MONTHLY_DONATION_REPORT_COLS)
+      .eq("is_published", true)
+      .order("western_year", { ascending: false })
+      .order("month", { ascending: false })
+      .order("sort_order", { ascending: true })
+      .limit(limit);
+
+    if (error || !data) throw error;
+
+    return (data as MonthlyDonationReportRow[]).map((row) =>
+      mapMonthlyDonationReport(row, []),
+    );
+  } catch {
+    return [];
+  }
+}
+
 export async function getMonthlyDonationReports(): Promise<
   MonthlyDonationReport[]
 > {

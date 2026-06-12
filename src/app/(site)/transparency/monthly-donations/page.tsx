@@ -1,16 +1,8 @@
 import type { Metadata } from "next";
-import { ArrowRight, PackageOpen } from "lucide-react";
-import { PageHero } from "@/components/ui/PageHero";
+import Image from "next/image";
 import { Container } from "@/components/ui/Container";
-import { Button } from "@/components/ui/Button";
 import { getMonthlyDonationReports } from "@/lib/data/queries";
-import {
-  formatMonthlyDonationPeriod,
-  getMonthlyDonationDonorDisplayName,
-  getMonthlyDonationDonorTypeLabel,
-  getMonthlyDonationRegionLabel,
-} from "@/lib/monthly-donations";
-import type { MonthlyDonationReport } from "@/lib/types";
+import { MonthlyDonationLedger } from "./_components/monthly-donation-ledger";
 
 export const metadata: Metadata = {
   title: "每月捐物清單",
@@ -19,26 +11,39 @@ export const metadata: Metadata = {
 
 export default async function MonthlyDonationsPage() {
   const reports = await getMonthlyDonationReports();
-  const groups = groupByPeriod(reports);
 
   return (
     <>
-      <PageHero
-        image="/images/about-hero-bg.jpg"
-        imagePosition="right"
-        eyebrow="Monthly Donations"
-        title="每月捐物清單"
-        align="left"
-        overlay="gradient"
-      >
-        <p className="mt-6 max-w-xl text-base leading-relaxed text-navy-100/85 sm:text-lg">
-          公開每月物資捐贈明細與照片，讓每一份物資流向都清楚可查。
-        </p>
-      </PageHero>
+      <section className="relative overflow-hidden bg-navy-900 py-12 text-white sm:py-14">
+        <Image
+          src="/images/about-hero-bg.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="pointer-events-none object-cover object-right opacity-70"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-navy-950 via-navy-900/75 to-navy-900/20" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgb(255_255_255/0.06)_1px,transparent_0)] bg-size-[26px_26px]" />
 
-      <main className="bg-[#f5f7f4] py-14 sm:py-20">
+        <Container className="relative">
+          <div className="max-w-3xl">
+            <p className="font-serif text-xs font-semibold uppercase tracking-[0.28em] text-amber-300">
+              Monthly donations
+            </p>
+            <h1 className="mt-3 font-serif text-4xl font-black leading-tight text-white sm:text-5xl">
+              每月捐物清單
+            </h1>
+            <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-navy-100/85 sm:text-base">
+              公開每月物資捐贈明細與照片，讓每一份物資流向都清楚可查。
+            </p>
+          </div>
+        </Container>
+      </section>
+
+      <main className="bg-[#f5f7f4] py-8 sm:py-10">
         <Container>
-          {groups.length === 0 ? (
+          {reports.length === 0 ? (
             <section className="rounded-2xl border border-dashed border-navy-200 bg-white p-8 text-center">
               <h2 className="font-serif text-2xl font-bold text-navy-900">
                 目前尚無每月捐物清單
@@ -48,81 +53,10 @@ export default async function MonthlyDonationsPage() {
               </p>
             </section>
           ) : (
-            <section className="space-y-8">
-              {groups.map(([period, items]) => (
-                <div key={period}>
-                  <div className="mb-4">
-                    <p className="text-sm font-semibold text-amber-700">
-                      Donation Archive
-                    </p>
-                    <h2 className="mt-1 font-serif text-2xl font-black text-navy-900">
-                      {period}
-                    </h2>
-                  </div>
-
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {items.map((report) => (
-                      <DonorCard key={report.id} report={report} />
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </section>
+            <MonthlyDonationLedger reports={reports} />
           )}
         </Container>
       </main>
     </>
   );
-}
-
-function DonorCard({ report }: { report: MonthlyDonationReport }) {
-  const donorName = getMonthlyDonationDonorDisplayName({
-    donorName: report.donorName,
-    isAnonymous: report.isAnonymous,
-  });
-
-  return (
-    <article className="flex h-full flex-col rounded-2xl border border-navy-100 bg-white p-5 shadow-card">
-      <div className="flex items-start gap-4">
-        <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-navy-50 text-navy-700">
-          <PackageOpen className="size-6" strokeWidth={1.6} />
-        </span>
-        <div className="min-w-0">
-          <p className="text-sm font-semibold text-amber-700">
-            {getMonthlyDonationRegionLabel(report.region)} ·{" "}
-            {getMonthlyDonationDonorTypeLabel(report.donorType)}
-          </p>
-          <h3 className="mt-1 font-serif text-lg font-bold leading-snug text-navy-900">
-            {donorName}
-          </h3>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {report.images.length > 0
-              ? `${report.images.length} 張照片`
-              : "尚無照片"}
-          </p>
-        </div>
-      </div>
-      <div className="mt-5">
-        <Button
-          href={`/transparency/monthly-donations/${report.id}`}
-          variant="outline"
-          className="w-full"
-        >
-          查看明細
-          <ArrowRight />
-        </Button>
-      </div>
-    </article>
-  );
-}
-
-function groupByPeriod(reports: MonthlyDonationReport[]) {
-  const grouped = new Map<string, MonthlyDonationReport[]>();
-  for (const report of reports) {
-    const period = formatMonthlyDonationPeriod(report.westernYear, report.month);
-    const group = grouped.get(period) ?? [];
-    group.push(report);
-    grouped.set(period, group);
-  }
-  return Array.from(grouped.entries());
 }

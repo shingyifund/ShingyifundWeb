@@ -42,18 +42,18 @@ export function StatsBand({ stats }: { stats: ImpactStat[] }) {
   }, []);
 
   return (
-    <section className="py-8">
+    <section className="py-5 sm:py-6">
       <div className="container-x">
         <div
           ref={ref}
-          className="relative overflow-hidden rounded-3xl bg-navy-800 px-6 py-12 shadow-soft sm:px-10"
+          className="relative overflow-hidden rounded-3xl bg-navy-800 px-6 py-9 shadow-soft sm:px-10 sm:py-10"
         >
           {/* 裝飾光暈 */}
           <div className="pointer-events-none absolute -left-20 -top-24 size-64 rounded-full bg-navy-600/40 blur-2xl will-change-transform" style={{ transform: "translateZ(0)" }} />
           <div className="pointer-events-none absolute -bottom-24 -right-16 size-64 rounded-full bg-amber-500/20 blur-2xl will-change-transform" style={{ transform: "translateZ(0)" }} />
 
           {/* 標題 + 愛心脈搏裝飾 */}
-          <div className="relative mb-12 flex items-center justify-center gap-3 text-amber-400">
+          <div className="relative mb-8 flex items-center justify-center gap-3 text-amber-400 sm:mb-9">
             <span className="hidden items-center gap-2 sm:flex">
               <span className="h-px w-12 bg-current/50" />
               <Heart className="size-4 fill-current text-rose-500" />
@@ -68,7 +68,7 @@ export function StatsBand({ stats }: { stats: ImpactStat[] }) {
           </div>
 
           {/* 數據 */}
-          <dl className="relative grid grid-cols-2 gap-y-10 sm:grid-cols-3 lg:grid-cols-5 lg:gap-y-0">
+          <dl className="relative grid grid-cols-2 gap-y-7 sm:grid-cols-3 sm:gap-y-8 lg:grid-cols-5 lg:gap-y-0">
             {stats.map((s) => {
               const Icon = ICONS[s.icon];
               return (
@@ -77,12 +77,12 @@ export function StatsBand({ stats }: { stats: ImpactStat[] }) {
                   className="flex items-center justify-center gap-3 px-3 lg:border-l lg:border-white/15 lg:first:border-l-0"
                 >
                   <Icon
-                    className="size-10 shrink-0 text-white/85"
+                    className="size-9 shrink-0 text-white/85 sm:size-10"
                     strokeWidth={1.5}
                   />
                   <div className="text-left">
                     <dt className="text-xs text-navy-100/70">{s.topLabel}</dt>
-                    <dd className="font-serif text-3xl font-black leading-none tabular-nums text-amber-400 sm:text-4xl">
+                    <dd className="font-serif text-[2rem] font-black leading-none tabular-nums text-amber-400 sm:text-4xl">
                       {start ? (
                         <CountUp end={s.value} duration={2} separator="," />
                       ) : (

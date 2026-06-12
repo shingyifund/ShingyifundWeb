@@ -193,6 +193,21 @@
     background-clip: text;
     color: transparent;
   }
+
+  .donation-marquee-track {
+    animation: marquee 24s linear infinite;
+  }
+
+  .donation-marquee-track:hover,
+  .group:hover .donation-marquee-track {
+    animation-play-state: paused !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .donation-marquee-track {
+      animation: none;
+    }
+  }
 }
 
 @theme inline {

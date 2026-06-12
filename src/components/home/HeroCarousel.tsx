@@ -28,59 +28,65 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
   }, [emblaApi, onSelect]);
 
   return (
-    <section className="pt-4 pb-14 sm:pb-16">
+    <section className="pt-4 pb-8 sm:pb-10">
       <h1 className="sr-only">
         財團法人興毅社會福利慈善事業基金會 — 讓愛延續，讓需要被看見
       </h1>
 
       {/* 手機保留 16:9，桌機以 16:7 稍微壓低高度，同一輪播內高度固定避免跳動。 */}
       <div className="container-x">
-        <div className="overflow-hidden rounded-2xl" ref={emblaRef}>
-          <div className="flex">
-            {slides.map((slide, i) => (
-              <div key={slide.id} className="relative min-w-0 flex-[0_0_100%]">
-                <div className="relative aspect-video w-full lg:aspect-[16/7]">
-                  {slide.content_type === "image" && (
-                    <ImageSlide slide={slide} priority={i === 0} />
-                  )}
-                  {slide.content_type === "image_text" && (
-                    <ImageTextSlide slide={slide} priority={i === 0} selected={selected === i} />
-                  )}
-                  {slide.content_type === "youtube" && (
-                    <YoutubeSlide slide={slide} selected={selected === i} />
-                  )}
+        <div className="relative">
+          <div className="overflow-hidden rounded-2xl" ref={emblaRef}>
+            <div className="flex">
+              {slides.map((slide, i) => (
+                <div key={slide.id} className="relative min-w-0 flex-[0_0_100%]">
+                  <div className="relative aspect-video w-full lg:aspect-[16/7]">
+                    {slide.content_type === "image" && (
+                      <ImageSlide slide={slide} priority={i === 0} />
+                    )}
+                    {slide.content_type === "image_text" && (
+                      <ImageTextSlide
+                        slide={slide}
+                        priority={i === 0}
+                        selected={selected === i}
+                      />
+                    )}
+                    {slide.content_type === "youtube" && (
+                      <YoutubeSlide slide={slide} selected={selected === i} />
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* 控制列：z-10 確保在 FeatureCards 疊卡之上 */}
-      <div className="container-x relative z-10 mt-4 flex items-center justify-between">
-        <div className="flex items-center">
-          {slides.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => emblaApi?.scrollTo(i)}
-              aria-label={`切換到第 ${i + 1} 張`}
-              aria-current={selected === i ? "true" : undefined}
-              className="group flex h-8 cursor-pointer items-center justify-center px-1.5"
-            >
-              <span
-                className={cn(
-                  "h-2 rounded-full transition-all duration-300",
-                  selected === i
-                    ? "w-8 bg-amber-500"
-                    : "w-2 bg-navy-300 group-hover:bg-navy-400",
-                )}
-              />
-            </button>
-          ))}
-        </div>
-        <div className="mr-20 flex gap-2 sm:mr-24 2xl:mr-0">
-          <ArrowBtn dir="prev" onClick={() => emblaApi?.scrollPrev()} />
-          <ArrowBtn dir="next" onClick={() => emblaApi?.scrollNext()} />
+          {/* 控制列疊在 hero 下緣，避免額外佔版面高度。 */}
+          <div className="pointer-events-none absolute inset-x-3 bottom-3 z-20 flex items-center justify-between sm:inset-x-5 sm:bottom-5">
+            <div className="pointer-events-auto flex items-center rounded-full bg-white/80 px-1.5 py-1 shadow-card backdrop-blur-md">
+              {slides.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => emblaApi?.scrollTo(i)}
+                  aria-label={`切換到第 ${i + 1} 張`}
+                  aria-current={selected === i ? "true" : undefined}
+                  className="group flex h-6 cursor-pointer items-center justify-center px-1 sm:h-7 sm:px-1.5"
+                >
+                  <span
+                    className={cn(
+                      "h-1.5 rounded-full transition-all duration-300 sm:h-2",
+                      selected === i
+                        ? "w-7 bg-amber-500 sm:w-8"
+                        : "w-1.5 bg-navy-300 group-hover:bg-navy-400 sm:w-2",
+                    )}
+                  />
+                </button>
+              ))}
+            </div>
+            <div className="pointer-events-auto mr-14 flex gap-1.5 sm:mr-20 sm:gap-2 2xl:mr-0">
+              <ArrowBtn dir="prev" onClick={() => emblaApi?.scrollPrev()} />
+              <ArrowBtn dir="next" onClick={() => emblaApi?.scrollNext()} />
+            </div>
+          </div>
         </div>
       </div>
     </section>

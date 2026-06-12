@@ -34,7 +34,7 @@ export async function FeatureCards() {
   const features = await getServiceFeatures();
 
   return (
-    <section className="relative -mt-8 pb-10 sm:-mt-12">
+    <section className="relative pt-1 pb-6 sm:pt-2 sm:pb-7">
       <Container>
         <div className="grid gap-6 md:grid-cols-2">
           {features.map((f, i) => (
