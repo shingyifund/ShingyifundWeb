@@ -132,7 +132,8 @@ export async function listSlides(): Promise<HeroSlideRecord[]> {
   const { data, error } = await supabase
     .from("hero_slides")
     .select(SELECT_COLS)
-    .order("sort_order", { ascending: true });
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: true });
 
   if (error) throw new Error(error.message);
 
@@ -353,7 +354,8 @@ export async function moveSlide(
   const { data, error: fetchError } = await supabase
     .from("hero_slides")
     .select("id, sort_order")
-    .order("sort_order", { ascending: true });
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: true });
 
   if (fetchError) return { ok: false, message: fetchError.message };
 
@@ -365,22 +367,19 @@ export async function moveSlide(
     return { ok: true };
   }
 
-  const current = slides[index];
-  const target = slides[targetIndex];
+  // 整批重排並重新賦值 0..n，順便正規化掉重複的 sort_order
+  const reordered = [...slides];
+  const [item] = reordered.splice(index, 1);
+  reordered.splice(targetIndex, 0, item);
 
-  const [currentResult, targetResult] = await Promise.all([
-    supabase
+  for (let i = 0; i < reordered.length; i++) {
+    if (reordered[i].sort_order === i) continue; // 值已正確就跳過
+    const { error } = await supabase
       .from("hero_slides")
-      .update({ sort_order: target.sort_order })
-      .eq("id", current.id),
-    supabase
-      .from("hero_slides")
-      .update({ sort_order: current.sort_order })
-      .eq("id", target.id),
-  ]);
-
-  const error = currentResult.error ?? targetResult.error;
-  if (error) return { ok: false, message: error.message };
+      .update({ sort_order: i })
+      .eq("id", reordered[i].id);
+    if (error) return { ok: false, message: error.message };
+  }
 
   revalidateHero();
   return { ok: true };

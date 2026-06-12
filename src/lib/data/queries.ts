@@ -29,7 +29,8 @@ export async function getHeroSlides(): Promise<HeroSlide[]> {
         "id, content_type, has_title, title, has_subtitle, subtitle, image_url, poster_image_url, youtube_url, youtube_video_id, has_cta, cta_label, cta_href, link_url, tone",
       )
       .eq("is_active", true)
-      .order("sort_order");
+      .order("sort_order")
+      .order("created_at");
 
     if (error || !data) throw error;
 
