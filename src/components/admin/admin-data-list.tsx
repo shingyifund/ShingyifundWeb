@@ -21,7 +21,7 @@ export function AdminDataList({
     <div className="overflow-hidden rounded-lg border bg-white">
       <div
         className={cn(
-          "hidden border-b bg-muted/50 px-4 py-3 text-xs font-medium text-muted-foreground",
+          "hidden gap-3 border-b bg-muted/50 px-4 py-3 text-xs font-medium text-muted-foreground",
           gridClassName,
           headerVisibleClassName,
         )}
