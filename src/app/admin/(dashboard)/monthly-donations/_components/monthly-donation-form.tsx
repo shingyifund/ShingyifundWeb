@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   MONTHLY_DONATION_DONOR_TYPES,
   MONTHLY_DONATION_REGIONS,
@@ -242,41 +243,43 @@ export function MonthlyDonationForm({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="region">區域</Label>
-          <select
-            id="region"
+          <Label>區域</Label>
+          <ToggleGroup
+            type="single"
             value={region}
-            onChange={(event) =>
-              setRegion(event.target.value as MonthlyDonationReportRecord["region"])
-            }
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+            onValueChange={(v) => {
+              if (v) setRegion(v as MonthlyDonationReportRecord["region"]);
+            }}
+            spacing={0}
+            variant="outline"
+            className="w-full"
           >
             {MONTHLY_DONATION_REGIONS.map((item) => (
-              <option key={item.value} value={item.value}>
+              <ToggleGroupItem key={item.value} value={item.value} className="flex-1 text-sm">
                 {item.label}
-              </option>
+              </ToggleGroupItem>
             ))}
-          </select>
+          </ToggleGroup>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="donor_type">分類</Label>
-          <select
-            id="donor_type"
+          <Label>分類</Label>
+          <ToggleGroup
+            type="single"
             value={donorType}
-            onChange={(event) =>
-              setDonorType(
-                event.target.value as MonthlyDonationReportRecord["donor_type"],
-              )
-            }
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+            onValueChange={(v) => {
+              if (v) setDonorType(v as MonthlyDonationReportRecord["donor_type"]);
+            }}
+            spacing={0}
+            variant="outline"
+            className="w-full"
           >
             {MONTHLY_DONATION_DONOR_TYPES.map((item) => (
-              <option key={item.value} value={item.value}>
+              <ToggleGroupItem key={item.value} value={item.value} className="flex-1 text-sm">
                 {item.label}
-              </option>
+              </ToggleGroupItem>
             ))}
-          </select>
+          </ToggleGroup>
         </div>
       </div>
 
