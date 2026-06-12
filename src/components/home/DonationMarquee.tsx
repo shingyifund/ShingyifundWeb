@@ -3,7 +3,6 @@ import { Heart } from "lucide-react";
 import { getRecentMonthlyDonors } from "@/lib/data/queries";
 import {
   formatMonthlyDonationPeriod,
-  getMonthlyDonationDonorTypeLabel,
   getMonthlyDonationDonorDisplayName,
   getMonthlyDonationRegionLabel,
 } from "@/lib/monthly-donations";
@@ -18,7 +17,7 @@ export async function DonationMarquee() {
   const loop = Array.from({ length: repeatCount }, () => donors).flat();
 
   return (
-    <section className="border-y border-navy-100 bg-cream py-5">
+    <section className="bg-cream pt-2">
       <div className="container-x">
         <div className="mb-3 flex items-center gap-2 px-1">
           <Heart className="size-4 fill-current text-rose-500" strokeWidth={2} />
@@ -62,7 +61,7 @@ function DonorChip({ donor }: { donor: MonthlyDonationReport }) {
     donorName: donor.donorName,
     isAnonymous: donor.isAnonymous,
   });
-  const donorType = getMonthlyDonationDonorTypeLabel(donor.donorType);
+  const title = donor.title || `感謝 ${name} 捐贈物資`;
 
   return (
     <li className="shrink-0">
@@ -75,16 +74,11 @@ function DonorChip({ donor }: { donor: MonthlyDonationReport }) {
         </span>
         <span className="flex flex-col leading-tight">
           <span className="max-w-48 truncate text-[13px] font-semibold text-navy-900">
-            感謝 {name} 捐贈佈施
+            {title}
           </span>
-          <span className="mt-0.5 flex items-center gap-1.5 text-[11px] text-ink-soft">
-            <span className="rounded-full bg-amber-50 px-1.5 py-px text-[10px] font-semibold leading-none text-amber-700">
-              {donorType}
-            </span>
-            <span>
-              {formatMonthlyDonationPeriod(donor.westernYear, donor.month)} ·{" "}
-              {getMonthlyDonationRegionLabel(donor.region)}
-            </span>
+          <span className="mt-0.5 text-[11px] text-ink-soft">
+            {formatMonthlyDonationPeriod(donor.westernYear, donor.month)} ·{" "}
+            {getMonthlyDonationRegionLabel(donor.region)}
           </span>
         </span>
       </Link>

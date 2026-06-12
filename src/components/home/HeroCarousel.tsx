@@ -28,7 +28,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
   }, [emblaApi, onSelect]);
 
   return (
-    <section className="pt-4 pb-8 sm:pb-10">
+    <section className="pt-2 pb-4 sm:pb-5">
       <h1 className="sr-only">
         財團法人興毅社會福利慈善事業基金會 — 讓愛延續，讓需要被看見
       </h1>
