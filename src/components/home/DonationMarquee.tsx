@@ -73,10 +73,10 @@ function DonorChip({ donor }: { donor: MonthlyDonationReport }) {
           <Heart className="size-3.5 fill-current" strokeWidth={2} />
         </span>
         <span className="flex flex-col leading-tight">
-          <span className="max-w-48 truncate text-[13px] font-semibold text-navy-900">
+          <span className="whitespace-nowrap text-[13px] font-semibold text-navy-900">
             {title}
           </span>
-          <span className="mt-0.5 text-[11px] text-ink-soft">
+          <span className="mt-0.5 whitespace-nowrap text-[11px] text-ink-soft">
             {formatMonthlyDonationPeriod(donor.westernYear, donor.month)} ·{" "}
             {getMonthlyDonationRegionLabel(donor.region)}
           </span>
