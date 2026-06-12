@@ -321,7 +321,7 @@ export async function getMonthlyDonationReports(): Promise<
       .order("month", { ascending: false })
       .order("region", { ascending: true })
       .order("donor_type", { ascending: true })
-      .order("sort_order", { ascending: true });
+      .order("created_at", { ascending: false });
 
     if (error || !data) throw error;
 

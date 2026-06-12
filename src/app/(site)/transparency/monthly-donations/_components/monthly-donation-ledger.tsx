@@ -150,8 +150,8 @@ export function MonthlyDonationLedger({
       <div className="overflow-hidden rounded-2xl bg-white shadow-[0_16px_44px_-28px_rgb(15_38_71_/_0.45)] ring-1 ring-navy-100">
         <div className="hidden grid-cols-[8rem_1fr_8rem_7rem_6rem] gap-4 border-b border-navy-100 bg-navy-50/70 px-4 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted md:grid">
           <span>月份</span>
-          <span>捐贈者</span>
-          <span>地區</span>
+          <span>項目</span>
+          <span>地區 / 捐贈者</span>
           <span>照片</span>
           <span className="text-right">明細</span>
         </div>
@@ -198,12 +198,12 @@ function DonationLedgerRow({ report }: { report: MonthlyDonationReport }) {
             <DonorIcon className="size-5" strokeWidth={1.7} />
           </span>
           <div className="min-w-0">
-            <h3 className="truncate font-serif text-lg font-bold leading-snug text-navy-900">
-              {donorName}
+            <h3 className="line-clamp-2 font-serif text-base font-bold leading-snug text-navy-900">
+              {report.title}
             </h3>
             <p className="text-xs font-semibold text-amber-700 md:hidden">
               {getMonthlyDonationRegionLabel(report.region)} ·{" "}
-              {getMonthlyDonationDonorTypeLabel(report.donorType)}
+              {getMonthlyDonationDonorTypeLabel(report.donorType)} · {donorName}
             </p>
           </div>
         </div>
@@ -211,6 +211,9 @@ function DonationLedgerRow({ report }: { report: MonthlyDonationReport }) {
         <p className="hidden text-sm font-semibold text-amber-700 md:block">
           {getMonthlyDonationRegionLabel(report.region)} ·{" "}
           {getMonthlyDonationDonorTypeLabel(report.donorType)}
+          <span className="mt-0.5 block font-normal text-navy-700">
+            {donorName}
+          </span>
         </p>
 
         <p className="flex items-center gap-2 text-sm text-ink-muted">

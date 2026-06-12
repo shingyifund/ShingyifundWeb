@@ -226,7 +226,8 @@ export async function listMonthlyDonationReports(): Promise<
     .order("western_year", { ascending: false })
     .order("month", { ascending: false })
     .order("region", { ascending: true })
-    .order("donor_type", { ascending: true });
+    .order("donor_type", { ascending: true })
+    .order("created_at", { ascending: false });
 
   if (error) throw new Error(error.message);
 
