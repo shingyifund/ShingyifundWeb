@@ -307,18 +307,30 @@ async function removeHeroImageByUrl(
 
 export async function deleteSlide(
   id: string,
-  imageUrl?: string | null,
+  _imageUrl?: string | null,
 ): Promise<ActionResult> {
   await assertAdmin();
 
   const supabase = await createAdminClient();
+
+  // 刪除前先查出圖片網址（image_url + poster_image_url 都要清）
+  const { data: existing } = await supabase
+    .from("hero_slides")
+    .select("image_url, poster_image_url")
+    .eq("id", id)
+    .maybeSingle();
+
   const { error } = await supabase.from("hero_slides").delete().eq("id", id);
 
   if (error) return { ok: false, message: error.message };
 
-  if (imageUrl?.includes("/storage/v1/object/public/hero-images/")) {
-    const path = imageUrl.split("/hero-images/")[1];
-    if (path) await supabase.storage.from("hero-images").remove([path]);
+  const paths: string[] = [];
+  for (const url of [existing?.image_url, existing?.poster_image_url]) {
+    const path = getHeroImagePath(url ?? "");
+    if (path) paths.push(path);
+  }
+  if (paths.length > 0) {
+    await supabase.storage.from("hero-images").remove(paths);
   }
 
   revalidateHero();
