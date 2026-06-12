@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Loader2, Save, X } from "lucide-react";
+import { Camera, Loader2, Save, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { FormAlert } from "@/components/ui/form-alert";
 import { Input } from "@/components/ui/input";
@@ -136,6 +136,11 @@ export function MonthlyDonationForm({
       selectedPreviews.forEach((preview) => URL.revokeObjectURL(preview.url));
     };
   }, [selectedPreviews]);
+
+  function appendFiles(files: File[]) {
+    setSelectedFiles((current) => [...current, ...files]);
+    setNewCaptions((current) => [...current, ...files.map(() => "")]);
+  }
 
   function removeSelectedFile(index: number) {
     setSelectedFiles((current) => current.filter((_, i) => i !== index));
@@ -378,16 +383,29 @@ export function MonthlyDonationForm({
 
       <div className="space-y-2">
         <Label>新增圖片</Label>
-        <UploadTrigger
-          multiple
-          accept="image/*"
-          label="選擇圖片"
-          hint="可多選；送出前會自動壓縮，每張壓縮後需小於 500KB。"
-          onFilesSelected={(files) => {
-            setSelectedFiles(files);
-            setNewCaptions(files.map(() => ""));
-          }}
-        />
+        <div className="grid gap-2 sm:grid-cols-2">
+          <UploadTrigger
+            multiple
+            accept="image/*"
+            label="選擇圖片"
+            hint="可多選相簿照片"
+            onFilesSelected={appendFiles}
+            className="sm:col-span-2"
+          />
+          {/* 拍照鈕只在手機顯示（桌機 capture 無效，會退化成選單張） */}
+          <UploadTrigger
+            accept="image/*"
+            capture="environment"
+            label="拍照"
+            hint="直接開相機拍照"
+            icon={<Camera className="size-5" strokeWidth={1.8} />}
+            onFilesSelected={appendFiles}
+            className="sm:hidden"
+          />
+        </div>
+        <p className="text-xs text-muted-foreground">
+          送出前會自動壓縮，每張壓縮後需小於 500KB。
+        </p>
         {selectedPreviews.length > 0 && (
           <div className="space-y-3 rounded-lg border bg-muted/30 p-3">
             <p className="text-sm text-muted-foreground">

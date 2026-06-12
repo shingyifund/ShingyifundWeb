@@ -8,6 +8,8 @@ type UploadTriggerProps = {
   onFilesSelected: (files: File[]) => void;
   accept?: string;
   multiple?: boolean;
+  /** "environment" 後鏡頭、"user" 前鏡頭；設定後手機點擊直接開相機（iOS 需單選） */
+  capture?: "environment" | "user";
   label?: string;
   hint?: string;
   icon?: ReactNode;
@@ -23,6 +25,7 @@ export function UploadTrigger({
   onFilesSelected,
   accept = "image/*",
   multiple = false,
+  capture,
   label = "選擇檔案",
   hint,
   icon,
@@ -51,6 +54,7 @@ export function UploadTrigger({
         type="file"
         accept={accept}
         multiple={multiple}
+        capture={capture}
         className="hidden"
         onChange={(event) => {
           const files = Array.from(event.target.files ?? []);
