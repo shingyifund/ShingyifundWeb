@@ -6,31 +6,20 @@ import { Button } from "@/components/ui/Button";
 import { getMonthlyDonationReports } from "@/lib/data/queries";
 import {
   formatMonthlyDonationPeriod,
+  getMonthlyDonationDonorDisplayName,
   getMonthlyDonationDonorTypeLabel,
   getMonthlyDonationRegionLabel,
-  monthlyDonationSlug,
 } from "@/lib/monthly-donations";
-import type {
-  MonthlyDonationDonorType,
-  MonthlyDonationRegion,
-} from "@/lib/types";
+import type { MonthlyDonationReport } from "@/lib/types";
 
 export const metadata: Metadata = {
   title: "每月捐物清單",
   description: "興毅基金會每月物資捐贈明細與照片公開查詢。",
 };
 
-type ArchiveItem = {
-  westernYear: number;
-  month: number;
-  region: MonthlyDonationRegion;
-  donorTypes: MonthlyDonationDonorType[];
-  imageCount: number;
-};
-
 export default async function MonthlyDonationsPage() {
   const reports = await getMonthlyDonationReports();
-  const archives = buildArchives(reports);
+  const groups = groupByPeriod(reports);
 
   return (
     <>
@@ -49,7 +38,7 @@ export default async function MonthlyDonationsPage() {
 
       <main className="bg-[#f5f7f4] py-14 sm:py-20">
         <Container>
-          {archives.length === 0 ? (
+          {groups.length === 0 ? (
             <section className="rounded-2xl border border-dashed border-navy-200 bg-white p-8 text-center">
               <h2 className="font-serif text-2xl font-bold text-navy-900">
                 目前尚無每月捐物清單
@@ -60,25 +49,20 @@ export default async function MonthlyDonationsPage() {
             </section>
           ) : (
             <section className="space-y-8">
-              {archives.map(([period, items]) => (
+              {groups.map(([period, items]) => (
                 <div key={period}>
-                  <div className="mb-4 flex items-end justify-between gap-4">
-                    <div>
-                      <p className="text-sm font-semibold text-amber-700">
-                        Donation Archive
-                      </p>
-                      <h2 className="mt-1 font-serif text-2xl font-black text-navy-900">
-                        {period}
-                      </h2>
-                    </div>
+                  <div className="mb-4">
+                    <p className="text-sm font-semibold text-amber-700">
+                      Donation Archive
+                    </p>
+                    <h2 className="mt-1 font-serif text-2xl font-black text-navy-900">
+                      {period}
+                    </h2>
                   </div>
 
-                  <div className="grid gap-4 md:grid-cols-2">
-                    {items.map((item) => (
-                      <ArchiveCard
-                        key={`${period}-${item.region}`}
-                        item={item}
-                      />
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {items.map((report) => (
+                      <DonorCard key={report.id} report={report} />
                     ))}
                   </div>
                 </div>
@@ -91,7 +75,12 @@ export default async function MonthlyDonationsPage() {
   );
 }
 
-function ArchiveCard({ item }: { item: ArchiveItem }) {
+function DonorCard({ report }: { report: MonthlyDonationReport }) {
+  const donorName = getMonthlyDonationDonorDisplayName({
+    donorName: report.donorName,
+    isAnonymous: report.isAnonymous,
+  });
+
   return (
     <article className="flex h-full flex-col rounded-2xl border border-navy-100 bg-white p-5 shadow-card">
       <div className="flex items-start gap-4">
@@ -100,20 +89,22 @@ function ArchiveCard({ item }: { item: ArchiveItem }) {
         </span>
         <div className="min-w-0">
           <p className="text-sm font-semibold text-amber-700">
-            {formatMonthlyDonationPeriod(item.westernYear, item.month)}
+            {getMonthlyDonationRegionLabel(report.region)} ·{" "}
+            {getMonthlyDonationDonorTypeLabel(report.donorType)}
           </p>
-          <h3 className="mt-1 font-serif text-xl font-bold leading-snug text-navy-900">
-            {getMonthlyDonationRegionLabel(item.region)}
+          <h3 className="mt-1 font-serif text-lg font-bold leading-snug text-navy-900">
+            {donorName}
           </h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            {item.donorTypes.map(getMonthlyDonationDonorTypeLabel).join("、")}
-            {item.imageCount > 0 ? ` / ${item.imageCount} 張照片` : ""}
+            {report.images.length > 0
+              ? `${report.images.length} 張照片`
+              : "尚無照片"}
           </p>
         </div>
       </div>
       <div className="mt-5">
         <Button
-          href={`/transparency/monthly-donations/${monthlyDonationSlug(item)}`}
+          href={`/transparency/monthly-donations/${report.id}`}
           variant="outline"
           className="w-full"
         >
@@ -125,48 +116,13 @@ function ArchiveCard({ item }: { item: ArchiveItem }) {
   );
 }
 
-function buildArchives(
-  reports: Awaited<ReturnType<typeof getMonthlyDonationReports>>,
-) {
-  const map = new Map<string, ArchiveItem>();
-
+function groupByPeriod(reports: MonthlyDonationReport[]) {
+  const grouped = new Map<string, MonthlyDonationReport[]>();
   for (const report of reports) {
-    const key = `${report.westernYear}-${report.month}-${report.region}`;
-    const current =
-      map.get(key) ??
-      ({
-        westernYear: report.westernYear,
-        month: report.month,
-        region: report.region,
-        donorTypes: [],
-        imageCount: 0,
-      } satisfies ArchiveItem);
-
-    if (!current.donorTypes.includes(report.donorType)) {
-      current.donorTypes.push(report.donorType);
-    }
-    current.imageCount += report.images.length;
-    map.set(key, current);
-  }
-
-  const items = Array.from(map.values()).sort((a, b) => {
-    if (a.westernYear !== b.westernYear) {
-      return b.westernYear - a.westernYear;
-    }
-    if (a.month !== b.month) return b.month - a.month;
-    return getMonthlyDonationRegionLabel(a.region).localeCompare(
-      getMonthlyDonationRegionLabel(b.region),
-      "zh-Hant",
-    );
-  });
-
-  const grouped = new Map<string, ArchiveItem[]>();
-  for (const item of items) {
-    const period = formatMonthlyDonationPeriod(item.westernYear, item.month);
+    const period = formatMonthlyDonationPeriod(report.westernYear, report.month);
     const group = grouped.get(period) ?? [];
-    group.push(item);
+    group.push(report);
     grouped.set(period, group);
   }
-
   return Array.from(grouped.entries());
 }

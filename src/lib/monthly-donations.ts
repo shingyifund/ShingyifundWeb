@@ -40,37 +40,25 @@ export function formatMonthlyDonationPeriod(westernYear: number, month: number) 
   return `${westernYear}年${String(month).padStart(2, "0")}月`;
 }
 
-export function monthlyDonationSlug({
-  westernYear,
-  month,
-  region,
+/** 匿名時前台顯示「善心人士」，否則顯示捐贈者名稱 */
+export function getMonthlyDonationDonorDisplayName({
+  donorName,
+  isAnonymous,
 }: {
-  westernYear: number;
-  month: number;
-  region: MonthlyDonationRegion;
+  donorName: string | null;
+  isAnonymous: boolean;
 }) {
-  return `${westernYear}-${String(month).padStart(2, "0")}-${region}`;
+  if (isAnonymous || !donorName) return "善心人士";
+  return donorName;
 }
 
-export function parseMonthlyDonationSlug(slug: string) {
-  const match = slug.match(/^(\d{4})-(\d{1,2})-(taipei|new_taipei|taoyuan|tainan)$/);
-  if (!match) return null;
-
-  const westernYear = Number(match[1]);
-  const month = Number(match[2]);
-
-  if (
-    !Number.isInteger(westernYear) ||
-    westernYear < 1912 ||
-    westernYear > 2999
-  ) {
-    return null;
-  }
-  if (!Number.isInteger(month) || month < 1 || month > 12) return null;
-
-  return {
-    westernYear,
-    month,
-    region: match[3] as MonthlyDonationRegion,
-  };
+/** 標題自動產生：感謝 {善心人士／捐贈者名稱} 捐贈物資 */
+export function buildMonthlyDonationTitle({
+  donorName,
+  isAnonymous,
+}: {
+  donorName: string | null;
+  isAnonymous: boolean;
+}) {
+  return `感謝 ${getMonthlyDonationDonorDisplayName({ donorName, isAnonymous })} 捐贈物資`;
 }

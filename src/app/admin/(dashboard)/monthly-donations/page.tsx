@@ -1,6 +1,6 @@
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { MonthlyDonationsTable } from "./_components/monthly-donations-table";
+import { MonthlyDonationsListView } from "./_components/monthly-donations-list-view";
 import { listMonthlyDonationReports } from "./actions";
 
 export default async function MonthlyDonationsAdminPage() {
@@ -23,7 +23,7 @@ export default async function MonthlyDonationsAdminPage() {
         </Button>
       </div>
 
-      <MonthlyDonationsTable reports={reports} />
+      <MonthlyDonationsListView reports={reports} />
     </div>
   );
 }

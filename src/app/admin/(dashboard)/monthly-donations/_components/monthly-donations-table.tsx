@@ -13,7 +13,7 @@ import { DeleteMonthlyDonationDialog } from "./delete-monthly-donation-dialog";
 import { MonthlyDonationPublishSwitch } from "./monthly-donation-publish-switch";
 
 const GRID_CLASS =
-  "lg:grid-cols-[120px_90px_90px_minmax(0,1fr)_100px_130px]";
+  "lg:grid-cols-[120px_80px_80px_140px_minmax(0,1fr)_100px_130px]";
 
 export function MonthlyDonationsTable({
   reports,
@@ -37,6 +37,7 @@ export function MonthlyDonationsTable({
         { label: "年月" },
         { label: "區域" },
         { label: "分類" },
+        { label: "捐贈者" },
         { label: "標題" },
         { label: "狀態" },
         { label: "操作", className: "text-right" },
@@ -58,6 +59,13 @@ export function MonthlyDonationsTable({
             </div>
             <div className="text-sm text-foreground">
               {getMonthlyDonationDonorTypeLabel(report.donor_type)}
+            </div>
+            <div className="min-w-0 text-sm">
+              {report.is_anonymous ? (
+                <span className="text-muted-foreground italic">（匿名）</span>
+              ) : (
+                <span className="text-foreground">{report.donor_name ?? "—"}</span>
+              )}
             </div>
             <div className="min-w-0">
               <p className="font-medium text-foreground">{report.title}</p>

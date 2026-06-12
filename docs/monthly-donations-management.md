@@ -9,18 +9,36 @@
 - 禁止新增 `no_direct_*`、`using=false`、`with_check=false` 之類的防禦性 policy，會擋住後台寫入。
 - 圖片存 Cloudinary，不存 Supabase Storage，所以不需要 `storage.objects` policy。
 
-## 需求範圍
+## 需求範圍（v2：一筆 = 一位捐贈者）
 
 - 前台入口：`徵信明細 > 每月捐物清單`
 - 前台列表頁：`/transparency/monthly-donations`
-- 前台詳細頁：`/transparency/monthly-donations/{西元年}-{月份}-{區域}`
+- 前台詳細頁：`/transparency/monthly-donations/{report_id}`（每位捐贈者一頁）
 - 後台：`/admin/monthly-donations`
-- 一筆資料代表：一個區域 + 一個分類（個人 / 團體）+ 一個月份。
+- **一筆資料代表：一位捐贈者（個人或團體）在某月某區的一次捐贈。**
+  - 同一個「年 + 月 + 區域 + 分類」底下可有多筆（多位捐贈者），無 unique 約束。
+- 捐贈者可匿名：`is_anonymous = true` 時前台顯示「善心人士」，後台仍保留真實姓名。
+- 標題自動產生「感謝 {捐贈者名稱／善心人士} 捐贈物資」，可手動修改。
+- 物資內容描述放在每張圖片的 `caption`，不再使用單一大文字框（content_text 移除）。
 - 後台可新增、編輯、刪除資料。
-- 後台可貼上 txt 捐贈明細。
-- 後台可多圖上傳，圖片上傳到 Cloudinary。
+- 後台可多圖上傳，每張圖可填說明（caption），圖片上傳到 Cloudinary。
 - 刪除資料時同步刪除 Cloudinary 圖片。
 - 前台只顯示 `is_published = true` 的資料。
+
+## 前台列表結構
+
+三層收合，手機友善：
+
+1. **月份**（2026年01月 / 2025年12月…）
+2. **個人 / 團體**（ToggleGroup 切換，與後台一致）
+3. **捐贈者卡片列表**（依區域分組），每張卡片連到該捐贈者詳細頁
+
+## 匿名顯示規則
+
+| `is_anonymous` | 前台顯示 | 後台顯示 |
+|----------------|----------|----------|
+| `false` | `donor_name`（必填） | `donor_name` |
+| `true` | 「善心人士」 | `donor_name`（若有填，內部可見） |
 
 ## Cloudinary 環境變數
 
@@ -34,22 +52,29 @@ CLOUDINARY_API_SECRET=
 
 `API_SECRET` 只可放 server environment，不能放前端或 commit。
 
+Cloudinary 資料夾路徑加上 `report_id` 一層，避免同月同區的圖混在一起：
+`monthly-donations/{年}/{月}/{區域}/{分類}/{report_id}/`
+
 ## Supabase 資料表
 
 ### `monthly_donation_reports`
 
 | 欄位 | 型別 | 說明 |
 |------|------|------|
-| id | uuid | 主鍵 |
-| title | text | 顯示標題 |
+| id | uuid | 主鍵（前台詳細頁 slug） |
+| title | text | 顯示標題（自動產生可改） |
 | western_year | smallint | 西元年度，例如 2026 |
 | month | smallint | 月份 1-12 |
 | region | text | `taipei` / `new_taipei` / `taoyuan` / `tainan` |
 | donor_type | text | `individual` / `organization` |
-| content_text | text | txt 捐贈明細內容 |
+| donor_name | text | 捐贈者名稱（匿名時可空） |
+| is_anonymous | boolean | 前台是否遮成「善心人士」 |
+| sort_order | smallint | 同月同區捐贈者顯示排序 |
 | is_published | boolean | 是否前台公開 |
 | created_at | timestamptz | 建立時間 |
 | updated_at | timestamptz | 更新時間 |
+
+> 移除 v1 的 `content_text` 欄位與 `unique(年,月,區域,分類)` 約束。
 
 ### `monthly_donation_images`
 
@@ -59,6 +84,7 @@ CLOUDINARY_API_SECRET=
 | report_id | uuid | 對應 `monthly_donation_reports.id` |
 | public_id | text | Cloudinary public id，刪除時使用 |
 | image_url | text | Cloudinary 圖片 URL |
+| caption | text | 圖片物資說明 |
 | file_name | text | 原始檔名 |
 | file_size | integer | 檔案大小 bytes |
 | width | integer | 圖片寬度 |
@@ -66,9 +92,14 @@ CLOUDINARY_API_SECRET=
 | sort_order | smallint | 顯示排序 |
 | created_at | timestamptz | 建立時間 |
 
-## SQL（完整、最小、可直接執行）
+## SQL（drop 重建，完整、可直接執行）
 
 ```sql
+-- 1. 砍掉舊表（images 先砍，有 FK）
+drop table if exists monthly_donation_images;
+drop table if exists monthly_donation_reports;
+
+-- 2. 重建 reports（一筆 = 一位捐贈者，無 unique 約束）
 create table monthly_donation_reports (
   id uuid primary key default gen_random_uuid(),
   title text not null,
@@ -76,18 +107,21 @@ create table monthly_donation_reports (
   month smallint not null check (month between 1 and 12),
   region text not null check (region in ('taipei', 'new_taipei', 'taoyuan', 'tainan')),
   donor_type text not null check (donor_type in ('individual', 'organization')),
-  content_text text not null,
+  donor_name text,
+  is_anonymous boolean not null default false,
+  sort_order smallint not null default 1,
   is_published boolean not null default true,
   created_at timestamptz default now(),
-  updated_at timestamptz default now(),
-  unique (western_year, month, region, donor_type)
+  updated_at timestamptz default now()
 );
 
+-- 3. 重建 images（加 caption）
 create table monthly_donation_images (
   id uuid primary key default gen_random_uuid(),
   report_id uuid not null references monthly_donation_reports(id) on delete cascade,
   public_id text not null,
   image_url text not null,
+  caption text,
   file_name text,
   file_size integer,
   width integer,
@@ -96,6 +130,11 @@ create table monthly_donation_images (
   created_at timestamptz default now()
 );
 
+-- 4. index：列表查詢用
+create index idx_mdr_archive
+  on monthly_donation_reports (western_year desc, month desc, region, donor_type, sort_order);
+
+-- 5. RLS
 alter table monthly_donation_reports enable row level security;
 alter table monthly_donation_images enable row level security;
 
@@ -149,7 +188,16 @@ with check (true);
 | 後台編輯頁 | `src/app/admin/(dashboard)/monthly-donations/[id]/page.tsx` |
 | 表單 / 列表 / 刪除元件 | `src/app/admin/(dashboard)/monthly-donations/_components/` |
 | 前台列表頁 | `src/app/(site)/transparency/monthly-donations/page.tsx` |
-| 前台詳細頁 | `src/app/(site)/transparency/monthly-donations/[slug]/page.tsx` |
+| 前台詳細頁 | `src/app/(site)/transparency/monthly-donations/[id]/page.tsx` |
 | Cloudinary helper | `src/lib/cloudinary.ts` |
 | 型別 | `src/lib/types.ts` |
 | 資料存取 | `src/lib/data/queries.ts` |
+
+## 程式碼需配合修改的重點（v1 → v2）
+
+1. **型別 / 欄位**：移除 `content_text`，新增 `donor_name`、`is_anonymous`、`sort_order`（reports）與 `caption`（images）。
+2. **後台表單**：移除「捐贈明細」大文字框；新增捐贈者名稱輸入、匿名 switch、每張圖的說明輸入。
+3. **slug**：`monthlyDonationSlug` / `parseMonthlyDonationSlug` 改為直接用 `report_id`，前台詳細頁路由改 `[id]`。
+4. **前台列表 `buildArchives`**：改為列出每位捐贈者（不再把同月同區合併成一張卡）。
+5. **Cloudinary folder**：路徑加 `report_id` 一層。
+6. **標題自動產生**：`感謝 {is_anonymous ? "善心人士" : donor_name} 捐贈物資`。

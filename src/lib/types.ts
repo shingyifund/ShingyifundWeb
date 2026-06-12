@@ -112,6 +112,7 @@ export type MonthlyDonationImage = {
   reportId: string;
   publicId: string;
   imageUrl: string;
+  caption: string | null;
   fileName: string | null;
   fileSize: number | null;
   width: number | null;
@@ -127,7 +128,9 @@ export type MonthlyDonationReport = {
   month: number;
   region: MonthlyDonationRegion;
   donorType: MonthlyDonationDonorType;
-  contentText: string;
+  donorName: string | null;
+  isAnonymous: boolean;
+  sortOrder: number;
   isPublished: boolean;
   createdAt: string | null;
   updatedAt: string | null;

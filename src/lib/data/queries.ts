@@ -153,10 +153,10 @@ export async function getFinancialReports(): Promise<FinancialReport[]> {
 }
 
 const MONTHLY_DONATION_REPORT_COLS =
-  "id, title, western_year, month, region, donor_type, content_text, is_published, created_at, updated_at";
+  "id, title, western_year, month, region, donor_type, donor_name, is_anonymous, sort_order, is_published, created_at, updated_at";
 
 const MONTHLY_DONATION_IMAGE_COLS =
-  "id, report_id, public_id, image_url, file_name, file_size, width, height, sort_order, created_at";
+  "id, report_id, public_id, image_url, caption, file_name, file_size, width, height, sort_order, created_at";
 
 type MonthlyDonationReportRow = {
   id: string;
@@ -165,7 +165,9 @@ type MonthlyDonationReportRow = {
   month: number;
   region: MonthlyDonationReport["region"];
   donor_type: MonthlyDonationReport["donorType"];
-  content_text: string;
+  donor_name: string | null;
+  is_anonymous: boolean;
+  sort_order: number;
   is_published: boolean;
   created_at: string | null;
   updated_at: string | null;
@@ -176,6 +178,7 @@ type MonthlyDonationImageRow = {
   report_id: string;
   public_id: string;
   image_url: string;
+  caption: string | null;
   file_name: string | null;
   file_size: number | null;
   width: number | null;
@@ -190,6 +193,7 @@ function mapMonthlyDonationImage(row: MonthlyDonationImageRow): MonthlyDonationI
     reportId: row.report_id,
     publicId: row.public_id,
     imageUrl: row.image_url,
+    caption: row.caption,
     fileName: row.file_name,
     fileSize: row.file_size,
     width: row.width,
@@ -210,7 +214,9 @@ function mapMonthlyDonationReport(
     month: row.month,
     region: row.region,
     donorType: row.donor_type,
-    contentText: row.content_text,
+    donorName: row.donor_name,
+    isAnonymous: row.is_anonymous,
+    sortOrder: row.sort_order,
     isPublished: row.is_published,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -253,7 +259,8 @@ export async function getMonthlyDonationReports(): Promise<
       .order("western_year", { ascending: false })
       .order("month", { ascending: false })
       .order("region", { ascending: true })
-      .order("donor_type", { ascending: true });
+      .order("donor_type", { ascending: true })
+      .order("sort_order", { ascending: true });
 
     if (error || !data) throw error;
 
@@ -270,37 +277,25 @@ export async function getMonthlyDonationReports(): Promise<
   }
 }
 
-export async function getMonthlyDonationReportsByArchive({
-  westernYear,
-  month,
-  region,
-}: {
-  westernYear: number;
-  month: number;
-  region: MonthlyDonationReport["region"];
-}): Promise<MonthlyDonationReport[]> {
+export async function getMonthlyDonationReportById(
+  id: string,
+): Promise<MonthlyDonationReport | null> {
   try {
     const supabase = await createClient();
     const { data, error } = await supabase
       .from("monthly_donation_reports")
       .select(MONTHLY_DONATION_REPORT_COLS)
       .eq("is_published", true)
-      .eq("western_year", westernYear)
-      .eq("month", month)
-      .eq("region", region)
-      .order("donor_type", { ascending: true });
+      .eq("id", id)
+      .maybeSingle();
 
     if (error || !data) throw error;
 
-    const rows = data as MonthlyDonationReportRow[];
-    const imagesByReportId = await getMonthlyDonationImagesByReportIds(
-      rows.map((row) => row.id),
-    );
+    const row = data as MonthlyDonationReportRow;
+    const imagesByReportId = await getMonthlyDonationImagesByReportIds([row.id]);
 
-    return rows.map((row) =>
-      mapMonthlyDonationReport(row, imagesByReportId.get(row.id) ?? []),
-    );
+    return mapMonthlyDonationReport(row, imagesByReportId.get(row.id) ?? []);
   } catch {
-    return [];
+    return null;
   }
 }

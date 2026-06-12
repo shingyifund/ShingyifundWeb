@@ -9,13 +9,11 @@ import { FormAlert } from "@/components/ui/form-alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   MONTHLY_DONATION_DONOR_TYPES,
   MONTHLY_DONATION_REGIONS,
-  getMonthlyDonationDonorTypeLabel,
-  getMonthlyDonationRegionLabel,
+  buildMonthlyDonationTitle,
 } from "@/lib/monthly-donations";
 import {
   createMonthlyDonationReport,
@@ -68,29 +66,9 @@ async function resizeImageForUpload(file: File) {
   return new File([blob], `${filename}.webp`, { type: "image/webp" });
 }
 
-function defaultTitle({
-  period,
-  month,
-  region,
-  donorType,
-}: {
-  period: string;
-  month: string;
-  region: MonthlyDonationReportRecord["region"];
-  donorType: MonthlyDonationReportRecord["donor_type"];
-}) {
-  const westernYear = period.slice(0, 4);
-  if (!westernYear || !month) return "";
-  return `${westernYear}年${String(Number(month)).padStart(2, "0")}月${getMonthlyDonationRegionLabel(region)}${getMonthlyDonationDonorTypeLabel(donorType)}捐贈明細`;
-}
-
 function toPeriodValue(report?: MonthlyDonationReportRecord) {
   if (!report) return "";
   return `${report.western_year}-${String(report.month).padStart(2, "0")}`;
-}
-
-function periodMonth(period: string) {
-  return period.split("-")[1] ?? "";
 }
 
 export function MonthlyDonationForm({
@@ -106,20 +84,28 @@ export function MonthlyDonationForm({
   const [donorType, setDonorType] = useState<
     MonthlyDonationReportRecord["donor_type"]
   >(report?.donor_type ?? "individual");
+  const [donorName, setDonorName] = useState(report?.donor_name ?? "");
+  const [isAnonymous, setIsAnonymous] = useState(report?.is_anonymous ?? false);
   const [isPublished, setIsPublished] = useState(report?.is_published ?? true);
   const [customTitle, setCustomTitle] = useState<string | null>(() => {
     if (!report?.title) return null;
     return report.title !==
-      defaultTitle({
-        period: toPeriodValue(report),
-        month: String(report.month),
-        region: report.region,
-        donorType: report.donor_type,
+      buildMonthlyDonationTitle({
+        donorName: report.donor_name,
+        isAnonymous: report.is_anonymous,
       })
       ? report.title
       : null;
   });
+  const [existingCaptions, setExistingCaptions] = useState<
+    Record<string, string>
+  >(() =>
+    Object.fromEntries(
+      (report?.images ?? []).map((img) => [img.id, img.caption ?? ""]),
+    ),
+  );
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [newCaptions, setNewCaptions] = useState<string[]>([]);
   const [deleteImageIds, setDeleteImageIds] = useState<Set<string>>(
     () => new Set(),
   );
@@ -130,14 +116,8 @@ export function MonthlyDonationForm({
   const [isPending, startTransition] = useTransition();
   const title = useMemo(
     () =>
-      customTitle ??
-      defaultTitle({
-        period,
-        month: periodMonth(period),
-        region,
-        donorType,
-      }),
-    [customTitle, donorType, period, region],
+      customTitle ?? buildMonthlyDonationTitle({ donorName: donorName || null, isAnonymous }),
+    [customTitle, donorName, isAnonymous],
   );
   const busy = submitStarted || isPending || processingImages;
   const busyText = processingImages ? "正在壓縮圖片..." : "正在儲存...";
@@ -158,6 +138,7 @@ export function MonthlyDonationForm({
 
   function removeSelectedFile(index: number) {
     setSelectedFiles((current) => current.filter((_, i) => i !== index));
+    setNewCaptions((current) => current.filter((_, i) => i !== index));
   }
 
   function resetSubmitState() {
@@ -202,11 +183,21 @@ export function MonthlyDonationForm({
     formData.set("period", period);
     formData.set("region", region);
     formData.set("donor_type", donorType);
+    formData.set("donor_name", donorName);
+    formData.set("is_anonymous", String(isAnonymous));
     formData.set("title", title);
     formData.set("is_published", String(isPublished));
     formData.delete("images");
-    for (const file of uploadFiles) formData.append("images", file);
+    formData.delete("new_captions");
+    uploadFiles.forEach((file, index) => {
+      formData.append("images", file);
+      formData.append("new_captions", newCaptions[index] ?? "");
+    });
     for (const id of deleteImageIds) formData.append("delete_image_ids", id);
+    // 既有圖片說明
+    for (const [imageId, caption] of Object.entries(existingCaptions)) {
+      formData.set(`image_caption_${imageId}`, caption);
+    }
 
     startTransition(async () => {
       const result = await (report
@@ -283,30 +274,44 @@ export function MonthlyDonationForm({
         </div>
       </div>
 
+      <div className="flex items-center justify-between rounded-lg border bg-muted/30 px-4 py-3">
+        <div>
+          <Label htmlFor="is_anonymous">匿名捐贈</Label>
+          <p className="mt-1 text-xs text-muted-foreground">
+            開啟後前台顯示「善心人士」，不公開姓名。
+          </p>
+        </div>
+        <Switch
+          id="is_anonymous"
+          checked={isAnonymous}
+          onCheckedChange={setIsAnonymous}
+        />
+      </div>
+
+      {!isAnonymous && (
+        <div className="space-y-2">
+          <Label htmlFor="donor_name">捐贈者名稱</Label>
+          <Input
+            id="donor_name"
+            value={donorName}
+            onChange={(event) => setDonorName(event.target.value)}
+            placeholder="例：沈小姐 / 里仁有機商店"
+          />
+        </div>
+      )}
+
       <div className="space-y-2">
         <Label htmlFor="title">標題</Label>
         <Input
           id="title"
           value={title}
           onChange={(event) => setCustomTitle(event.target.value)}
-          placeholder="2026年02月桃園個人捐贈明細"
+          placeholder="感謝 善心人士 捐贈物資"
           required
         />
         <p className="text-xs text-muted-foreground">
-          標題會依年度、月份、區域與分類自動產生，也可手動修改。
+          標題會依捐贈者名稱自動產生，也可手動修改。
         </p>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="content_text">捐贈明細</Label>
-        <Textarea
-          id="content_text"
-          name="content_text"
-          defaultValue={report?.content_text ?? ""}
-          rows={12}
-          placeholder="貼上 txt 檔案中的捐贈明細內容"
-          required
-        />
       </div>
 
       {report?.images.length ? (
@@ -316,11 +321,11 @@ export function MonthlyDonationForm({
             {report.images.map((image) => {
               const deleting = deleteImageIds.has(image.id);
               return (
-                <label
+                <div
                   key={image.id}
                   className="group overflow-hidden rounded-lg border bg-white"
                 >
-                  <div className="relative aspect-[4/3] bg-muted">
+                  <div className="relative aspect-4/3 bg-muted">
                     <Image
                       src={image.image_url}
                       alt={image.file_name ?? "捐贈物資照片"}
@@ -334,22 +339,36 @@ export function MonthlyDonationForm({
                       </div>
                     )}
                   </div>
-                  <span className="flex items-center gap-2 px-3 py-2 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={deleting}
-                      onChange={(event) => {
-                        setDeleteImageIds((current) => {
-                          const next = new Set(current);
-                          if (event.target.checked) next.add(image.id);
-                          else next.delete(image.id);
-                          return next;
-                        });
-                      }}
+                  <div className="space-y-2 px-3 py-2">
+                    <Input
+                      value={existingCaptions[image.id] ?? ""}
+                      onChange={(event) =>
+                        setExistingCaptions((current) => ({
+                          ...current,
+                          [image.id]: event.target.value,
+                        }))
+                      }
+                      placeholder="圖片說明（物資內容）"
+                      disabled={deleting}
+                      className="h-9 text-sm"
                     />
-                    刪除此圖片
-                  </span>
-                </label>
+                    <span className="flex items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={deleting}
+                        onChange={(event) => {
+                          setDeleteImageIds((current) => {
+                            const next = new Set(current);
+                            if (event.target.checked) next.add(image.id);
+                            else next.delete(image.id);
+                            return next;
+                          });
+                        }}
+                      />
+                      刪除此圖片
+                    </span>
+                  </div>
+                </div>
               );
             })}
           </div>
@@ -363,9 +382,11 @@ export function MonthlyDonationForm({
           type="file"
           accept="image/*"
           multiple
-          onChange={(event) =>
-            setSelectedFiles(Array.from(event.target.files ?? []))
-          }
+          onChange={(event) => {
+            const files = Array.from(event.target.files ?? []);
+            setSelectedFiles(files);
+            setNewCaptions(files.map(() => ""));
+          }}
         />
         <p className="text-xs text-muted-foreground">
           可多選圖片；送出前會自動壓縮，每張壓縮後需小於 500KB。
@@ -381,26 +402,40 @@ export function MonthlyDonationForm({
                   key={`${preview.file.name}-${preview.file.lastModified}-${index}`}
                   className="overflow-hidden rounded-lg border bg-white"
                 >
-                  <div className="relative aspect-[4/3] bg-muted">
+                  <div className="relative aspect-4/3 bg-muted">
                     <img
                       src={preview.url}
                       alt={preview.file.name}
                       className="size-full object-cover"
                     />
                   </div>
-                  <div className="flex items-center justify-between gap-2 px-3 py-2">
-                    <p className="min-w-0 truncate text-sm text-foreground">
-                      {preview.file.name}
-                    </p>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon-sm"
-                      aria-label={`移除 ${preview.file.name}`}
-                      onClick={() => removeSelectedFile(index)}
-                    >
-                      <X />
-                    </Button>
+                  <div className="space-y-2 px-3 py-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="min-w-0 truncate text-sm text-foreground">
+                        {preview.file.name}
+                      </p>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-sm"
+                        aria-label={`移除 ${preview.file.name}`}
+                        onClick={() => removeSelectedFile(index)}
+                      >
+                        <X />
+                      </Button>
+                    </div>
+                    <Input
+                      value={newCaptions[index] ?? ""}
+                      onChange={(event) =>
+                        setNewCaptions((current) => {
+                          const next = [...current];
+                          next[index] = event.target.value;
+                          return next;
+                        })
+                      }
+                      placeholder="圖片說明（物資內容）"
+                      className="h-9 text-sm"
+                    />
                   </div>
                 </div>
               ))}

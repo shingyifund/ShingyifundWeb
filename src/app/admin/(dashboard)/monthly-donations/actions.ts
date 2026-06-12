@@ -5,8 +5,7 @@ import { deleteCloudinaryImage, uploadCloudinaryImage } from "@/lib/cloudinary";
 import {
   MONTHLY_DONATION_DONOR_TYPES,
   MONTHLY_DONATION_REGIONS,
-  getMonthlyDonationDonorTypeLabel,
-  getMonthlyDonationRegionLabel,
+  buildMonthlyDonationTitle,
 } from "@/lib/monthly-donations";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
 import type {
@@ -16,9 +15,9 @@ import type {
 import { revalidatePath } from "next/cache";
 
 const REPORT_COLS =
-  "id, title, western_year, month, region, donor_type, content_text, is_published, created_at, updated_at";
+  "id, title, western_year, month, region, donor_type, donor_name, is_anonymous, sort_order, is_published, created_at, updated_at";
 const IMAGE_COLS =
-  "id, report_id, public_id, image_url, file_name, file_size, width, height, sort_order, created_at";
+  "id, report_id, public_id, image_url, caption, file_name, file_size, width, height, sort_order, created_at";
 const MAX_IMAGE_BYTES = 500 * 1024;
 const MAX_IMAGE_COUNT = 40;
 
@@ -27,6 +26,7 @@ export type MonthlyDonationImageRecord = {
   report_id: string;
   public_id: string;
   image_url: string;
+  caption: string | null;
   file_name: string | null;
   file_size: number | null;
   width: number | null;
@@ -42,7 +42,9 @@ export type MonthlyDonationReportRecord = {
   month: number;
   region: MonthlyDonationRegion;
   donor_type: MonthlyDonationDonorType;
-  content_text: string;
+  donor_name: string | null;
+  is_anonymous: boolean;
+  sort_order: number;
   is_published: boolean;
   created_at: string | null;
   updated_at: string | null;
@@ -90,27 +92,14 @@ function parsePeriod(formData: FormData) {
   return { westernYear, month };
 }
 
-function defaultTitle({
-  westernYear,
-  month,
-  region,
-  donorType,
-}: {
-  westernYear: number;
-  month: number;
-  region: MonthlyDonationRegion;
-  donorType: MonthlyDonationDonorType;
-}) {
-  return `${westernYear}年${String(month).padStart(2, "0")}月${getMonthlyDonationRegionLabel(region)}${getMonthlyDonationDonorTypeLabel(donorType)}捐贈明細`;
-}
-
 function reportPayload(formData: FormData) {
   const period = parsePeriod(formData);
   const region = textValue(formData, "region") as MonthlyDonationRegion | null;
   const donorType = textValue(formData, "donor_type") as
     | MonthlyDonationDonorType
     | null;
-  const contentText = textValue(formData, "content_text");
+  const isAnonymous = formData.get("is_anonymous") === "true";
+  const donorName = textValue(formData, "donor_name");
 
   if (!period) return { error: "請選擇有效年月" as const };
   if (!region || !MONTHLY_DONATION_REGIONS.some((item) => item.value === region)) {
@@ -122,16 +111,13 @@ function reportPayload(formData: FormData) {
   ) {
     return { error: "請選擇個人或團體" as const };
   }
-  if (!contentText) return { error: "請輸入捐贈明細" as const };
+  if (!isAnonymous && !donorName) {
+    return { error: "請輸入捐贈者名稱，或開啟匿名" as const };
+  }
 
   const title =
     textValue(formData, "title") ??
-    defaultTitle({
-      westernYear: period.westernYear,
-      month: period.month,
-      region,
-      donorType,
-    });
+    buildMonthlyDonationTitle({ donorName, isAnonymous });
 
   return {
     data: {
@@ -140,7 +126,8 @@ function reportPayload(formData: FormData) {
       month: period.month,
       region,
       donor_type: donorType,
-      content_text: contentText,
+      donor_name: donorName,
+      is_anonymous: isAnonymous,
       is_published: formData.get("is_published") === "true",
       updated_at: new Date().toISOString(),
     },
@@ -151,6 +138,15 @@ function imageFiles(formData: FormData) {
   return formData
     .getAll("images")
     .filter((file): file is File => file instanceof File && file.size > 0);
+}
+
+/** 新上傳圖片的說明，與 imageFiles() 順序對齊 */
+function newImageCaptions(formData: FormData) {
+  return formData.getAll("new_captions").map((value) => {
+    if (typeof value !== "string") return null;
+    const trimmed = value.trim();
+    return trimmed.length > 0 ? trimmed : null;
+  });
 }
 
 function validateImages(files: File[]) {
@@ -168,18 +164,22 @@ function validateImages(files: File[]) {
   return null;
 }
 
-function cloudinaryFolder(payload: {
-  western_year: number;
-  month: number;
-  region: MonthlyDonationRegion;
-  donor_type: MonthlyDonationDonorType;
-}) {
+function cloudinaryFolder(
+  payload: {
+    western_year: number;
+    month: number;
+    region: MonthlyDonationRegion;
+    donor_type: MonthlyDonationDonorType;
+  },
+  reportId: string,
+) {
   return [
     "monthly-donations",
     String(payload.western_year),
     String(payload.month).padStart(2, "0"),
     payload.region,
     payload.donor_type,
+    reportId,
   ].join("/");
 }
 
@@ -264,11 +264,13 @@ export async function getMonthlyDonationReportById(
 
 async function uploadImages({
   files,
+  captions,
   reportId,
   payload,
   startSortOrder,
 }: {
   files: File[];
+  captions: (string | null)[];
   reportId: string;
   payload: {
     western_year: number;
@@ -281,13 +283,14 @@ async function uploadImages({
   const uploaded: Array<{
     public_id: string;
     image_url: string;
+    caption: string | null;
     file_name: string;
     file_size: number | null;
     width: number | null;
     height: number | null;
     sort_order: number;
   }> = [];
-  const folder = cloudinaryFolder(payload);
+  const folder = cloudinaryFolder(payload, reportId);
 
   for (const [index, file] of files.entries()) {
     const upload = await uploadCloudinaryImage({
@@ -299,6 +302,7 @@ async function uploadImages({
     uploaded.push({
       public_id: upload.publicId,
       image_url: optimizedCloudinaryUrl(upload.imageUrl),
+      caption: captions[index] ?? null,
       file_name: file.name,
       file_size: upload.fileSize,
       width: upload.width,
@@ -347,6 +351,7 @@ export async function createMonthlyDonationReport(
   try {
     await uploadImages({
       files,
+      captions: newImageCaptions(formData),
       reportId: data.id,
       payload: payload.data,
       startSortOrder: 1,
@@ -420,6 +425,20 @@ export async function updateMonthlyDonationReport(
 
   if (updateError) return { ok: false, message: updateError.message };
 
+  // 更新既有圖片的說明：欄位名 image_caption_{imageId}
+  for (const [key, value] of formData.entries()) {
+    if (!key.startsWith("image_caption_") || typeof value !== "string") continue;
+    const imageId = key.slice("image_caption_".length);
+    if (deleteIds.includes(imageId)) continue;
+    const caption = value.trim().length > 0 ? value.trim() : null;
+    const { error } = await supabase
+      .from("monthly_donation_images")
+      .update({ caption })
+      .eq("report_id", id)
+      .eq("id", imageId);
+    if (error) return { ok: false, message: error.message };
+  }
+
   if (files.length > 0) {
     const { data: lastImage, error } = await supabase
       .from("monthly_donation_images")
@@ -434,6 +453,7 @@ export async function updateMonthlyDonationReport(
     try {
       await uploadImages({
         files,
+        captions: newImageCaptions(formData),
         reportId: id,
         payload: payload.data,
         startSortOrder: (lastImage?.sort_order ?? 0) + 1,
