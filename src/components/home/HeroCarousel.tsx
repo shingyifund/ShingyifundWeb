@@ -60,8 +60,8 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
             </div>
           </div>
 
-          {/* 控制列疊在 hero 下緣，避免額外佔版面高度。 */}
-          <div className="pointer-events-none absolute inset-x-3 bottom-3 z-20 flex items-center justify-between sm:inset-x-5 sm:bottom-5">
+          {/* 控制列疊在 hero 下緣；小寬度只留置中 dots，箭頭隱藏避免與 CTA 重疊。 */}
+          <div className="pointer-events-none absolute inset-x-3 bottom-3 z-20 flex items-center justify-end sm:inset-x-5 sm:bottom-5 sm:justify-between">
             <div className="pointer-events-auto flex items-center rounded-full bg-white/80 px-1.5 py-1 shadow-card backdrop-blur-md">
               {slides.map((_, i) => (
                 <button
@@ -82,7 +82,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
                 </button>
               ))}
             </div>
-            <div className="pointer-events-auto mr-14 flex gap-1.5 sm:mr-20 sm:gap-2 2xl:mr-0">
+            <div className="pointer-events-auto mr-14 hidden gap-1.5 sm:mr-20 sm:flex sm:gap-2 2xl:mr-0">
               <ArrowBtn dir="prev" onClick={() => emblaApi?.scrollPrev()} />
               <ArrowBtn dir="next" onClick={() => emblaApi?.scrollNext()} />
             </div>
