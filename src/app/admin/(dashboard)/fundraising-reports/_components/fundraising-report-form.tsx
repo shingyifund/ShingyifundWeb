@@ -2,10 +2,12 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { FileText } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FormAlert } from "@/components/ui/form-alert";
+import { UploadTrigger } from "@/components/admin/upload-trigger";
 import {
   createFundraisingReport,
   type FundraisingReportRecord,
@@ -33,12 +35,18 @@ export function FundraisingReportForm({
   });
   const title = customTitle ?? defaultTitle(fiscalYear);
   const [message, setMessage] = useState<string | null>(null);
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [isPending, startTransition] = useTransition();
 
   function handleSubmit(formData: FormData) {
     setMessage(null);
+    if (!isEdit && !pdfFile) {
+      setMessage("請選擇 PDF 檔案");
+      return;
+    }
     formData.set("fiscal_year", fiscalYear);
     formData.set("title", title);
+    if (pdfFile) formData.set("pdf_file", pdfFile);
 
     startTransition(async () => {
       const result =
@@ -87,19 +95,18 @@ export function FundraisingReportForm({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="pdf_file">PDF 檔案</Label>
-        <Input
-          id="pdf_file"
-          name="pdf_file"
-          type="file"
+        <Label>PDF 檔案</Label>
+        <UploadTrigger
           accept="application/pdf,.pdf"
-          required={!isEdit}
+          label={pdfFile ? pdfFile.name : "選擇 PDF 檔案"}
+          hint={
+            isEdit
+              ? "不選擇檔案會保留目前 PDF；選擇新檔會替換並刪除舊檔。"
+              : "新增勸募成果報告需上傳 PDF。"
+          }
+          icon={<FileText className="size-5" strokeWidth={1.8} />}
+          onFilesSelected={(files) => setPdfFile(files[0] ?? null)}
         />
-        <p className="text-xs text-muted-foreground">
-          {isEdit
-            ? "不選擇檔案會保留目前 PDF；選擇新檔會替換並刪除舊檔。"
-            : "新增勸募成果報告需上傳 PDF。"}
-        </p>
       </div>
 
       {report?.file_url && (

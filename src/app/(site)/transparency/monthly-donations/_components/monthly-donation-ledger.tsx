@@ -20,40 +20,44 @@ import type { MonthlyDonationDonorType, MonthlyDonationReport } from "@/lib/type
 
 type DonorFilter = "all" | MonthlyDonationDonorType;
 
-function periodKey(report: MonthlyDonationReport) {
-  return `${report.westernYear}-${String(report.month).padStart(2, "0")}`;
-}
-
 export function MonthlyDonationLedger({
   reports,
 }: {
   reports: MonthlyDonationReport[];
 }) {
-  const months = useMemo(() => {
-    const seen = new Map<string, { key: string; label: string }>();
-    for (const report of reports) {
-      const key = periodKey(report);
-      if (!seen.has(key)) {
-        seen.set(key, {
-          key,
-          label: formatMonthlyDonationPeriod(report.westernYear, report.month),
-        });
-      }
-    }
-    return Array.from(seen.values());
+  const years = useMemo(() => {
+    const seen = new Set<number>();
+    for (const report of reports) seen.add(report.westernYear);
+    return Array.from(seen).sort((a, b) => b - a);
   }, [reports]);
 
-  const [month, setMonth] = useState("all");
+  const [year, setYear] = useState("all");
+  const [month, setMonth] = useState<number | "all">("all");
   const [donorType, setDonorType] = useState<DonorFilter>("all");
+
+  const months = useMemo(() => {
+    if (year === "all") return [];
+    const seen = new Set<number>();
+    for (const report of reports) {
+      if (report.westernYear === Number(year)) seen.add(report.month);
+    }
+    return Array.from(seen).sort((a, b) => b - a);
+  }, [reports, year]);
+
+  function handleYearChange(value: string) {
+    setYear(value || "all");
+    setMonth("all");
+  }
 
   const filtered = useMemo(
     () =>
       reports.filter((report) => {
-        if (month !== "all" && periodKey(report) !== month) return false;
+        if (year !== "all" && report.westernYear !== Number(year)) return false;
+        if (month !== "all" && report.month !== month) return false;
         if (donorType !== "all" && report.donorType !== donorType) return false;
         return true;
       }),
-    [donorType, month, reports],
+    [donorType, year, month, reports],
   );
 
   return (
@@ -73,24 +77,52 @@ export function MonthlyDonationLedger({
           </p>
         </div>
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <ToggleGroup
-            type="single"
-            value={month}
-            onValueChange={(value) => setMonth(value || "all")}
-            spacing={0}
-            variant="outline"
-            className="flex-wrap"
-          >
-            <ToggleGroupItem value="all" className="text-sm">
-              全部月份
-            </ToggleGroupItem>
-            {months.map((item) => (
-              <ToggleGroupItem key={item.key} value={item.key} className="text-sm">
-                {item.label}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="space-y-3">
+            {/* 年份 */}
+            {years.length > 0 && (
+              <ToggleGroup
+                type="single"
+                value={year}
+                onValueChange={handleYearChange}
+                spacing={0}
+                variant="outline"
+                className="flex-wrap"
+              >
+                <ToggleGroupItem value="all" className="text-sm">
+                  全部年份
+                </ToggleGroupItem>
+                {years.map((y) => (
+                  <ToggleGroupItem key={y} value={String(y)} className="text-sm">
+                    {y}
+                  </ToggleGroupItem>
+                ))}
+              </ToggleGroup>
+            )}
+
+            {/* 月份（選定年份後才出現） */}
+            {months.length > 0 && (
+              <ToggleGroup
+                type="single"
+                value={month === "all" ? "all" : String(month)}
+                onValueChange={(v) =>
+                  setMonth(v === "all" || !v ? "all" : Number(v))
+                }
+                spacing={0}
+                variant="outline"
+                className="flex-wrap"
+              >
+                <ToggleGroupItem value="all" className="text-sm">
+                  全年
+                </ToggleGroupItem>
+                {months.map((m) => (
+                  <ToggleGroupItem key={m} value={String(m)} className="text-sm">
+                    {String(m).padStart(2, "0")} 月
+                  </ToggleGroupItem>
+                ))}
+              </ToggleGroup>
+            )}
+          </div>
 
           <ToggleGroup
             type="single"
@@ -100,6 +132,7 @@ export function MonthlyDonationLedger({
             }
             spacing={0}
             variant="outline"
+            className="shrink-0"
           >
             <ToggleGroupItem value="all" className="text-sm">
               全部

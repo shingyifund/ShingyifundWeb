@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { UploadTrigger } from "@/components/admin/upload-trigger";
 import {
   MONTHLY_DONATION_DONOR_TYPES,
   MONTHLY_DONATION_REGIONS,
@@ -376,21 +377,17 @@ export function MonthlyDonationForm({
       ) : null}
 
       <div className="space-y-2">
-        <Label htmlFor="images">新增圖片</Label>
-        <Input
-          id="images"
-          type="file"
-          accept="image/*"
+        <Label>新增圖片</Label>
+        <UploadTrigger
           multiple
-          onChange={(event) => {
-            const files = Array.from(event.target.files ?? []);
+          accept="image/*"
+          label="選擇圖片"
+          hint="可多選；送出前會自動壓縮，每張壓縮後需小於 500KB。"
+          onFilesSelected={(files) => {
             setSelectedFiles(files);
             setNewCaptions(files.map(() => ""));
           }}
         />
-        <p className="text-xs text-muted-foreground">
-          可多選圖片；送出前會自動壓縮，每張壓縮後需小於 500KB。
-        </p>
         {selectedPreviews.length > 0 && (
           <div className="space-y-3 rounded-lg border bg-muted/30 p-3">
             <p className="text-sm text-muted-foreground">
