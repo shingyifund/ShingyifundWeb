@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Bell, HandHeart, ImageIcon } from "lucide-react";
-import { FacebookIcon } from "@/components/brand/SocialIcons";
+import { FaFacebookF, FaInstagram, FaThreads } from "react-icons/fa6";
 import { siteConfig } from "@/config/site";
 import { Container } from "@/components/ui/Container";
 import { FacebookPagePlugin } from "./FacebookPagePlugin";
@@ -71,15 +71,37 @@ export function FacebookFeed() {
                 })}
               </ul>
 
-              <Link
-                href={siteConfig.social.facebook}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-9 inline-flex items-center gap-2 rounded-full bg-[#1877F2] px-6 py-3 text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:shadow-md active:translate-y-0"
-              >
-                <FacebookIcon className="size-4" />
-                追蹤粉絲專頁
-              </Link>
+              <div className="mt-9 flex flex-wrap items-center gap-3">
+                <Link
+                  href={siteConfig.social.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full bg-[#1877F2] px-6 py-3 text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:shadow-md active:translate-y-0"
+                >
+                  <FaFacebookF className="size-4" />
+                  追蹤粉絲專頁
+                </Link>
+
+                <Link
+                  href={siteConfig.social.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className="inline-flex size-12 items-center justify-center rounded-full bg-[linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5)] text-white transition-all hover:-translate-y-0.5 hover:shadow-md active:translate-y-0"
+                >
+                  <FaInstagram className="size-5" />
+                </Link>
+
+                <Link
+                  href={siteConfig.social.threads}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Threads"
+                  className="inline-flex size-12 items-center justify-center rounded-full bg-black text-white transition-all hover:-translate-y-0.5 hover:shadow-md active:translate-y-0"
+                >
+                  <FaThreads className="size-5" />
+                </Link>
+              </div>
             </div>
 
             {/* 右：FB 官方 Page Plugin，白卡鑲嵌深藍框內 */}

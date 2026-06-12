@@ -1,7 +1,12 @@
 import Image from "next/image";
 import { Mail, MapPin, Phone, Printer } from "lucide-react";
 import { siteConfig } from "@/config/site";
-import { FacebookIcon, YoutubeIcon } from "@/components/brand/SocialIcons";
+import {
+  FaFacebookF,
+  FaInstagram,
+  FaThreads,
+  FaYoutube,
+} from "react-icons/fa6";
 import { CopyButton } from "@/components/layout/CopyButton";
 
 /** 基金會已落實的 SDGs（依原站，跳過 6、14、15） */
@@ -51,10 +56,16 @@ export function SiteFooter() {
 
           <div className="mt-6 flex gap-3">
             <SocialLink href={siteConfig.social.facebook} label="Facebook">
-              <FacebookIcon className="size-5" />
+              <FaFacebookF className="size-5" />
+            </SocialLink>
+            <SocialLink href={siteConfig.social.instagram} label="Instagram">
+              <FaInstagram className="size-5" />
+            </SocialLink>
+            <SocialLink href={siteConfig.social.threads} label="Threads">
+              <FaThreads className="size-5" />
             </SocialLink>
             <SocialLink href={siteConfig.social.youtube} label="YouTube">
-              <YoutubeIcon className="size-5" />
+              <FaYoutube className="size-5" />
             </SocialLink>
           </div>
         </div>

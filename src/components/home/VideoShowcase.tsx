@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Play } from "lucide-react";
+import { FaYoutube } from "react-icons/fa6";
 import { getYouTubeVideos } from "@/lib/data/queries";
 import { siteConfig } from "@/config/site";
 import { Container } from "@/components/ui/Container";
@@ -85,6 +86,7 @@ export async function VideoShowcase() {
                   rel="noopener noreferrer"
                   className="mt-7 inline-flex w-fit items-center gap-2 rounded-full bg-amber-500 px-6 py-3 text-[15px] font-medium text-navy-900 transition-all hover:-translate-y-0.5 hover:bg-amber-400 active:translate-y-0"
                 >
+                  <FaYoutube className="size-5 text-[#FF0000]" />
                   前往 YouTube 頻道
                   <ArrowRight className="size-4" />
                 </Link>

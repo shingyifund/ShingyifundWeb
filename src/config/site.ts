@@ -33,6 +33,8 @@ export const siteConfig = {
   social: {
     facebook: "https://www.facebook.com/shingyifund",
     youtube: "https://www.youtube.com/@shingyifund",
+    instagram: "https://www.instagram.com/shingyifund/",
+    threads: "https://www.threads.com/@shingyifund",
   },
 
   /** 網站版本號（每次改版手動更新） */

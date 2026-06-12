@@ -11,10 +11,10 @@ export default function HomePage() {
     <>
       <DonationMarquee />
       <HeroSection />
+      <FacebookFeed />
       <FeatureCards />
       <ImpactStats />
       <VideoShowcase />
-      <FacebookFeed />
       <TransparencySection />
     </>
   );
