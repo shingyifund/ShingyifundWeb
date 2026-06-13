@@ -7,6 +7,7 @@ import { ArrowDown, ArrowUp, Edit3, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { LinkPendingIcon } from "@/components/ui/link-pending";
 import { moveSlide, toggleSlideActive } from "../actions";
 import { DeleteSlideDialog } from "./delete-slide-dialog";
 
@@ -90,7 +91,9 @@ export function HeroRowActions({
         </Button>
         <Button asChild variant="ghost" size="icon-sm" aria-label={`編輯 ${title}`}>
           <Link href={`/admin/hero/${id}`}>
-            <Edit3 />
+            <LinkPendingIcon>
+              <Edit3 />
+            </LinkPendingIcon>
           </Link>
         </Button>
         <DeleteSlideDialog id={id} imageUrl={imageUrl} title={title} />
