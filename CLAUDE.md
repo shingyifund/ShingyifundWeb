@@ -21,6 +21,21 @@
 - `heartbeat`、`ping-ring` 等無限迴圈動畫須在 CSS 宣告 `will-change: transform`
 - opacity 動畫元素加 `willChange: "opacity"`
 
+## UI 元件規範
+
+本專案為 shadcn/ui 結構（根目錄 `components.json`，style `radix-nova`，元件位於 `src/components/ui/`）。
+
+優先順序：
+
+1. **優先使用 shadcn 官方元件** — 需要新元件時先用 CLI 加：`npx shadcn@latest add <name>`，並先確認 `src/components/ui/` 是否已有現成的。
+2. **registry 沒有的，以 shadcn 為基底自製** — 用 shadcn 的 Popover / Button / ToggleGroup 等既有元件組裝，沿用站上 token 與樣式，**不另起爐灶、不引入功能重疊的第三方 UI 套件**。
+   - 範例：年月（month-only）選擇器 registry 無現成品，`src/components/ui/month-picker.tsx` 以 Popover + Button 自組。
+3. **避免裸寫原生控件** — 表單一律走 shadcn 元件。原生 HTML 控件僅限技術必要的場景（如 `<input type="file">` 檔案選擇器、瀏覽器原生 checkbox），且須封裝。
+
+注意事項：
+- 本環境不能跑互動式 CLI prompt（會 hang）。若 CLI 問是否覆蓋既有檔需謹慎，避免覆蓋專案客製的 `Button.tsx`（首字母大寫，import 路徑為 `@/components/ui/Button`）。
+- 排版／展示用元件（Container、PageHero、SectionHeading、Reveal…）非互動控件，shadcn registry 無對應品項，屬正常自製。
+
 ## 技術棧
 - Next.js 15 App Router
 - Tailwind CSS v4（CSS-first 設定，token 定義在 globals.css `@theme`）
