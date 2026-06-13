@@ -31,7 +31,12 @@ export function HeroTable({ slides }: { slides: HeroSlideRecord[] }) {
               : null);
 
           return (
-            <div key={slide.id} className="flex items-center gap-3 px-4 py-3">
+            <div
+              key={slide.id}
+              className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:gap-4"
+            >
+              {/* 縮圖 + 內容：維持橫排 */}
+              <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-4">
               {/* 縮圖：固定寬度，16:9 */}
               <div className="relative aspect-video w-24 shrink-0 overflow-hidden rounded-md bg-muted sm:w-36">
                 {thumbSrc && (
@@ -69,9 +74,10 @@ export function HeroTable({ slides }: { slides: HeroSlideRecord[] }) {
                   </Badge>
                 </div>
               </div>
+              </div>
 
-              {/* 操作列：靠右，不換行 */}
-              <div className="shrink-0">
+              {/* 操作列：手機掉到第二列靠右，桌機也靠右 */}
+              <div className="flex shrink-0 justify-end sm:ml-auto">
                 <HeroRowActions
                   id={slide.id}
                   imageUrl={slide.image_url}

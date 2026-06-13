@@ -6,7 +6,6 @@ import {
   ArrowRight,
   Building2,
   CalendarDays,
-  ImageIcon,
   UserRound,
 } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -148,12 +147,11 @@ export function MonthlyDonationLedger({
       </div>
 
       <div className="overflow-hidden rounded-2xl bg-white shadow-[0_16px_44px_-28px_rgb(15_38_71_/_0.45)] ring-1 ring-navy-100">
-        <div className="hidden grid-cols-[8rem_1fr_8rem_7rem_6rem] gap-4 border-b border-navy-100 bg-navy-50/70 px-4 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted md:grid">
+        <div className="hidden grid-cols-[8rem_1fr_8rem_6rem] gap-4 border-b border-navy-100 bg-navy-50/70 px-4 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted md:grid">
           <span>月份</span>
           <span>項目</span>
           <span>地區 / 捐贈者</span>
-          <span>照片</span>
-          <span className="text-right">明細</span>
+          <span className="text-center">明細</span>
         </div>
 
         {filtered.length === 0 ? (
@@ -187,7 +185,7 @@ function DonationLedgerRow({ report }: { report: MonthlyDonationReport }) {
 
   return (
     <article className="group bg-white transition-colors hover:bg-amber-50/45">
-      <div className="grid gap-3 px-4 py-3 md:grid-cols-[8rem_1fr_8rem_7rem_6rem] md:items-center md:gap-4">
+      <div className="grid gap-3 px-4 py-3 md:grid-cols-[8rem_1fr_8rem_6rem] md:items-center md:gap-4">
         <div className="flex items-center gap-2 text-sm font-semibold text-navy-800">
           <CalendarDays className="size-4 text-amber-600" strokeWidth={1.8} />
           {period}
@@ -216,16 +214,9 @@ function DonationLedgerRow({ report }: { report: MonthlyDonationReport }) {
           </span>
         </p>
 
-        <p className="flex items-center gap-2 text-sm text-ink-muted">
-          <ImageIcon className="size-4 text-navy-400" strokeWidth={1.8} />
-          {report.images.length > 0
-            ? `${report.images.length} 張照片`
-            : "尚無照片"}
-        </p>
-
         <Link
           href={`/transparency/monthly-donations/${report.id}`}
-          className="inline-flex items-center justify-center gap-1.5 rounded-full border border-navy-100 bg-white px-3 py-2 text-sm font-semibold text-navy-900 transition-colors hover:border-amber-300 hover:bg-white md:justify-self-end"
+          className="inline-flex items-center justify-center gap-1.5 rounded-full border border-navy-100 bg-white px-3 py-2 text-sm font-semibold text-navy-900 transition-colors hover:border-amber-300 hover:bg-white md:justify-self-center"
         >
           查看
           <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />

@@ -53,17 +53,21 @@ export function HeroRowActions({
   }
 
   return (
-    <div className="flex flex-col items-end gap-1.5">
-      {/* 第一行：顯示 switch + spinner */}
+    <div className="flex items-center gap-3">
+      {isPending && (
+        <Loader2 className="size-3.5 animate-spin text-muted-foreground" />
+      )}
       <div className="flex items-center gap-1.5 select-none">
-        {isPending && <Loader2 className="size-3.5 animate-spin text-muted-foreground" />}
         <Switch id={`switch-${id}`} checked={localActive} onCheckedChange={toggle} />
-        <Label htmlFor={`switch-${id}`} className="cursor-pointer text-xs text-muted-foreground">
+        <Label
+          htmlFor={`switch-${id}`}
+          className="cursor-pointer text-xs text-muted-foreground"
+        >
           {localActive ? "顯示" : "停用"}
         </Label>
       </div>
-      {/* 第二行：排序 / 編輯 / 刪除 */}
-      <div className="flex items-center gap-0.5">
+      <span className="h-5 w-px bg-border" aria-hidden />
+      <div className="flex items-center gap-1.5">
         <Button
           type="button"
           variant="ghost"
