@@ -9,6 +9,7 @@ import {
   UserRound,
 } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { LinkPendingIcon } from "@/components/ui/link-pending";
 import {
   formatMonthlyDonationPeriod,
   getMonthlyDonationDonorDisplayName,
@@ -219,7 +220,9 @@ function DonationLedgerRow({ report }: { report: MonthlyDonationReport }) {
           className="inline-flex items-center justify-center gap-1.5 rounded-full border border-navy-100 bg-white px-3 py-2 text-sm font-semibold text-navy-900 transition-colors hover:border-amber-300 hover:bg-white md:justify-self-center"
         >
           查看
-          <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+          <LinkPendingIcon>
+            <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+          </LinkPendingIcon>
         </Link>
       </div>
     </article>
