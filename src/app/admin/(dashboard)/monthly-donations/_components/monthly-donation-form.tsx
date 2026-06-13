@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { MonthPicker } from "@/components/ui/month-picker";
 import { UploadTrigger } from "@/components/admin/upload-trigger";
 import {
   MONTHLY_DONATION_DONOR_TYPES,
@@ -161,6 +162,12 @@ export function MonthlyDonationForm({
     setSubmitStarted(true);
     setMessage(null);
 
+    if (!period) {
+      setMessage("請選擇年月");
+      resetSubmitState();
+      return;
+    }
+
     if (selectedFiles.length > MAX_IMAGE_COUNT) {
       setMessage(`每筆最多上傳 ${MAX_IMAGE_COUNT} 張圖片`);
       resetSubmitState();
@@ -229,14 +236,12 @@ export function MonthlyDonationForm({
     <form action={handleSubmit} className="space-y-5">
       <div className="space-y-2">
         <Label htmlFor="period">年月</Label>
-        <Input
+        <MonthPicker
           id="period"
-          type="month"
-          min="1912-01"
-          max="2999-12"
           value={period}
-          onChange={(event) => setPeriod(event.target.value)}
-          required
+          onChange={setPeriod}
+          fromYear={1912}
+          toYear={2100}
         />
       </div>
 
