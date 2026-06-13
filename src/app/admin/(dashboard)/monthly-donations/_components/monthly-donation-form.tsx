@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useIsMobile } from "@/hooks/use-is-mobile";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Camera, Loader2, Save, X } from "lucide-react";
@@ -78,6 +79,7 @@ export function MonthlyDonationForm({
   report?: MonthlyDonationReportRecord;
 }) {
   const router = useRouter();
+  const isMobile = useIsMobile();
   const [period, setPeriod] = useState(toPeriodValue(report));
   const [region, setRegion] = useState<MonthlyDonationReportRecord["region"]>(
     report?.region ?? "taipei",
@@ -383,25 +385,25 @@ export function MonthlyDonationForm({
 
       <div className="space-y-2">
         <Label>新增圖片</Label>
-        <div className="grid gap-2 sm:grid-cols-2">
+        <div className="flex flex-wrap gap-2">
           <UploadTrigger
+            variant="button"
             multiple
             accept="image/*"
             label="選擇圖片"
-            hint="可多選相簿照片"
             onFilesSelected={appendFiles}
-            className="sm:col-span-2"
           />
-          {/* 拍照鈕只在手機顯示（桌機 capture 無效，會退化成選單張） */}
-          <UploadTrigger
-            accept="image/*"
-            capture="environment"
-            label="拍照"
-            hint="直接開相機拍照"
-            icon={<Camera className="size-5" strokeWidth={1.8} />}
-            onFilesSelected={appendFiles}
-            className="sm:hidden"
-          />
+          {/* 拍照鈕只在行動裝置顯示（UA 偵測，桌機 capture 無效） */}
+          {isMobile && (
+            <UploadTrigger
+              variant="button"
+              accept="image/*"
+              capture="environment"
+              label="拍照"
+              icon={<Camera className="size-4" strokeWidth={1.8} />}
+              onFilesSelected={appendFiles}
+            />
+          )}
         </div>
         <p className="text-xs text-muted-foreground">
           送出前會自動壓縮，每張壓縮後需小於 500KB。

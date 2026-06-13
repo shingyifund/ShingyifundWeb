@@ -15,11 +15,16 @@ type UploadTriggerProps = {
   icon?: ReactNode;
   disabled?: boolean;
   className?: string;
+  /**
+   * "dropzone"（預設）：虛線大框，適合 PDF 等明確的單次上傳。
+   * "button"：緊湊行內按鈕，適合圖片多選等頻繁操作。
+   */
+  variant?: "dropzone" | "button";
 };
 
 /**
- * 共用「上傳觸發鈕」：虛線框 + icon + 文字，點擊開啟系統檔案選擇。
- * 封裝原生 <input type="file">，不外露。各場景自接檔案處理邏輯。
+ * 共用「上傳觸發鈕」：點擊開啟系統檔案選擇。
+ * variant="dropzone" 為大框虛線，variant="button" 為緊湊行內鈕。
  */
 export function UploadTrigger({
   onFilesSelected,
@@ -31,8 +36,43 @@ export function UploadTrigger({
   icon,
   disabled = false,
   className,
+  variant = "dropzone",
 }: UploadTriggerProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files ?? []);
+    if (files.length > 0) onFilesSelected(files);
+    event.target.value = "";
+  };
+
+  if (variant === "button") {
+    return (
+      <span className={cn("inline-flex", className)}>
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={() => inputRef.current?.click()}
+          className="inline-flex items-center gap-1.5 rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium text-foreground shadow-xs transition-colors hover:border-amber-400 hover:bg-amber-50 hover:text-amber-700 disabled:pointer-events-none disabled:opacity-50"
+        >
+          <span className="flex shrink-0 items-center text-amber-600">
+            {icon ?? <UploadCloud className="size-4" strokeWidth={1.8} />}
+          </span>
+          {label}
+          {hint && <span className="text-xs font-normal text-muted-foreground">· {hint}</span>}
+        </button>
+        <input
+          ref={inputRef}
+          type="file"
+          accept={accept}
+          multiple={multiple}
+          capture={capture}
+          className="hidden"
+          onChange={handleChange}
+        />
+      </span>
+    );
+  }
 
   return (
     <div className={cn("space-y-1.5", className)}>
@@ -56,12 +96,7 @@ export function UploadTrigger({
         multiple={multiple}
         capture={capture}
         className="hidden"
-        onChange={(event) => {
-          const files = Array.from(event.target.files ?? []);
-          if (files.length > 0) onFilesSelected(files);
-          // 清空以便重選同檔
-          event.target.value = "";
-        }}
+        onChange={handleChange}
       />
     </div>
   );
