@@ -1,12 +1,6 @@
 import { Badge } from "@/components/ui/badge";
-import {
-  AdminDataList,
-  AdminDataListRow,
-} from "@/components/admin/admin-data-list";
 import type { HeroSlideRecord } from "../actions";
 import { HeroRowActions } from "./hero-row-actions";
-
-const GRID_CLASS = "lg:grid-cols-[100px_minmax(0,1fr)_90px_100px_220px]";
 
 const TYPE_LABELS: Record<string, string> = {
   image: "圖片",
@@ -27,86 +21,70 @@ export function HeroTable({ slides }: { slides: HeroSlideRecord[] }) {
   }
 
   return (
-    <AdminDataList
-      columns={[
-        { label: "預覽" },
-        { label: "內容" },
-        { label: "型態" },
-        { label: "狀態" },
-        { label: "操作", className: "text-right" },
-      ]}
-      gridClassName={GRID_CLASS}
-      headerVisibleClassName="lg:grid"
-    >
-      {slides.map((slide, index) => {
-        const thumbSrc =
-          slide.image_url ??
-          (slide.youtube_video_id
-            ? `https://img.youtube.com/vi/${slide.youtube_video_id}/hqdefault.jpg`
-            : null);
+    <div className="overflow-hidden rounded-lg border bg-white">
+      <div className="divide-y">
+        {slides.map((slide, index) => {
+          const thumbSrc =
+            slide.image_url ??
+            (slide.youtube_video_id
+              ? `https://img.youtube.com/vi/${slide.youtube_video_id}/hqdefault.jpg`
+              : null);
 
-        return (
-          <AdminDataListRow
-            key={slide.id}
-            gridClassName={GRID_CLASS}
-            itemAlignClassName="lg:items-center"
-          >
-            <div className="relative aspect-video w-20 overflow-hidden rounded-md bg-muted">
-              {thumbSrc && (
-                <img
-                  src={thumbSrc}
-                  alt=""
-                  className="absolute inset-0 size-full object-cover"
-                />
-              )}
-            </div>
-            <div className="min-w-0">
-              <div className="max-w-xl">
+          return (
+            <div key={slide.id} className="flex items-center gap-3 px-4 py-3">
+              {/* 縮圖：固定寬度，16:9 */}
+              <div className="relative aspect-video w-24 shrink-0 overflow-hidden rounded-md bg-muted sm:w-36">
+                {thumbSrc && (
+                  <img
+                    src={thumbSrc}
+                    alt=""
+                    className="absolute inset-0 size-full object-cover"
+                  />
+                )}
+              </div>
+
+              {/* 內容：彈性填滿 */}
+              <div className="min-w-0 flex-1">
                 {slide.has_title && slide.title ? (
-                  <p className="font-medium text-foreground">{slide.title}</p>
+                  <p className="truncate font-medium text-foreground">{slide.title}</p>
                 ) : (
-                  <p className="text-sm text-muted-foreground italic">（無標題）</p>
+                  <p className="text-sm italic text-muted-foreground">（無標題）</p>
                 )}
                 {slide.has_subtitle && slide.subtitle && (
-                  <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+                  <p className="mt-0.5 line-clamp-1 text-sm text-muted-foreground">
                     {slide.subtitle}
                   </p>
                 )}
-                {slide.has_cta && slide.cta_label && slide.cta_href && (
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    {slide.cta_label} {"→"} {slide.cta_href}
-                  </p>
-                )}
                 {slide.content_type === "youtube" && slide.youtube_video_id && (
-                  <p className="mt-1 text-xs text-muted-foreground">
+                  <p className="mt-0.5 truncate text-xs text-muted-foreground">
                     ID: {slide.youtube_video_id}
                   </p>
                 )}
+                <div className="mt-1.5 flex flex-wrap gap-1.5">
+                  <Badge variant="outline">
+                    {TYPE_LABELS[slide.content_type] ?? slide.content_type}
+                  </Badge>
+                  <Badge variant={slide.is_active ? "default" : "secondary"}>
+                    {slide.is_active ? "顯示中" : "已停用"}
+                  </Badge>
+                </div>
+              </div>
+
+              {/* 操作列：靠右，不換行 */}
+              <div className="shrink-0">
+                <HeroRowActions
+                  id={slide.id}
+                  imageUrl={slide.image_url}
+                  title={slide.title ?? slide.content_type}
+                  isActive={slide.is_active}
+                  isFirst={index === 0}
+                  isLast={index === slides.length - 1}
+                />
               </div>
             </div>
-            <div>
-              <Badge variant="outline">
-                {TYPE_LABELS[slide.content_type] ?? slide.content_type}
-              </Badge>
-            </div>
-            <div>
-              <Badge variant={slide.is_active ? "default" : "secondary"}>
-                {slide.is_active ? "顯示中" : "已停用"}
-              </Badge>
-            </div>
-            <div>
-              <HeroRowActions
-                id={slide.id}
-                imageUrl={slide.image_url}
-                title={slide.title ?? slide.content_type}
-                isActive={slide.is_active}
-                isFirst={index === 0}
-                isLast={index === slides.length - 1}
-              />
-            </div>
-          </AdminDataListRow>
-        );
-      })}
-    </AdminDataList>
+          );
+        })}
+      </div>
+    </div>
   );
 }
