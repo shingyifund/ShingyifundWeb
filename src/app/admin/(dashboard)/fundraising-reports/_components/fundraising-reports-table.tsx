@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button";
 import type { FundraisingReportRecord } from "../actions";
 import { DeleteFundraisingReportDialog } from "./delete-fundraising-report-dialog";
 
-const GRID_CLASS = "md:grid-cols-[100px_minmax(0,1fr)_150px_150px]";
+const GRID_CLASS = "lg:grid-cols-[100px_minmax(0,1fr)_150px_150px]";
 
 export function FundraisingReportsTable({
   reports,
@@ -26,30 +26,18 @@ export function FundraisingReportsTable({
   }
 
   return (
-    <AdminDataList
-      columns={[
-        { label: "年度" },
-        { label: "標題" },
-        { label: "檔案" },
-        { label: "操作", className: "text-right" },
-      ]}
-      gridClassName={GRID_CLASS}
-    >
-      {reports.map((report) => (
-        <AdminDataListRow key={report.id} gridClassName={GRID_CLASS}>
-            <div className="text-sm font-semibold text-navy-800">
-              {report.fiscal_year}年度
-            </div>
-            <div className="min-w-0">
-              <p className="font-medium text-foreground">{report.title}</p>
-              {report.file_name && (
-                <p className="mt-1 truncate text-xs text-muted-foreground">
-                  {report.file_name}
-                  {report.file_size ? ` · ${formatFileSize(report.file_size)}` : ""}
-                </p>
-              )}
-            </div>
-            <div>
+    <>
+      {/* 手機版：緊湊卡片 */}
+      <div className="space-y-3 lg:hidden">
+        {reports.map((report) => (
+          <div key={report.id} className="rounded-lg border bg-white px-4 py-3">
+            <p className="font-medium text-foreground">{report.title}</p>
+            <p className="mt-1 truncate text-xs text-muted-foreground">
+              {report.fiscal_year} 年度
+              {report.file_name ? ` · ${report.file_name}` : ""}
+              {report.file_size ? ` · ${formatFileSize(report.file_size)}` : ""}
+            </p>
+            <div className="mt-2 flex items-center justify-between">
               <Button
                 href={report.file_url}
                 target="_blank"
@@ -60,25 +48,90 @@ export function FundraisingReportsTable({
                 查看 PDF
                 <ExternalLink />
               </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  href={`/admin/fundraising-reports/${report.id}`}
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label={`編輯 ${report.title}`}
+                >
+                  <Pencil />
+                </Button>
+                <DeleteFundraisingReportDialog
+                  id={report.id}
+                  filePath={report.file_path}
+                  title={report.title}
+                />
+              </div>
             </div>
-            <div className="flex items-center justify-end gap-2">
-              <Button
-                href={`/admin/fundraising-reports/${report.id}`}
-                variant="ghost"
-                size="icon-sm"
-                aria-label={`編輯 ${report.title}`}
-              >
-                <Pencil />
-              </Button>
-              <DeleteFundraisingReportDialog
-                id={report.id}
-                filePath={report.file_path}
-                title={report.title}
-              />
-            </div>
-        </AdminDataListRow>
-      ))}
-    </AdminDataList>
+          </div>
+        ))}
+      </div>
+
+      {/* 桌面版：表格 */}
+      <div className="hidden lg:block">
+        <AdminDataList
+          columns={[
+            { label: "年度" },
+            { label: "標題" },
+            { label: "檔案" },
+            { label: "操作", className: "text-right" },
+          ]}
+          gridClassName={GRID_CLASS}
+          headerVisibleClassName="lg:grid"
+        >
+          {reports.map((report) => (
+            <AdminDataListRow
+              key={report.id}
+              gridClassName={GRID_CLASS}
+              itemAlignClassName="lg:items-center"
+            >
+              <div className="text-sm font-semibold text-navy-800">
+                {report.fiscal_year}年度
+              </div>
+              <div className="min-w-0">
+                <p className="font-medium text-foreground">{report.title}</p>
+                {report.file_name && (
+                  <p className="mt-1 truncate text-xs text-muted-foreground">
+                    {report.file_name}
+                    {report.file_size
+                      ? ` · ${formatFileSize(report.file_size)}`
+                      : ""}
+                  </p>
+                )}
+              </div>
+              <div>
+                <Button
+                  href={report.file_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  variant="outline"
+                  size="sm"
+                >
+                  查看 PDF
+                  <ExternalLink />
+                </Button>
+              </div>
+              <div className="flex items-center justify-end gap-2">
+                <Button
+                  href={`/admin/fundraising-reports/${report.id}`}
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label={`編輯 ${report.title}`}
+                >
+                  <Pencil />
+                </Button>
+                <DeleteFundraisingReportDialog
+                  id={report.id}
+                  filePath={report.file_path}
+                  title={report.title}
+                />
+              </div>
+            </AdminDataListRow>
+          ))}
+        </AdminDataList>
+      </div>
+    </>
   );
 }
 

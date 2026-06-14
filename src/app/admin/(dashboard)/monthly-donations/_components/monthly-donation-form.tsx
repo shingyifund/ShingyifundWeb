@@ -70,7 +70,11 @@ async function resizeImageForUpload(file: File) {
 }
 
 function toPeriodValue(report?: MonthlyDonationReportRecord) {
-  if (!report) return "";
+  // 編輯既有資料用原值；新增時預設當月
+  if (!report) {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  }
   return `${report.western_year}-${String(report.month).padStart(2, "0")}`;
 }
 
