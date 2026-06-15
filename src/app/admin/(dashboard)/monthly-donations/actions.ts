@@ -20,6 +20,7 @@ const IMAGE_COLS =
   "id, report_id, public_id, image_url, caption, file_name, file_size, width, height, sort_order, created_at";
 const MAX_IMAGE_BYTES = 500 * 1024;
 const MAX_IMAGE_COUNT = 40;
+const IMAGE_UPLOAD_CONCURRENCY = 4;
 
 export type MonthlyDonationImageRecord = {
   id: string;
@@ -54,6 +55,17 @@ export type MonthlyDonationReportRecord = {
 export type ActionResult = {
   ok: boolean;
   message?: string;
+};
+
+type UploadedMonthlyDonationImage = {
+  public_id: string;
+  image_url: string;
+  caption: string | null;
+  file_name: string;
+  file_size: number | null;
+  width: number | null;
+  height: number | null;
+  sort_order: number;
 };
 
 async function getAuthorizedAdmin() {
@@ -159,6 +171,14 @@ function validateImages(files: File[]) {
     if (file.size > MAX_IMAGE_BYTES) {
       return "圖片壓縮後仍超過 500KB，請換較小圖片。";
     }
+  }
+
+  return null;
+}
+
+function validateTotalImageCount(total: number) {
+  if (total > MAX_IMAGE_COUNT) {
+    return `每筆最多保留 ${MAX_IMAGE_COUNT} 張圖片`;
   }
 
   return null;
@@ -281,36 +301,60 @@ async function uploadImages({
   };
   startSortOrder: number;
 }) {
-  const uploaded: Array<{
-    public_id: string;
-    image_url: string;
-    caption: string | null;
-    file_name: string;
-    file_size: number | null;
-    width: number | null;
-    height: number | null;
-    sort_order: number;
-  }> = [];
+  const uploaded: UploadedMonthlyDonationImage[] = [];
   const folder = cloudinaryFolder(payload, reportId);
 
-  for (const [index, file] of files.entries()) {
-    const upload = await uploadCloudinaryImage({
-      file,
-      folder,
-      publicId: crypto.randomUUID(),
-    });
+  for (let index = 0; index < files.length; index += IMAGE_UPLOAD_CONCURRENCY) {
+    const chunk = files.slice(index, index + IMAGE_UPLOAD_CONCURRENCY);
+    const uploadResults = await Promise.allSettled(
+      chunk.map(async (file, chunkIndex): Promise<UploadedMonthlyDonationImage> => {
+        const imageIndex = index + chunkIndex;
+        const upload = await uploadCloudinaryImage({
+          file,
+          folder,
+          publicId: crypto.randomUUID(),
+        });
 
-    uploaded.push({
-      public_id: upload.publicId,
-      image_url: optimizedCloudinaryUrl(upload.imageUrl),
-      caption: captions[index] ?? null,
-      file_name: file.name,
-      file_size: upload.fileSize,
-      width: upload.width,
-      height: upload.height,
-      sort_order: startSortOrder + index,
-    });
+        return {
+          public_id: upload.publicId,
+          image_url: optimizedCloudinaryUrl(upload.imageUrl),
+          caption: captions[imageIndex] ?? null,
+          file_name: file.name,
+          file_size: upload.fileSize,
+          width: upload.width,
+          height: upload.height,
+          sort_order: startSortOrder + imageIndex,
+        };
+      }),
+    );
+    const uploads = uploadResults
+      .filter(
+        (result): result is PromiseFulfilledResult<UploadedMonthlyDonationImage> =>
+          result.status === "fulfilled",
+      )
+      .map((result) => result.value);
+
+    uploaded.push(...uploads);
+
+    const failedUpload = uploadResults.find(
+      (result): result is PromiseRejectedResult => result.status === "rejected",
+    );
+    if (failedUpload) {
+      await cleanupUploadedImages(uploaded);
+      throw failedUpload.reason instanceof Error
+        ? failedUpload.reason
+        : new Error("圖片上傳失敗");
+    }
   }
+
+  return uploaded;
+}
+
+async function insertUploadedImages(
+  reportId: string,
+  uploaded: Awaited<ReturnType<typeof uploadImages>>,
+) {
+  if (uploaded.length === 0) return;
 
   const supabase = await createAdminClient();
   const rows = uploaded.map((image) => ({
@@ -327,6 +371,12 @@ async function uploadImages({
   }
 }
 
+async function cleanupUploadedImages(uploaded: Awaited<ReturnType<typeof uploadImages>>) {
+  await Promise.allSettled(
+    uploaded.map((image) => deleteCloudinaryImage(image.public_id)),
+  );
+}
+
 export async function createMonthlyDonationReport(
   formData: FormData,
 ): Promise<ActionResult> {
@@ -339,6 +389,8 @@ export async function createMonthlyDonationReport(
   const files = imageFiles(formData);
   const imageError = validateImages(files);
   if (imageError) return { ok: false, message: imageError };
+  const countError = validateTotalImageCount(files.length);
+  if (countError) return { ok: false, message: countError };
 
   const supabase = await createAdminClient();
   const { data, error } = await supabase
@@ -350,13 +402,14 @@ export async function createMonthlyDonationReport(
   if (error) return { ok: false, message: error.message };
 
   try {
-    await uploadImages({
+    const uploaded = await uploadImages({
       files,
       captions: newImageCaptions(formData),
       reportId: data.id,
       payload: payload.data,
       startSortOrder: 1,
     });
+    await insertUploadedImages(data.id, uploaded);
   } catch (error) {
     await supabase.from("monthly_donation_reports").delete().eq("id", data.id);
     return {
@@ -393,78 +446,120 @@ export async function updateMonthlyDonationReport(
   if (fetchError) return { ok: false, message: fetchError.message };
   if (!existing) return { ok: false, message: "找不到每月捐物清單" };
 
-  const deleteIds = formData
-    .getAll("delete_image_ids")
-    .filter((value): value is string => typeof value === "string");
+  const { data: currentImages, error: currentImagesError } = await supabase
+    .from("monthly_donation_images")
+    .select("id, public_id, sort_order")
+    .eq("report_id", id);
+
+  if (currentImagesError) return { ok: false, message: currentImagesError.message };
+
+  const currentImageRows = (currentImages ?? []) as Array<{
+    id: string;
+    public_id: string;
+    sort_order: number;
+  }>;
+  const currentImageIds = new Set(currentImageRows.map((image) => image.id));
+  const deleteIds = [
+    ...new Set(
+      formData
+        .getAll("delete_image_ids")
+        .filter(
+          (value): value is string =>
+            typeof value === "string" && currentImageIds.has(value),
+        ),
+    ),
+  ];
+  const deleteIdSet = new Set(deleteIds);
+  const totalAfterUpdate = currentImageRows.length - deleteIds.length + files.length;
+  const countError = validateTotalImageCount(totalAfterUpdate);
+  if (countError) return { ok: false, message: countError };
+
+  const startSortOrder =
+    Math.max(0, ...currentImageRows.map((image) => image.sort_order)) + 1;
+  let uploaded: Awaited<ReturnType<typeof uploadImages>> = [];
+
+  try {
+    uploaded = await uploadImages({
+      files,
+      captions: newImageCaptions(formData),
+      reportId: id,
+      payload: payload.data,
+      startSortOrder,
+    });
+  } catch (error) {
+    return {
+      ok: false,
+      message: error instanceof Error ? error.message : "圖片上傳失敗",
+    };
+  }
+
+  try {
+    const { error: updateError } = await supabase
+      .from("monthly_donation_reports")
+      .update(payload.data)
+      .eq("id", id);
+
+    if (updateError) throw new Error(updateError.message);
+
+    const captionRows = [...formData.entries()]
+      .filter(
+        ([key, value]) =>
+          key.startsWith("image_caption_") && typeof value === "string",
+      )
+      .map(([key, value]) => {
+        const imageId = key.slice("image_caption_".length);
+        return {
+          id: imageId,
+          caption:
+            typeof value === "string" && value.trim().length > 0
+              ? value.trim()
+              : null,
+        };
+      })
+      .filter(
+        (row) => currentImageIds.has(row.id) && !deleteIdSet.has(row.id),
+      );
+
+    if (captionRows.length > 0) {
+      const captionResults = await Promise.all(
+        captionRows.map((row) =>
+          supabase
+            .from("monthly_donation_images")
+            .update({ caption: row.caption })
+            .eq("report_id", id)
+            .eq("id", row.id),
+        ),
+      );
+      const captionError = captionResults.find((result) => result.error)?.error;
+      if (captionError) throw new Error(captionError.message);
+    }
+
+    await insertUploadedImages(id, uploaded);
+
+    if (deleteIds.length > 0) {
+      const { error: deleteError } = await supabase
+        .from("monthly_donation_images")
+        .delete()
+        .eq("report_id", id)
+        .in("id", deleteIds);
+
+      if (deleteError) throw new Error(deleteError.message);
+    }
+  } catch (error) {
+    await cleanupUploadedImages(uploaded);
+    return {
+      ok: false,
+      message: error instanceof Error ? error.message : "儲存失敗",
+    };
+  }
 
   if (deleteIds.length > 0) {
-    const { data: images, error } = await supabase
-      .from("monthly_donation_images")
-      .select("id, public_id")
-      .eq("report_id", id)
-      .in("id", deleteIds);
-
-    if (error) return { ok: false, message: error.message };
-
-    const { error: deleteError } = await supabase
-      .from("monthly_donation_images")
-      .delete()
-      .eq("report_id", id)
-      .in("id", deleteIds);
-
-    if (deleteError) return { ok: false, message: deleteError.message };
-
+    const deletePublicIds = currentImageRows
+      .filter((image) => deleteIdSet.has(image.id))
+      .map((image) => image.public_id);
     await Promise.allSettled(
-      (images ?? []).map((image) => deleteCloudinaryImage(image.public_id)),
+      deletePublicIds.map((publicId) => deleteCloudinaryImage(publicId)),
     );
-  }
-
-  const { error: updateError } = await supabase
-    .from("monthly_donation_reports")
-    .update(payload.data)
-    .eq("id", id);
-
-  if (updateError) return { ok: false, message: updateError.message };
-
-  // 更新既有圖片的說明：欄位名 image_caption_{imageId}
-  for (const [key, value] of formData.entries()) {
-    if (!key.startsWith("image_caption_") || typeof value !== "string") continue;
-    const imageId = key.slice("image_caption_".length);
-    if (deleteIds.includes(imageId)) continue;
-    const caption = value.trim().length > 0 ? value.trim() : null;
-    const { error } = await supabase
-      .from("monthly_donation_images")
-      .update({ caption })
-      .eq("report_id", id)
-      .eq("id", imageId);
-    if (error) return { ok: false, message: error.message };
-  }
-
-  if (files.length > 0) {
-    const { data: lastImage, error } = await supabase
-      .from("monthly_donation_images")
-      .select("sort_order")
-      .eq("report_id", id)
-      .order("sort_order", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (error) return { ok: false, message: error.message };
-
-    try {
-      await uploadImages({
-        files,
-        captions: newImageCaptions(formData),
-        reportId: id,
-        payload: payload.data,
-        startSortOrder: (lastImage?.sort_order ?? 0) + 1,
-      });
-    } catch (error) {
-      return {
-        ok: false,
-        message: error instanceof Error ? error.message : "圖片上傳失敗",
-      };
-    }
   }
 
   revalidateMonthlyDonations();

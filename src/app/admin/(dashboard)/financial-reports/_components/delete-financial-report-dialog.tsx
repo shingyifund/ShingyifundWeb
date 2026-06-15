@@ -17,11 +17,9 @@ import { deleteFinancialReport } from "../actions";
 
 export function DeleteFinancialReportDialog({
   id,
-  filePath,
   title,
 }: {
   id: string;
-  filePath: string;
   title: string;
 }) {
   const [open, setOpen] = useState(false);
@@ -31,7 +29,7 @@ export function DeleteFinancialReportDialog({
   function handleDelete() {
     setMessage(null);
     startTransition(async () => {
-      const result = await deleteFinancialReport(id, filePath);
+      const result = await deleteFinancialReport(id);
 
       if (!result.ok) {
         setMessage(result.message ?? "刪除失敗");

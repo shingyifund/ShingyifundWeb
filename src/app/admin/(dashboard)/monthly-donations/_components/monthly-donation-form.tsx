@@ -129,6 +129,9 @@ export function MonthlyDonationForm({
   );
   const busy = submitStarted || isPending || processingImages;
   const busyText = processingImages ? "正在壓縮圖片..." : "正在儲存...";
+  const activeExistingImageCount =
+    (report?.images.length ?? 0) - deleteImageIds.size;
+  const totalImageCount = activeExistingImageCount + selectedFiles.length;
   const selectedPreviews = useMemo(
     () =>
       selectedFiles.map((file) => ({
@@ -174,6 +177,11 @@ export function MonthlyDonationForm({
 
     if (selectedFiles.length > MAX_IMAGE_COUNT) {
       setMessage(`每筆最多上傳 ${MAX_IMAGE_COUNT} 張圖片`);
+      resetSubmitState();
+      return;
+    }
+    if (totalImageCount > MAX_IMAGE_COUNT) {
+      setMessage(`每筆最多保留 ${MAX_IMAGE_COUNT} 張圖片`);
       resetSubmitState();
       return;
     }

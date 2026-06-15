@@ -226,20 +226,26 @@ export async function updateFundraisingReport(
   return { ok: true };
 }
 
-export async function deleteFundraisingReport(
-  id: string,
-  filePath: string,
-): Promise<ActionResult> {
+export async function deleteFundraisingReport(id: string): Promise<ActionResult> {
   const user = await getAuthorizedAdmin();
   if (!user) return { ok: false, message: "未授權" };
 
   const supabase = await createAdminClient();
+  const { data: existing, error: fetchError } = await supabase
+    .from("fundraising_reports")
+    .select("file_path")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (fetchError) return { ok: false, message: fetchError.message };
+  if (!existing) return { ok: false, message: "找不到勸募成果報告" };
+
   const { error } = await supabase.from("fundraising_reports").delete().eq("id", id);
 
   if (error) return { ok: false, message: error.message };
 
-  if (filePath) {
-    await supabase.storage.from(BUCKET).remove([filePath]);
+  if (existing.file_path) {
+    await supabase.storage.from(BUCKET).remove([existing.file_path]);
   }
 
   revalidateFundraisingReports();

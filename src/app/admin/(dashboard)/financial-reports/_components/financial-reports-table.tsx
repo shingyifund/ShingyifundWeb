@@ -60,7 +60,6 @@ export function FinancialReportsTable({
                 </Button>
                 <DeleteFinancialReportDialog
                   id={report.id}
-                  filePath={report.file_path}
                   title={report.title}
                 />
               </div>
@@ -125,7 +124,6 @@ export function FinancialReportsTable({
                 </Button>
                 <DeleteFinancialReportDialog
                   id={report.id}
-                  filePath={report.file_path}
                   title={report.title}
                 />
               </div>
