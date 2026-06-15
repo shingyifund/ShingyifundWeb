@@ -14,7 +14,7 @@ export default async function AdminLayout({
 
   return (
     <div className="min-h-screen bg-[#f5f7f4] text-foreground">
-      <header className="border-b bg-white">
+      <header className="sticky top-0 z-40 border-b bg-white">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
           <Link href="/admin" className="flex items-center gap-3" aria-label="回到後台總覽">
             <Image
