@@ -100,6 +100,14 @@ export type MonthlyDonationRegion =
   | "taoyuan"
   | "tainan";
 
+export type FacebookPost = {
+  id: string;
+  message: string;
+  createdTime: string;
+  fullPicture: string | null;
+  permalink: string;
+};
+
 export type MonthlyDonationDonorType = "individual" | "organization";
 
 export type MonthlyDonationImage = {
