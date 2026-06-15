@@ -41,7 +41,7 @@ export async function DonationMarquee() {
             className="donation-marquee-track flex w-max gap-3 will-change-transform"
             style={{
               animationName: "marquee",
-              animationDuration: "24s",
+              animationDuration: "60s",
               animationTimingFunction: "linear",
               animationIterationCount: "infinite",
             }}

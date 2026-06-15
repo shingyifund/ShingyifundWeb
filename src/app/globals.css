@@ -195,7 +195,7 @@
   }
 
   .donation-marquee-track {
-    animation: marquee 24s linear infinite;
+    animation: marquee 60s linear infinite;
   }
 
   .donation-marquee-track:hover,
