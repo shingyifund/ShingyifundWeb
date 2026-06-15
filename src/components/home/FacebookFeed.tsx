@@ -3,7 +3,8 @@ import { Bell, HandHeart, ImageIcon } from "lucide-react";
 import { FaFacebookF, FaInstagram, FaThreads } from "react-icons/fa6";
 import { siteConfig } from "@/config/site";
 import { Container } from "@/components/ui/Container";
-import { FacebookPagePlugin } from "./FacebookPagePlugin";
+import { getFacebookPosts } from "@/lib/data/facebook";
+import { FacebookPosts } from "./FacebookPosts";
 
 const REASONS = [
   {
@@ -23,7 +24,9 @@ const REASONS = [
   },
 ];
 
-export function FacebookFeed() {
+export async function FacebookFeed() {
+  const posts = await getFacebookPosts(4);
+
   return (
     <section className="bg-mist/60 py-4">
       <Container>
@@ -39,7 +42,7 @@ export function FacebookFeed() {
             style={{ transform: "translateZ(0)" }}
           />
 
-          <div className="relative grid items-center gap-10 lg:grid-cols-[1fr_500px]">
+          <div className="relative grid items-start gap-8 lg:grid-cols-[minmax(0,360px)_1fr] lg:gap-12">
             {/* 左：文案 + 追蹤理由 + CTA */}
             <div>
               <span className="inline-flex items-center gap-2 text-sm font-medium tracking-wide text-amber-300">
@@ -104,8 +107,8 @@ export function FacebookFeed() {
               </div>
             </div>
 
-            {/* 右：FB 官方 Page Plugin，白卡鑲嵌深藍框內 */}
-            <FacebookPagePlugin width={500} height={560} />
+            {/* 右：粉專最新貼文（Graph API，全平台可顯示） */}
+            <FacebookPosts posts={posts} />
           </div>
         </div>
       </Container>

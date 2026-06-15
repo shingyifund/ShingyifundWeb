@@ -59,7 +59,6 @@ export function FundraisingReportsTable({
                 </Button>
                 <DeleteFundraisingReportDialog
                   id={report.id}
-                  filePath={report.file_path}
                   title={report.title}
                 />
               </div>
@@ -123,7 +122,6 @@ export function FundraisingReportsTable({
                 </Button>
                 <DeleteFundraisingReportDialog
                   id={report.id}
-                  filePath={report.file_path}
                   title={report.title}
                 />
               </div>
