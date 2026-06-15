@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ChevronDown, Heart, Menu, X } from "lucide-react";
-import { mainNav } from "@/config/nav";
+import { mainNav, type NavItem } from "@/config/nav";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 
@@ -61,56 +61,9 @@ export function SiteHeader() {
 
         {/* 桌機主選單 */}
         <nav className="hidden shrink-0 items-center gap-0.5 xl:flex">
-          {mainNav.map((item) => {
-            const active = isActive(item.href);
-            return (
-            <div key={item.href} className="group relative shrink-0">
-              {item.children ? (
-                <button
-                  type="button"
-                  className={cn(
-                    "flex cursor-default items-center gap-1 whitespace-nowrap rounded-full px-3 py-2 text-[15px] font-medium transition-colors",
-                    active
-                      ? "bg-amber-50 text-navy-800"
-                      : "text-ink-soft hover:text-navy-700",
-                  )}
-                >
-                  {item.label}
-                  <ChevronDown className="size-3.5 opacity-60 transition-transform group-hover:rotate-180" />
-                </button>
-              ) : (
-                <Link
-                  href={item.href}
-                  aria-current={active ? "page" : undefined}
-                  className={cn(
-                    "flex items-center gap-1 whitespace-nowrap rounded-full px-3 py-2 text-[15px] font-medium transition-colors",
-                    active
-                      ? "bg-amber-50 text-navy-800"
-                      : "text-ink-soft hover:text-navy-700",
-                  )}
-                >
-                  {item.label}
-                </Link>
-              )}
-
-              {item.children && (
-                <div className="invisible absolute left-1/2 top-full z-50 w-56 -translate-x-1/2 translate-y-1 pt-2 opacity-0 transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
-                  <div className="overflow-hidden rounded-2xl border border-navy-100 bg-white p-2 shadow-[0_18px_44px_-18px_rgb(15_38_71/0.35)]">
-                    {item.children.map((child) => (
-                      <Link
-                        key={child.href}
-                        href={child.href}
-                        className="block rounded-xl px-4 py-2.5 text-sm text-ink-soft transition-colors hover:bg-amber-50 hover:text-navy-700"
-                      >
-                        {child.label}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-            );
-          })}
+          {mainNav.map((item) => (
+            <DesktopNavItem key={item.href} item={item} active={isActive(item.href)} />
+          ))}
         </nav>
 
         {/* 右側漢堡（捐款改由右側固定鈕 DonateFab） */}
@@ -130,6 +83,115 @@ export function SiteHeader() {
     {/* 行動版抽屜（放在 header 外，避免 backdrop-blur 造成 fixed 定位錯誤） */}
     <MobileDrawer open={open} onClose={() => setOpen(false)} />
     </>
+  );
+}
+
+/** 偵測主要指標是否支援精準 hover（觸控/2-in-1 會回傳 false） */
+function useHoverCapable() {
+  const [hoverable, setHoverable] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
+    setHoverable(mq.matches);
+    const onChange = () => setHoverable(mq.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+  return hoverable;
+}
+
+/**
+ * 桌機單一選單項目。
+ * 滑鼠裝置：移入即開（沿用 hover 體驗）。
+ * 觸控／混合裝置：hover 樣式被瀏覽器停用，改以點擊開合，並支援點外面 / Esc 關閉。
+ */
+function DesktopNavItem({ item, active }: { item: NavItem; active: boolean }) {
+  const [open, setOpen] = useState(false);
+  const hoverable = useHoverCapable();
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (e: PointerEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  if (!item.children) {
+    return (
+      <Link
+        href={item.href}
+        aria-current={active ? "page" : undefined}
+        className={cn(
+          "flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-3 py-2 text-[15px] font-medium transition-colors",
+          active ? "bg-amber-50 text-navy-800" : "text-ink-soft hover:text-navy-700",
+        )}
+      >
+        {item.label}
+      </Link>
+    );
+  }
+
+  const hoverProps = hoverable
+    ? {
+        onMouseEnter: () => setOpen(true),
+        onMouseLeave: () => setOpen(false),
+      }
+    : {};
+
+  return (
+    <div ref={ref} className="relative shrink-0" {...hoverProps}>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        className={cn(
+          "flex cursor-pointer items-center gap-1 whitespace-nowrap rounded-full px-3 py-2 text-[15px] font-medium transition-colors",
+          active || open
+            ? "bg-amber-50 text-navy-800"
+            : "text-ink-soft hover:text-navy-700",
+        )}
+      >
+        {item.label}
+        <ChevronDown
+          className={cn(
+            "size-3.5 opacity-60 transition-transform",
+            open && "rotate-180",
+          )}
+        />
+      </button>
+
+      <div
+        className={cn(
+          "absolute left-1/2 top-full z-50 w-56 -translate-x-1/2 pt-2 transition-all duration-200",
+          open
+            ? "visible translate-y-0 opacity-100"
+            : "invisible translate-y-1 opacity-0",
+        )}
+      >
+        <div className="overflow-hidden rounded-2xl border border-navy-100 bg-white p-2 shadow-[0_18px_44px_-18px_rgb(15_38_71/0.35)]">
+          {item.children.map((child) => (
+            <Link
+              key={child.href}
+              href={child.href}
+              onClick={() => setOpen(false)}
+              className="block rounded-xl px-4 py-2.5 text-sm text-ink-soft transition-colors hover:bg-amber-50 hover:text-navy-700"
+            >
+              {child.label}
+            </Link>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 
