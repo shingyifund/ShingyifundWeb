@@ -86,27 +86,12 @@ export function SiteHeader() {
   );
 }
 
-/** 偵測主要指標是否支援精準 hover（觸控/2-in-1 會回傳 false） */
-function useHoverCapable() {
-  const [hoverable, setHoverable] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
-    setHoverable(mq.matches);
-    const onChange = () => setHoverable(mq.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
-  return hoverable;
-}
-
 /**
  * 桌機單一選單項目。
- * 滑鼠裝置：移入即開（沿用 hover 體驗）。
- * 觸控／混合裝置：hover 樣式被瀏覽器停用，改以點擊開合，並支援點外面 / Esc 關閉。
+ * 一律點擊開合（各裝置行為一致），並支援點外面 / Esc 關閉。
  */
 function DesktopNavItem({ item, active }: { item: NavItem; active: boolean }) {
   const [open, setOpen] = useState(false);
-  const hoverable = useHoverCapable();
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -140,15 +125,8 @@ function DesktopNavItem({ item, active }: { item: NavItem; active: boolean }) {
     );
   }
 
-  const hoverProps = hoverable
-    ? {
-        onMouseEnter: () => setOpen(true),
-        onMouseLeave: () => setOpen(false),
-      }
-    : {};
-
   return (
-    <div ref={ref} className="relative shrink-0" {...hoverProps}>
+    <div ref={ref} className="relative shrink-0">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
