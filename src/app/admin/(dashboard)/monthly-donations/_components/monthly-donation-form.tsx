@@ -29,6 +29,7 @@ const MAX_UPLOAD_HEIGHT = 900;
 const UPLOAD_QUALITY = 0.62;
 const MAX_ACTION_FILE_BYTES = 500 * 1024;
 const MAX_IMAGE_COUNT = 40;
+const WATERMARK_TEXT = "興毅基金會";
 
 function canvasToBlob(
   canvas: HTMLCanvasElement,
@@ -38,6 +39,35 @@ function canvasToBlob(
   return new Promise<Blob | null>((resolve) => {
     canvas.toBlob(resolve, type, quality);
   });
+}
+
+function drawWatermark(ctx: CanvasRenderingContext2D, width: number, height: number) {
+  const minSide = Math.min(width, height);
+  const fontSize = Math.max(18, Math.round(minSide * 0.045));
+  const paddingX = Math.round(fontSize * 0.9);
+  const paddingY = Math.round(fontSize * 0.55);
+  const margin = Math.max(16, Math.round(minSide * 0.035));
+
+  ctx.save();
+  ctx.font = `700 ${fontSize}px "Noto Sans TC", "PingFang TC", sans-serif`;
+  ctx.textBaseline = "middle";
+
+  const metrics = ctx.measureText(WATERMARK_TEXT);
+  const boxWidth = Math.ceil(metrics.width + paddingX * 2);
+  const boxHeight = Math.ceil(fontSize + paddingY * 2);
+  const x = width - boxWidth - margin;
+  const y = height - boxHeight - margin;
+
+  ctx.fillStyle = "rgba(15, 23, 42, 0.42)";
+  ctx.beginPath();
+  ctx.roundRect(x, y, boxWidth, boxHeight, Math.round(boxHeight / 2));
+  ctx.fill();
+
+  ctx.shadowColor = "rgba(0, 0, 0, 0.35)";
+  ctx.shadowBlur = Math.max(2, Math.round(fontSize * 0.12));
+  ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+  ctx.fillText(WATERMARK_TEXT, x + paddingX, y + boxHeight / 2);
+  ctx.restore();
 }
 
 async function resizeImageForUpload(file: File) {
@@ -61,6 +91,7 @@ async function resizeImageForUpload(file: File) {
 
   ctx.drawImage(image, 0, 0, width, height);
   image.close();
+  drawWatermark(ctx, width, height);
 
   const blob = await canvasToBlob(canvas, "image/webp", UPLOAD_QUALITY);
   if (!blob) return file;
@@ -128,7 +159,7 @@ export function MonthlyDonationForm({
     [customTitle, donorName, isAnonymous],
   );
   const busy = submitStarted || isPending || processingImages;
-  const busyText = processingImages ? "正在壓縮圖片..." : "正在儲存...";
+  const busyText = processingImages ? "正在壓縮並加入浮水印..." : "正在儲存...";
   const activeExistingImageCount =
     (report?.images.length ?? 0) - deleteImageIds.size;
   const totalImageCount = activeExistingImageCount + selectedFiles.length;
@@ -350,7 +381,7 @@ export function MonthlyDonationForm({
                   key={image.id}
                   className="group overflow-hidden rounded-lg border bg-white"
                 >
-                  <div className="relative aspect-4/3 bg-muted">
+                  <div className="relative aspect-video bg-muted">
                     <Image
                       src={image.image_url}
                       alt={image.file_name ?? "捐贈物資照片"}
@@ -423,7 +454,7 @@ export function MonthlyDonationForm({
           )}
         </div>
         <p className="text-xs text-muted-foreground">
-          送出前會自動壓縮，每張壓縮後需小於 500KB。
+          送出前會自動壓縮並加入「興毅基金會」浮水印，每張處理後需小於 500KB。
         </p>
         {selectedPreviews.length > 0 && (
           <div className="space-y-3 rounded-lg border bg-muted/30 p-3">
@@ -436,7 +467,7 @@ export function MonthlyDonationForm({
                   key={`${preview.file.name}-${preview.file.lastModified}-${index}`}
                   className="overflow-hidden rounded-lg border bg-white"
                 >
-                  <div className="relative aspect-4/3 bg-muted">
+                  <div className="relative aspect-video bg-muted">
                     <img
                       src={preview.url}
                       alt={preview.file.name}

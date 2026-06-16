@@ -172,7 +172,7 @@ export function MonthlyDonationLedger({
       ) : (
         <>
           <div className="overflow-hidden rounded-2xl bg-white shadow-[0_16px_44px_-28px_rgb(15_38_71/0.45)] ring-1 ring-navy-100">
-            <div className="hidden grid-cols-[72px_140px_250px_minmax(0,1fr)_6rem] gap-4 border-b border-navy-100 bg-navy-50/70 px-4 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted md:grid">
+            <div className="hidden grid-cols-[112px_150px_250px_minmax(0,1fr)_6rem] gap-4 border-b border-navy-100 bg-navy-50/70 px-4 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted md:grid">
               <span>圖片</span>
               <span>月份 / 區域</span>
               <span>捐贈者</span>
@@ -232,9 +232,15 @@ export function MonthlyDonationLedger({
   );
 }
 
-function Thumbnail({ url }: { url: string | null }) {
+function Thumbnail({
+  url,
+  className = "h-16 w-28",
+}: {
+  url: string | null;
+  className?: string;
+}) {
   return (
-    <div className="size-14 shrink-0 overflow-hidden rounded-xl bg-navy-50">
+    <div className={`${className} shrink-0 overflow-hidden rounded-xl bg-navy-50`}>
       {url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={url} alt="" className="size-full object-cover" />
@@ -262,7 +268,7 @@ function DonationLedgerRow({ report }: { report: MonthlyDonationListItem }) {
       <div className="px-4 py-3">
         {/* Mobile */}
         <div className="flex gap-3 md:hidden">
-          <Thumbnail url={report.firstImageUrl} />
+          <Thumbnail url={report.firstImageUrl} className="h-20 w-32" />
           <div className="min-w-0 flex-1">
             <p className="text-xs text-ink-muted">
               {period} · {regionLabel} · {typeLabel}
@@ -282,7 +288,7 @@ function DonationLedgerRow({ report }: { report: MonthlyDonationListItem }) {
         </div>
 
         {/* Desktop */}
-        <div className="hidden md:grid md:grid-cols-[72px_140px_250px_minmax(0,1fr)_6rem] md:items-center md:gap-4">
+        <div className="hidden md:grid md:grid-cols-[112px_150px_250px_minmax(0,1fr)_6rem] md:items-center md:gap-4">
           <Thumbnail url={report.firstImageUrl} />
 
           <div className="space-y-0.5">

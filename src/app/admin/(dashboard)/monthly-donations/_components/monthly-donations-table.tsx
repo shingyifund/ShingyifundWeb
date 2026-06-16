@@ -13,11 +13,11 @@ import { DeleteMonthlyDonationDialog } from "./delete-monthly-donation-dialog";
 import { MonthlyDonationPublishSwitch } from "./monthly-donation-publish-switch";
 
 const GRID_CLASS =
-  "lg:grid-cols-[72px_180px_140px_minmax(0,1fr)_100px_130px]";
+  "lg:grid-cols-[112px_180px_140px_minmax(0,1fr)_100px_130px]";
 
 function Thumbnail({ url }: { url: string | null }) {
   return (
-    <div className="size-14 shrink-0 overflow-hidden rounded-lg bg-muted">
+    <div className="h-16 w-28 shrink-0 overflow-hidden rounded-lg bg-muted">
       {url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={url} alt="" className="size-full object-cover" />

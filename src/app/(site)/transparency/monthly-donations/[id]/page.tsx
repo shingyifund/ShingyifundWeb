@@ -45,6 +45,18 @@ export default async function MonthlyDonationDetailPage({
     donorName: report.donorName,
     isAnonymous: report.isAnonymous,
   });
+  const imageGridClass =
+    report.images.length === 1
+      ? "mt-8 max-w-4xl"
+      : report.images.length === 2
+        ? "mt-8 grid gap-5 md:grid-cols-2"
+        : "mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-3";
+  const imageSizes =
+    report.images.length === 1
+      ? "(min-width: 1024px) 896px, 100vw"
+      : report.images.length === 2
+        ? "(min-width: 768px) 50vw, 100vw"
+        : "(min-width: 1280px) 33vw, (min-width: 640px) 50vw, 100vw";
 
   return (
     <>
@@ -81,11 +93,11 @@ export default async function MonthlyDonationDetailPage({
             </h1>
 
             {report.images.length > 0 ? (
-              <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className={imageGridClass}>
                 {report.images.map((image, index) => (
                   <figure
                     key={image.id}
-                    className="overflow-hidden rounded-xl border border-navy-100 bg-white"
+                    className="overflow-hidden rounded-2xl border border-navy-100 bg-white"
                   >
                     <a
                       href={image.imageUrl}
@@ -93,12 +105,12 @@ export default async function MonthlyDonationDetailPage({
                       rel="noopener noreferrer"
                       className="group block"
                     >
-                      <div className="relative aspect-4/3 bg-muted">
+                      <div className="relative aspect-video bg-muted">
                         <Image
                           src={image.imageUrl}
                           alt={image.caption ?? image.fileName ?? `物品照片 ${index + 1}`}
                           fill
-                          sizes="(min-width: 1024px) 320px, (min-width: 640px) 50vw, 100vw"
+                          sizes={imageSizes}
                           className="object-cover transition-transform duration-300 group-hover:scale-105"
                         />
                       </div>
