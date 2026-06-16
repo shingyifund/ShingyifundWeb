@@ -234,30 +234,75 @@ async function listImages(reportIds: string[]) {
   return map;
 }
 
-export async function listMonthlyDonationReports(): Promise<
-  MonthlyDonationReportRecord[]
-> {
+export type MonthlyDonationListRecord = Omit<MonthlyDonationReportRecord, "images"> & {
+  imageCount: number;
+  firstImageUrl: string | null;
+};
+
+export type MonthlyDonationListParams = {
+  year?: number;
+  month?: number;
+  donorType?: MonthlyDonationDonorType;
+  donorName?: string;
+  page: number;
+  pageSize: number;
+};
+
+export type MonthlyDonationListResult = {
+  rows: MonthlyDonationListRecord[];
+  total: number;
+};
+
+export async function listMonthlyDonationReportsPaged(
+  params: MonthlyDonationListParams,
+): Promise<MonthlyDonationListResult> {
   await assertAdmin();
 
+  const { year, month, donorType, donorName, page, pageSize } = params;
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
   const supabase = await createAdminClient();
-  const { data, error } = await supabase
+
+  let query = supabase
     .from("monthly_donation_reports")
-    .select(REPORT_COLS)
+    .select(`${REPORT_COLS}, monthly_donation_images(image_url, sort_order)`, {
+      count: "exact",
+    })
     .order("western_year", { ascending: false })
     .order("month", { ascending: false })
     .order("region", { ascending: true })
     .order("donor_type", { ascending: true })
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(from, to);
+
+  if (year !== undefined) query = query.eq("western_year", year);
+  if (month !== undefined) query = query.eq("month", month);
+  if (donorType !== undefined) query = query.eq("donor_type", donorType);
+  if (donorName) query = query.ilike("donor_name", `%${donorName}%`);
+
+  const { data: rawData, count, error } = await query;
 
   if (error) throw new Error(error.message);
 
-  const rows = (data ?? []) as Omit<MonthlyDonationReportRecord, "images">[];
-  const imagesByReportId = await listImages(rows.map((row) => row.id));
+  interface RawRow extends Omit<MonthlyDonationReportRecord, "images"> {
+    monthly_donation_images: { image_url: string; sort_order: number }[];
+  }
 
-  return rows.map((row) => ({
-    ...row,
-    images: imagesByReportId.get(row.id) ?? [],
-  }));
+  const rows: MonthlyDonationListRecord[] = ((rawData ?? []) as RawRow[]).map(
+    ({ monthly_donation_images, ...rest }) => {
+      const sorted = [...(monthly_donation_images ?? [])].sort(
+        (a, b) => a.sort_order - b.sort_order,
+      );
+      return {
+        ...rest,
+        imageCount: monthly_donation_images?.length ?? 0,
+        firstImageUrl: sorted[0]?.image_url ?? null,
+      };
+    },
+  );
+
+  return { rows, total: count ?? 0 };
 }
 
 export async function getMonthlyDonationReportById(

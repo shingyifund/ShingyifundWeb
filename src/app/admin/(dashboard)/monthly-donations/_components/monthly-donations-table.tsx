@@ -1,4 +1,4 @@
-import { Pencil } from "lucide-react";
+import { ImageIcon, Pencil } from "lucide-react";
 import {
   AdminDataList,
   AdminDataListRow,
@@ -8,17 +8,32 @@ import {
   getMonthlyDonationDonorTypeLabel,
   getMonthlyDonationRegionLabel,
 } from "@/lib/monthly-donations";
-import type { MonthlyDonationReportRecord } from "../actions";
+import type { MonthlyDonationListRecord } from "../actions";
 import { DeleteMonthlyDonationDialog } from "./delete-monthly-donation-dialog";
 import { MonthlyDonationPublishSwitch } from "./monthly-donation-publish-switch";
 
 const GRID_CLASS =
-  "lg:grid-cols-[120px_80px_80px_140px_minmax(0,1fr)_100px_130px]";
+  "lg:grid-cols-[72px_180px_140px_minmax(0,1fr)_100px_130px]";
+
+function Thumbnail({ url }: { url: string | null }) {
+  return (
+    <div className="size-14 shrink-0 overflow-hidden rounded-lg bg-muted">
+      {url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={url} alt="" className="size-full object-cover" />
+      ) : (
+        <div className="flex size-full items-center justify-center">
+          <ImageIcon className="size-5 text-muted-foreground/40" />
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function MonthlyDonationsTable({
   reports,
 }: {
-  reports: MonthlyDonationReportRecord[];
+  reports: MonthlyDonationListRecord[];
 }) {
   if (reports.length === 0) {
     return (
@@ -42,34 +57,38 @@ export function MonthlyDonationsTable({
           return (
             <div
               key={report.id}
-              className="rounded-lg border bg-white px-4 py-3"
+              className="flex gap-3 rounded-lg border bg-white p-3"
             >
-              <p className="font-medium text-foreground">{report.title}</p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {report.western_year}/{String(report.month).padStart(2, "0")} ·{" "}
-                {getMonthlyDonationRegionLabel(report.region)} ·{" "}
-                {getMonthlyDonationDonorTypeLabel(report.donor_type)} · {donor} ·{" "}
-                {report.images.length} 張圖片
-              </p>
-              <div className="mt-2 flex items-center justify-between">
-                <MonthlyDonationPublishSwitch
-                  id={report.id}
-                  title={report.title}
-                  isPublished={report.is_published}
-                />
-                <div className="flex items-center gap-2">
-                  <Button
-                    href={`/admin/monthly-donations/${report.id}`}
-                    variant="ghost"
-                    size="icon-sm"
-                    aria-label={`編輯 ${report.title}`}
-                  >
-                    <Pencil />
-                  </Button>
-                  <DeleteMonthlyDonationDialog
+              <Thumbnail url={report.firstImageUrl} />
+              <div className="min-w-0 flex-1">
+                <p className="font-medium text-foreground">{report.title}</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  {report.western_year}年{String(report.month).padStart(2, "0")}月
+                  {" · "}{getMonthlyDonationRegionLabel(report.region)}
+                  {" · "}{getMonthlyDonationDonorTypeLabel(report.donor_type)}
+                  {" · "}{donor}
+                  {" · "}{report.imageCount} 張
+                </p>
+                <div className="mt-2 flex items-center justify-between">
+                  <MonthlyDonationPublishSwitch
                     id={report.id}
                     title={report.title}
+                    isPublished={report.is_published}
                   />
+                  <div className="flex items-center gap-2">
+                    <Button
+                      href={`/admin/monthly-donations/${report.id}`}
+                      variant="ghost"
+                      size="icon-sm"
+                      aria-label={`編輯 ${report.title}`}
+                    >
+                      <Pencil />
+                    </Button>
+                    <DeleteMonthlyDonationDialog
+                      id={report.id}
+                      title={report.title}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -81,9 +100,8 @@ export function MonthlyDonationsTable({
       <div className="hidden lg:block">
         <AdminDataList
           columns={[
-            { label: "年月" },
-            { label: "區域" },
-            { label: "分類" },
+            { label: "圖片" },
+            { label: "年月 / 區域 / 分類" },
             { label: "捐贈者" },
             { label: "標題" },
             { label: "狀態" },
@@ -98,14 +116,16 @@ export function MonthlyDonationsTable({
               gridClassName={GRID_CLASS}
               itemAlignClassName="lg:items-center"
             >
-              <div className="text-sm font-semibold text-navy-800">
-                {report.western_year}年{String(report.month).padStart(2, "0")}月
-              </div>
-              <div className="text-sm text-foreground">
-                {getMonthlyDonationRegionLabel(report.region)}
-              </div>
-              <div className="text-sm text-foreground">
-                {getMonthlyDonationDonorTypeLabel(report.donor_type)}
+              <Thumbnail url={report.firstImageUrl} />
+              <div className="space-y-0.5">
+                <p className="text-sm font-semibold text-navy-800">
+                  {report.western_year}年{String(report.month).padStart(2, "0")}月
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {getMonthlyDonationRegionLabel(report.region)}
+                  {" · "}
+                  {getMonthlyDonationDonorTypeLabel(report.donor_type)}
+                </p>
               </div>
               <div className="min-w-0 text-sm">
                 {report.is_anonymous ? (
@@ -119,7 +139,7 @@ export function MonthlyDonationsTable({
               <div className="min-w-0">
                 <p className="font-medium text-foreground">{report.title}</p>
                 <p className="mt-1 truncate text-xs text-muted-foreground">
-                  {report.images.length} 張圖片
+                  {report.imageCount} 張圖片
                 </p>
               </div>
               <div>

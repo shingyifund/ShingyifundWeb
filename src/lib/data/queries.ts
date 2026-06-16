@@ -10,6 +10,7 @@ import type {
   FundraisingReport,
   HeroSlide,
   ImpactStat,
+  MonthlyDonationDonorType,
   MonthlyDonationImage,
   MonthlyDonationReport,
   YouTubeVideo,
@@ -358,5 +359,81 @@ export async function getMonthlyDonationReportById(
     return mapMonthlyDonationReport(row, imagesByReportId.get(row.id) ?? []);
   } catch {
     return null;
+  }
+}
+
+export type MonthlyDonationListItem = Omit<MonthlyDonationReport, "images"> & {
+  firstImageUrl: string | null;
+};
+
+interface MonthlyDonationReportListRow extends MonthlyDonationReportRow {
+  monthly_donation_images: { image_url: string; sort_order: number }[] | null;
+}
+
+export async function getMonthlyDonationReportsPaged({
+  year,
+  month,
+  donorType,
+  page,
+  pageSize,
+}: {
+  year?: number;
+  month?: number;
+  donorType?: MonthlyDonationDonorType;
+  page: number;
+  pageSize: number;
+}): Promise<{ rows: MonthlyDonationListItem[]; total: number }> {
+  try {
+    const supabase = await createClient();
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+
+    let query = supabase
+      .from("monthly_donation_reports")
+      .select(
+        `${MONTHLY_DONATION_REPORT_COLS}, monthly_donation_images(image_url, sort_order)`,
+        { count: "exact" },
+      )
+      .eq("is_published", true)
+      .order("western_year", { ascending: false })
+      .order("month", { ascending: false })
+      .order("region", { ascending: true })
+      .order("donor_type", { ascending: true })
+      .order("created_at", { ascending: false })
+      .range(from, to);
+
+    if (year !== undefined) query = query.eq("western_year", year);
+    if (month !== undefined) query = query.eq("month", month);
+    if (donorType !== undefined) query = query.eq("donor_type", donorType);
+
+    const { data, count, error } = await query;
+    if (error || !data) throw error;
+
+    const rows = (data as MonthlyDonationReportListRow[]).map((row) => {
+      const imgs = (row.monthly_donation_images ?? []).sort(
+        (a, b) => a.sort_order - b.sort_order,
+      );
+      const base = mapMonthlyDonationReport(row, []);
+      const item: MonthlyDonationListItem = {
+        id: base.id,
+        title: base.title,
+        westernYear: base.westernYear,
+        month: base.month,
+        region: base.region,
+        donorType: base.donorType,
+        donorName: base.donorName,
+        isAnonymous: base.isAnonymous,
+        sortOrder: base.sortOrder,
+        isPublished: base.isPublished,
+        createdAt: base.createdAt,
+        updatedAt: base.updatedAt,
+        firstImageUrl: imgs[0]?.image_url ?? null,
+      };
+      return item;
+    });
+
+    return { rows, total: count ?? 0 };
+  } catch {
+    return { rows: [], total: 0 };
   }
 }

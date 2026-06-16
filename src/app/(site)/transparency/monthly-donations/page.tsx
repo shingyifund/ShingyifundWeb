@@ -1,7 +1,9 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { Container } from "@/components/ui/Container";
-import { getMonthlyDonationReports } from "@/lib/data/queries";
+import { getMonthlyDonationReportsPaged } from "@/lib/data/queries";
+import type { MonthlyDonationDonorType } from "@/lib/types";
 import { MonthlyDonationLedger } from "./_components/monthly-donation-ledger";
 
 export const metadata: Metadata = {
@@ -9,8 +11,29 @@ export const metadata: Metadata = {
   description: "興毅基金會每月物資捐贈明細與照片公開查詢。",
 };
 
-export default async function MonthlyDonationsPage() {
-  const reports = await getMonthlyDonationReports();
+const PAGE_SIZE = 10;
+
+export default async function MonthlyDonationsPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | undefined>>;
+}) {
+  const sp = await searchParams;
+
+  const year = sp.year ? Number(sp.year) : undefined;
+  const month = sp.month ? Number(sp.month) : undefined;
+  const donorType = sp.donorType as MonthlyDonationDonorType | undefined;
+  const page = Math.max(1, Number(sp.page) || 1);
+
+  const { rows, total } = await getMonthlyDonationReportsPaged({
+    year,
+    month,
+    donorType,
+    page,
+    pageSize: PAGE_SIZE,
+  });
+
+  const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
     <>
@@ -23,7 +46,7 @@ export default async function MonthlyDonationsPage() {
           sizes="100vw"
           className="pointer-events-none object-cover object-right opacity-70"
         />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-navy-950 via-navy-900/75 to-navy-900/20" />
+        <div className="pointer-events-none absolute inset-0 bg-linear-to-r from-navy-950 via-navy-900/75 to-navy-900/20" />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgb(255_255_255/0.06)_1px,transparent_0)] bg-size-[26px_26px]" />
 
         <Container className="relative">
@@ -43,18 +66,18 @@ export default async function MonthlyDonationsPage() {
 
       <main className="bg-[#f5f7f4] py-8 sm:py-10">
         <Container>
-          {reports.length === 0 ? (
-            <section className="rounded-2xl border border-dashed border-navy-200 bg-white p-8 text-center">
-              <h2 className="font-serif text-2xl font-bold text-navy-900">
-                目前尚無每月捐物清單
-              </h2>
-              <p className="mt-3 text-sm text-muted-foreground">
-                後台新增資料後，清單會顯示在此頁。
-              </p>
-            </section>
-          ) : (
-            <MonthlyDonationLedger reports={reports} />
-          )}
+          <Suspense>
+            <MonthlyDonationLedger
+              reports={rows}
+              total={total}
+              page={page}
+              pageSize={PAGE_SIZE}
+              totalPages={totalPages}
+              currentYear={year}
+              currentMonth={month}
+              currentDonorType={donorType}
+            />
+          </Suspense>
         </Container>
       </main>
     </>
