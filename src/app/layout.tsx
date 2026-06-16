@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Noto_Sans_TC, Noto_Serif_TC } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
@@ -63,6 +64,7 @@ export default function RootLayout({
     <html lang="zh-Hant" className={cn(notoSans.variable, notoSerif.variable, "font-sans")}>
       <body className="bg-grain min-h-screen antialiased">
         {children}
+        <Analytics />
       </body>
     </html>
   );
