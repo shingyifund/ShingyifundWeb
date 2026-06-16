@@ -1,11 +1,13 @@
 "use client";
 
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowRight,
   Building2,
   ImageIcon,
+  Loader2,
   UserRound,
   X,
 } from "lucide-react";
@@ -44,6 +46,10 @@ export function MonthlyDonationLedger({
   currentDonorType,
 }: Props) {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const [pendingPageDirection, setPendingPageDirection] = useState<
+    "prev" | "next" | null
+  >(null);
 
   function buildUrl(overrides: {
     year?: string;
@@ -69,20 +75,36 @@ export function MonthlyDonationLedger({
   function handlePeriodChange(val: string) {
     const match = /^(\d{4})-(\d{2})$/.exec(val);
     if (match) {
-      router.push(
-        buildUrl({ year: match[1], month: String(Number(match[2])), page: undefined }),
-      );
+      setPendingPageDirection(null);
+      startTransition(() => {
+        router.push(
+          buildUrl({ year: match[1], month: String(Number(match[2])), page: undefined }),
+        );
+      });
     }
   }
 
   function handlePeriodClear() {
-    router.push(buildUrl({ year: undefined, month: undefined, page: undefined }));
+    setPendingPageDirection(null);
+    startTransition(() => {
+      router.push(buildUrl({ year: undefined, month: undefined, page: undefined }));
+    });
   }
 
   function handleDonorTypeChange(value: string) {
-    router.push(
-      buildUrl({ donorType: value === "all" || !value ? undefined : value, page: undefined }),
-    );
+    setPendingPageDirection(null);
+    startTransition(() => {
+      router.push(
+        buildUrl({ donorType: value === "all" || !value ? undefined : value, page: undefined }),
+      );
+    });
+  }
+
+  function handlePageChange(nextPage: number) {
+    setPendingPageDirection(nextPage < page ? "prev" : "next");
+    startTransition(() => {
+      router.push(buildUrl({ page: String(nextPage) }));
+    });
   }
 
   const periodValue =
@@ -119,12 +141,14 @@ export function MonthlyDonationLedger({
                 onChange={handlePeriodChange}
                 placeholder="選擇年月"
                 className="w-40"
+                disabled={isPending}
               />
               {periodValue && (
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon-sm"
+                  disabled={isPending}
                   onClick={handlePeriodClear}
                   aria-label="清除年月篩選"
                 >
@@ -139,6 +163,7 @@ export function MonthlyDonationLedger({
               onValueChange={handleDonorTypeChange}
               spacing={0}
               variant="outline"
+              disabled={isPending}
             >
               <ToggleGroupItem value="all" className="text-sm">全部</ToggleGroupItem>
               <ToggleGroupItem value="individual" className="text-sm">個人</ToggleGroupItem>
@@ -150,7 +175,13 @@ export function MonthlyDonationLedger({
                 type="button"
                 variant="ghost"
                 size="sm"
-                onClick={() => router.push("?")}
+                disabled={isPending}
+                onClick={() => {
+                  setPendingPageDirection(null);
+                  startTransition(() => {
+                    router.push("?");
+                  });
+                }}
                 className="text-ink-muted"
               >
                 清除篩選
@@ -207,9 +238,12 @@ export function MonthlyDonationLedger({
                 <Button
                   variant="outline"
                   size="sm"
-                  disabled={page <= 1}
-                  onClick={() => router.push(buildUrl({ page: String(page - 1) }))}
+                  disabled={isPending || page <= 1}
+                  onClick={() => handlePageChange(page - 1)}
                 >
+                  {isPending && pendingPageDirection === "prev" && (
+                    <Loader2 className="size-4 animate-spin" />
+                  )}
                   上一頁
                 </Button>
                 <span className="min-w-16 text-center text-sm text-ink-muted">
@@ -218,9 +252,12 @@ export function MonthlyDonationLedger({
                 <Button
                   variant="outline"
                   size="sm"
-                  disabled={page >= totalPages}
-                  onClick={() => router.push(buildUrl({ page: String(page + 1) }))}
+                  disabled={isPending || page >= totalPages}
+                  onClick={() => handlePageChange(page + 1)}
                 >
+                  {isPending && pendingPageDirection === "next" && (
+                    <Loader2 className="size-4 animate-spin" />
+                  )}
                   下一頁
                 </Button>
               </div>
