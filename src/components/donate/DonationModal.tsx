@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { CreditCard, Heart, Landmark, Receipt, X, type LucideIcon } from "lucide-react";
 import { siteConfig } from "@/config/site";
+import { ONLINE_DONATION_URL } from "@/config/nav";
 import { CopyButton } from "@/components/layout/CopyButton";
 import { Button } from "@/components/ui/Button";
 
@@ -115,9 +116,16 @@ export function DonationModal({
           </div>
 
           <div className="mt-6 flex items-center justify-center">
-            <Button href="/donate" variant="secondary" size="md" onClick={onClose}>
+            <Button
+              href={ONLINE_DONATION_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="secondary"
+              size="md"
+              onClick={onClose}
+            >
               <Heart className="size-4 fill-current text-rose-500" />
-              前往捐款頁
+              線上捐款
             </Button>
           </div>
         </div>

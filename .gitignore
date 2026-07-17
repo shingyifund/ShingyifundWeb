@@ -35,3 +35,6 @@ yarn-error.log*
 .claude/
 skills-lock.json
 bun.lock
+
+# 內容來源文件（不進版控）
+docs/*.docx

@@ -3,6 +3,13 @@ import { Container } from "@/components/ui/Container";
 import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
 
+const POSITION_CLASS = {
+  center: "object-center",
+  right: "object-right",
+  /** 偏上但不貼齊頂端，避免人物頭部被裁切 */
+  top: "object-[center_25%]",
+} as const;
+
 export function PageHero({
   image,
   imageAlt = "",
@@ -15,7 +22,7 @@ export function PageHero({
 }: {
   image: string;
   imageAlt?: string;
-  imagePosition?: "center" | "right";
+  imagePosition?: "center" | "right" | "top";
   eyebrow?: string;
   title: string;
   align?: "left" | "center";
@@ -33,7 +40,7 @@ export function PageHero({
         sizes="100vw"
         className={cn(
           "pointer-events-none object-cover opacity-95",
-          imagePosition === "right" ? "object-right" : "object-center",
+          POSITION_CLASS[imagePosition],
         )}
       />
 

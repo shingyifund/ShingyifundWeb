@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ChevronDown, Heart, Menu, X } from "lucide-react";
-import { mainNav, type NavItem } from "@/config/nav";
+import { mainNav, ONLINE_DONATION_URL, type NavItem } from "@/config/nav";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 
@@ -157,16 +157,31 @@ function DesktopNavItem({ item, active }: { item: NavItem; active: boolean }) {
         )}
       >
         <div className="overflow-hidden rounded-2xl border border-navy-100 bg-white p-2 shadow-[0_18px_44px_-18px_rgb(15_38_71/0.35)]">
-          {item.children.map((child) => (
-            <Link
-              key={child.href}
-              href={child.href}
-              onClick={() => setOpen(false)}
-              className="block rounded-xl px-4 py-2.5 text-sm text-ink-soft transition-colors hover:bg-amber-50 hover:text-navy-700"
-            >
-              {child.label}
-            </Link>
-          ))}
+          {item.children.map((child) => {
+            const childClass =
+              "block rounded-xl px-4 py-2.5 text-sm text-ink-soft transition-colors hover:bg-amber-50 hover:text-navy-700";
+            return child.external ? (
+              <a
+                key={child.href}
+                href={child.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setOpen(false)}
+                className={childClass}
+              >
+                {child.label}
+              </a>
+            ) : (
+              <Link
+                key={child.href}
+                href={child.href}
+                onClick={() => setOpen(false)}
+                className={childClass}
+              >
+                {child.label}
+              </Link>
+            );
+          })}
         </div>
       </div>
     </div>
@@ -241,16 +256,31 @@ function MobileDrawer({
                       )}
                     >
                       <div className="overflow-hidden">
-                        {item.children.map((child) => (
-                          <Link
-                            key={child.href}
-                            href={child.href}
-                            onClick={onClose}
-                            className="block rounded-lg px-3 py-2 text-sm text-ink-soft hover:bg-amber-50 hover:text-navy-700"
-                          >
-                            {child.label}
-                          </Link>
-                        ))}
+                        {item.children.map((child) => {
+                          const childClass =
+                            "block rounded-lg px-3 py-2 text-sm text-ink-soft hover:bg-amber-50 hover:text-navy-700";
+                          return child.external ? (
+                            <a
+                              key={child.href}
+                              href={child.href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={onClose}
+                              className={childClass}
+                            >
+                              {child.label}
+                            </a>
+                          ) : (
+                            <Link
+                              key={child.href}
+                              href={child.href}
+                              onClick={onClose}
+                              className={childClass}
+                            >
+                              {child.label}
+                            </Link>
+                          );
+                        })}
                       </div>
                     </div>
                   </>
@@ -269,9 +299,15 @@ function MobileDrawer({
         </nav>
 
         <div className="border-t border-navy-100 p-4">
-          <Button href="/donate" className="w-full" onClick={onClose}>
+          <Button
+            href={ONLINE_DONATION_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full"
+            onClick={onClose}
+          >
             <Heart className="size-4 fill-current text-rose-500" />
-            立即捐款
+            線上捐款
           </Button>
         </div>
       </div>
