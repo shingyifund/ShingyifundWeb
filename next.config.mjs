@@ -1,8 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  serverActions: {
-    bodySizeLimit: "50mb",
-  },
   experimental: {
     proxyClientMaxBodySize: "50mb",
     serverActions: {

@@ -10,6 +10,8 @@ import type {
 // 示意圖（取自原站，兩張重複使用，待替換為正式素材）
 const IMG_A = "/images/photo-a.jpg"; // 雙手捧米
 const IMG_B = "/images/photo-b.jpg"; // 志工發放物資
+const IMG_RELIEF = "/images/relief.jpg"; // 社會救助插畫
+const IMG_FOODBANK = "/images/foodbank.jpg"; // 食物銀行插畫
 
 export const heroSlides: HeroSlide[] = [
   {
@@ -72,7 +74,7 @@ export const serviceFeatures: ServiceFeature[] = [
     accent: "amber",
     title: "社會救助",
     description: "提供急難救助、生活扶助與關懷訪視，陪伴弱勢家庭度過困境，重建生活希望。",
-    image: IMG_B,
+    image: IMG_RELIEF,
     bullets: [
       { label: "急難救助", icon: "handHeart" },
       { label: "生活扶助", icon: "lifeKit" },
@@ -86,7 +88,7 @@ export const serviceFeatures: ServiceFeature[] = [
     accent: "navy",
     title: "食物銀行",
     description: "透過募集、整理與發放物資，減少食物浪費，將愛心送到有需要的家庭與團體。",
-    image: IMG_A,
+    image: IMG_FOODBANK,
     bullets: [
       { label: "食物募集", icon: "collect" },
       { label: "物資整理", icon: "sort" },

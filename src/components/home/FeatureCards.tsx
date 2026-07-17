@@ -79,7 +79,7 @@ function FeatureCard({ feature }: { feature: ServiceFeature }) {
           label="示意圖片"
           sizes="(max-width: 768px) 100vw, 50vw"
           className="absolute inset-0 size-full"
-          imgClassName="transition-transform duration-500 group-hover:scale-105"
+          imgClassName="object-top transition-transform duration-500 group-hover:scale-105"
         />
       </div>
 
