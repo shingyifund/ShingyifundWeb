@@ -1,3 +1,5 @@
+import pkg from "../../package.json";
+
 /** 興毅基金會 — 組織常數資訊（單一來源） */
 export const siteConfig = {
   name: "財團法人興毅社會福利慈善事業基金會",
@@ -37,8 +39,8 @@ export const siteConfig = {
     threads: "https://www.threads.com/@shingyifund",
   },
 
-  /** 網站版本號（每次改版手動更新） */
-  version: "v0.1.11",
+  /** 網站版本號（取自 package.json，不需手動維護） */
+  version: `v${pkg.version}`,
 } as const;
 
 export type SiteConfig = typeof siteConfig;
