@@ -184,12 +184,15 @@ export const reliefConfig = {
       {
         title: "社會救助申請表",
         description: "供申請人及轉介單位填寫家庭狀況、急難原因與申請需求。",
-        href: null as string | null,
+        href: "/downloads/relief-application-form.doc" as string | null,
+        /** 下載後的檔名（保留中文原名） */
+        fileName: "興毅基金會_社會救助申請表.doc",
       },
       {
         title: "個人資料蒐集、處理及利用告知暨同意書",
         description: "申請時請與其他申請資料一併填寫及送交。",
-        href: null as string | null,
+        href: "/downloads/privacy-consent-form.docx" as string | null,
+        fileName: "興毅基金會_個人資料蒐集及使用同意書.docx",
       },
     ],
   },

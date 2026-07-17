@@ -9,7 +9,7 @@ export function ReliefDownloads() {
   const { downloads } = reliefConfig;
 
   return (
-    <section className="bg-mist/60 py-20">
+    <section id="relief-downloads" className="scroll-mt-24 bg-mist/60 py-20">
       <Container>
         <SectionHeading
           align="center"
@@ -35,7 +35,12 @@ export function ReliefDownloads() {
 
                 <div className="mt-5">
                   {doc.href ? (
-                    <Button href={doc.href} size="sm" variant="secondary" download>
+                    <Button
+                      href={doc.href}
+                      size="sm"
+                      variant="secondary"
+                      download={doc.fileName}
+                    >
                       <Download className="size-4" />
                       下載文件
                     </Button>

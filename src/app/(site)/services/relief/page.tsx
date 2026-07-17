@@ -8,6 +8,7 @@ import { ReliefDocuments } from "@/components/services/ReliefDocuments";
 import { ReliefPrinciples } from "@/components/services/ReliefPrinciples";
 import { ReliefTerms } from "@/components/services/ReliefTerms";
 import { ReliefDownloads } from "@/components/services/ReliefDownloads";
+import { ReliefDownloadFab } from "@/components/services/ReliefDownloadFab";
 import { ReliefFaq } from "@/components/services/ReliefFaq";
 import { reliefConfig } from "@/config/relief";
 
@@ -41,6 +42,8 @@ export default function ReliefPage() {
       <ReliefTerms />
       <ReliefDownloads />
       <ReliefFaq />
+
+      <ReliefDownloadFab />
     </>
   );
 }
