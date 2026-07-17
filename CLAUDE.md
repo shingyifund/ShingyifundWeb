@@ -36,6 +36,18 @@
 - 本環境不能跑互動式 CLI prompt（會 hang）。若 CLI 問是否覆蓋既有檔需謹慎，避免覆蓋專案客製的 `Button.tsx`（首字母大寫，import 路徑為 `@/components/ui/Button`）。
 - 排版／展示用元件（Container、PageHero、SectionHeading、Reveal…）非互動控件，shadcn registry 無對應品項，屬正常自製。
 
+## 版號與發布
+
+- **版號單一來源為 `package.json` 的 `version`**。footer 顯示的版號由 `src/config/site.ts` 讀取 `package.json`（`version: \`v${pkg.version}\``），不可再寫死字串。
+- 發布流程：改完 → `npx next build` 驗證 → 升 `package.json` 版號 → commit 標題結尾帶 `(v0.1.x)` → push。
+- Commit 標題慣例：`feat: 說明 (v0.1.x)`、`fix: 說明`（修 bug 不一定升版）。
+- **不要自動 push**，使用者說 push 才推。
+
+### 不進版控
+- `docs/*.doc`、`docs/*.docx` — 內容來源文件（.gitignore 已設）
+- `.agents/`、`.claude/` — agent skills
+- 需要對外下載的檔案放 `public/downloads/`（用英文檔名，下載時以 `download` 屬性帶回中文原名）
+
 ## 技術棧
 - Next.js 15 App Router
 - Tailwind CSS v4（CSS-first 設定，token 定義在 globals.css `@theme`）
