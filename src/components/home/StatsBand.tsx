@@ -77,24 +77,26 @@ export function StatsBand({ stats }: { stats: ImpactStat[] }) {
               return (
                 <div
                   key={s.id}
-                  className="flex items-center justify-center gap-3 px-3 lg:border-l lg:border-white/15 lg:first:border-l-0"
+                  className="grid min-w-0 grid-cols-[2.5rem_minmax(0,1fr)] grid-rows-[1.5rem_2.5rem_2.75rem] items-center gap-x-3 px-3 lg:border-l lg:border-white/15 lg:first:border-l-0"
                 >
                   <Icon
-                    className="size-9 shrink-0 text-white/85 sm:size-10"
+                    className="row-span-3 size-9 shrink-0 self-center text-white/85 sm:size-10"
                     strokeWidth={1.5}
                   />
-                  <div className="text-left">
-                    <dt className="text-xs text-navy-100/70">{s.topLabel}</dt>
-                    <dd className="font-serif text-[2rem] font-black leading-none tabular-nums text-amber-400 sm:text-4xl">
-                      {start ? (
-                        <CountUp end={s.value} duration={2} separator="," />
-                      ) : (
-                        0
-                      )}
-                      {s.suffix}
-                    </dd>
-                    <p className="mt-1 text-xs text-navy-100/70">{s.bottomLabel}</p>
-                  </div>
+                  <dt className="col-start-2 row-start-1 self-end text-xs leading-5 text-navy-100/70">
+                    {s.topLabel}
+                  </dt>
+                  <dd className="col-start-2 row-start-2 self-center whitespace-nowrap font-serif text-[2rem] font-black leading-none tabular-nums text-amber-400 sm:text-4xl">
+                    {start ? (
+                      <CountUp end={s.value} duration={2} separator="," />
+                    ) : (
+                      0
+                    )}
+                    {s.suffix}
+                  </dd>
+                  <p className="col-start-2 row-start-3 self-start pt-1 text-xs leading-5 text-navy-100/70">
+                    {s.bottomLabel}
+                  </p>
                 </div>
               );
             })}
