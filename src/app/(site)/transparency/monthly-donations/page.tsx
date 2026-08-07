@@ -5,11 +5,14 @@ import { Container } from "@/components/ui/Container";
 import { getMonthlyDonationReportsPaged } from "@/lib/data/queries";
 import type { MonthlyDonationDonorType } from "@/lib/types";
 import { MonthlyDonationLedger } from "./_components/monthly-donation-ledger";
+import { getRequestLocale } from "@/i18n/request";
 
-export const metadata: Metadata = {
-  title: "每月捐物清單",
-  description: "興毅基金會每月物資捐贈明細與照片公開查詢。",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getRequestLocale();
+  return locale === "en"
+    ? { title: "Monthly In-kind Donations", description: "Browse Shing Yi Foundation's monthly in-kind donation records and photographs." }
+    : { title: "每月捐物清單", description: "興毅基金會每月物資捐贈明細與照片公開查詢。" };
+}
 
 const PAGE_SIZE = 10;
 
@@ -18,6 +21,7 @@ export default async function MonthlyDonationsPage({
 }: {
   searchParams: Promise<Record<string, string | undefined>>;
 }) {
+  const locale = await getRequestLocale();
   const sp = await searchParams;
 
   const year = sp.year ? Number(sp.year) : undefined;
@@ -55,10 +59,10 @@ export default async function MonthlyDonationsPage({
               Monthly donations
             </p>
             <h1 className="mt-3 font-serif text-4xl font-black leading-tight text-white sm:text-5xl">
-              每月捐物清單
+              {locale === "en" ? "Monthly In-kind Donations" : "每月捐物清單"}
             </h1>
             <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-navy-100/85 sm:text-base">
-              公開每月物資捐贈明細與照片，讓每一份物資流向都清楚可查。
+              {locale === "en" ? "Browse monthly donation details and photographs, with a clear public record of where every contribution goes." : "公開每月物資捐贈明細與照片，讓每一份物資流向都清楚可查。"}
             </p>
           </div>
         </Container>

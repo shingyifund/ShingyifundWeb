@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Check, Copy } from "lucide-react";
+import { useLocale } from "@/i18n/provider";
 
 /**
  * 複製按鈕 — 複製指定文字到剪貼簿，顯示短暫成功回饋。
@@ -17,6 +18,7 @@ export function CopyButton({
   tone?: "light" | "dark";
 }) {
   const [copied, setCopied] = useState(false);
+  const locale = useLocale();
 
   async function handleCopy() {
     try {
@@ -37,7 +39,7 @@ export function CopyButton({
     <button
       type="button"
       onClick={handleCopy}
-      aria-label={`複製${label}`}
+      aria-label={locale === "en" ? `Copy ${label}` : `複製${label}`}
       className={`inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${styles}`}
     >
       {copied ? (

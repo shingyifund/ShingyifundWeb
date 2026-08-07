@@ -2,14 +2,14 @@ import { Check } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
-import { reliefConfig } from "@/config/relief";
+import { getReliefConfig } from "@/config/relief";
 
 /**
  * 審查與補助原則 — 用深色區塊做視覺分隔，
  * 讓「申請不等於獲補助」這類期待管理的內容有足夠份量。
  */
-export function ReliefPrinciples() {
-  const { principles } = reliefConfig;
+export async function ReliefPrinciples() {
+  const { principles } = await getReliefConfig();
 
   return (
     <section className="relative overflow-hidden bg-navy-900 py-20">

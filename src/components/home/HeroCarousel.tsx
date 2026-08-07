@@ -6,10 +6,13 @@ import Autoplay from "embla-carousel-autoplay";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 import type { HeroSlide } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { useLocale } from "@/i18n/provider";
+import { translate } from "@/i18n/translations";
 import { Button } from "@/components/ui/Button";
 import { ImagePlaceholder } from "@/components/ui/ImagePlaceholder";
 
 export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
+  const locale = useLocale();
   const [emblaRef, emblaApi] = useEmblaCarousel(
     { loop: true, align: "start" },
     [Autoplay({ delay: 6000, stopOnInteraction: false })],
@@ -67,7 +70,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
                 <button
                   key={i}
                   onClick={() => emblaApi?.scrollTo(i)}
-                  aria-label={`切換到第 ${i + 1} 張`}
+                  aria-label={locale === "en" ? `Go to slide ${i + 1}` : `切換到第 ${i + 1} 張`}
                   aria-current={selected === i ? "true" : undefined}
                   className="group flex h-6 cursor-pointer items-center justify-center px-1 sm:h-7 sm:px-1.5"
                 >
@@ -94,13 +97,14 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
 }
 
 function ImageSlide({ slide, priority }: { slide: HeroSlide; priority: boolean }) {
+  const locale = useLocale();
   const inner = (
     <>
       <ImagePlaceholder
         src={slide.image_url}
         alt=""
         tone="mist"
-        label="主視覺圖片"
+        label={translate(locale, "主視覺圖片")}
         priority={priority}
         sizes="100vw"
         className="absolute inset-0 size-full"
@@ -117,7 +121,7 @@ function ImageSlide({ slide, priority }: { slide: HeroSlide; priority: boolean }
         target="_blank"
         rel="noopener noreferrer"
         className="absolute inset-0"
-        aria-label="查看詳情"
+        aria-label={translate(locale, "查看詳情")}
       >
         {inner}
       </a>
@@ -136,6 +140,7 @@ function ImageTextSlide({
   priority: boolean;
   selected: boolean;
 }) {
+  const locale = useLocale();
   const isNavy = slide.tone === "navy";
 
   return (
@@ -144,7 +149,7 @@ function ImageTextSlide({
         src={slide.image_url}
         alt={slide.title ?? ""}
         tone={isNavy ? "navy" : "mist"}
-        label="主視覺圖片"
+        label={translate(locale, "主視覺圖片")}
         priority={priority}
         sizes="100vw"
         className="absolute inset-0 size-full"
@@ -199,7 +204,7 @@ function ImageTextSlide({
                 variant="white"
                 className="h-11 px-6 text-base sm:h-12 sm:px-8"
               >
-                {slide.cta_label ?? "了解服務"}
+                {slide.cta_label ?? translate(locale, "了解服務")}
               </Button>
             </div>
           )}
@@ -210,6 +215,7 @@ function ImageTextSlide({
 }
 
 function YoutubeSlide({ slide, selected }: { slide: HeroSlide; selected: boolean }) {
+  const locale = useLocale();
   const posterSrc =
     slide.poster_image_url ??
     (slide.youtube_video_id
@@ -223,7 +229,7 @@ function YoutubeSlide({ slide, selected }: { slide: HeroSlide; selected: boolean
           src={posterSrc}
           alt={slide.title ?? ""}
           tone="mist"
-          label="影片封面"
+          label={translate(locale, "影片封面")}
           priority={false}
           sizes="100vw"
           className="absolute inset-0 size-full"
@@ -238,7 +244,7 @@ function YoutubeSlide({ slide, selected }: { slide: HeroSlide; selected: boolean
           target="_blank"
           rel="noopener noreferrer"
           className="absolute inset-0 flex items-center justify-center"
-          aria-label="在 YouTube 觀看影片"
+          aria-label={translate(locale, "在 YouTube 觀看影片")}
         >
           <span className="flex size-14 items-center justify-center rounded-full bg-white/90 text-red-600 shadow-lg transition hover:scale-105 hover:bg-white sm:size-16">
             <Play className="size-6 translate-x-0.5 fill-current sm:size-7" />
@@ -285,10 +291,11 @@ function HeroTitle({ text }: { text: string }) {
 }
 
 function ArrowBtn({ dir, onClick }: { dir: "prev" | "next"; onClick: () => void }) {
+  const locale = useLocale();
   return (
     <button
       onClick={onClick}
-      aria-label={dir === "prev" ? "上一張" : "下一張"}
+      aria-label={dir === "prev" ? translate(locale, "上一張") : translate(locale, "下一張")}
       className="inline-flex size-9 cursor-pointer items-center justify-center rounded-full border border-navy-200 bg-white text-navy-700 transition-all hover:bg-navy-50 hover:shadow-md"
     >
       {dir === "prev" ? (

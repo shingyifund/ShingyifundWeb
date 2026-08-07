@@ -10,15 +10,15 @@ import { ReliefTerms } from "@/components/services/ReliefTerms";
 import { ReliefDownloads } from "@/components/services/ReliefDownloads";
 import { ReliefDownloadFab } from "@/components/services/ReliefDownloadFab";
 import { ReliefFaq } from "@/components/services/ReliefFaq";
-import { reliefConfig } from "@/config/relief";
+import { getReliefConfig } from "@/config/relief";
 
-export const metadata: Metadata = {
-  title: "社會救助",
-  description: reliefConfig.hero.intro,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const config = await getReliefConfig();
+  return { title: config.hero.title, description: config.hero.intro };
+}
 
-export default function ReliefPage() {
-  const { hero } = reliefConfig;
+export default async function ReliefPage() {
+  const { hero } = await getReliefConfig();
 
   return (
     <>

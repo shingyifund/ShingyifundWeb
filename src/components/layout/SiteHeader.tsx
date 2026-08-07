@@ -5,21 +5,33 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ChevronDown, Heart, Menu, X } from "lucide-react";
-import { mainNav, ONLINE_DONATION_URL, type NavItem } from "@/config/nav";
+import { getMainNav, ONLINE_DONATION_URL, type NavItem } from "@/config/nav";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
+import { useLocale } from "@/i18n/provider";
+import { localizeHref, switchLocaleHref, type Locale } from "@/i18n/config";
+import { translate } from "@/i18n/translations";
 
 /** 當前路徑是否落在該選單項目底下 */
 function useIsActive() {
   const pathname = usePathname();
-  return (href: string) =>
-    href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/");
+  const normalize = (value: string) => value.replace(/^\/(tw|en)(?=\/|$)/, "") || "/";
+  const currentPath = normalize(pathname);
+  return (href: string) => {
+    const targetPath = normalize(href);
+    return targetPath === "/"
+      ? currentPath === "/"
+      : currentPath === targetPath || currentPath.startsWith(targetPath + "/");
+  };
 }
 
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const isActive = useIsActive();
+  const pathname = usePathname();
+  const locale = useLocale();
+  const mainNav = getMainNav(locale);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
@@ -48,10 +60,10 @@ export function SiteHeader() {
     >
       <div className="container-x flex h-18 items-center justify-between gap-4">
         {/* Logo */}
-        <Link href="/" className="flex shrink-0 items-center" aria-label="興毅基金會首頁">
+        <Link href={localizeHref("/", locale)} className="flex shrink-0 items-center" aria-label={translate(locale, "興毅基金會首頁")}>
           <Image
             src="/brand/logo.svg"
-            alt="興毅基金會"
+            alt={translate(locale, "興毅基金會")}
             width={245}
             height={43}
             priority
@@ -68,11 +80,27 @@ export function SiteHeader() {
 
         {/* 右側漢堡（捐款改由右側固定鈕 DonateFab） */}
         <div className="flex items-center gap-2">
+          <div className="hidden items-center rounded-full border border-navy-100 bg-white/70 p-1 sm:flex" aria-label="Language">
+            {(["tw", "en"] as const).map((item) => (
+              <a
+                key={item}
+                href={switchLocaleHref(pathname, item)}
+                hrefLang={item === "en" ? "en" : "zh-Hant-TW"}
+                className={cn(
+                  "rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wide transition-colors",
+                  locale === item ? "bg-navy-700 text-white" : "text-navy-600 hover:bg-navy-50",
+                )}
+                aria-current={locale === item ? "true" : undefined}
+              >
+                {item === "tw" ? "TW" : "EN"}
+              </a>
+            ))}
+          </div>
           <button
             type="button"
             onClick={() => setOpen(true)}
             className="inline-flex size-11 cursor-pointer items-center justify-center rounded-full text-navy-700 transition-colors hover:bg-navy-50 xl:hidden"
-            aria-label="開啟選單"
+            aria-label={translate(locale, "開啟選單")}
           >
             <Menu className="size-6" />
           </button>
@@ -81,7 +109,7 @@ export function SiteHeader() {
     </header>
 
     {/* 行動版抽屜（放在 header 外，避免 backdrop-blur 造成 fixed 定位錯誤） */}
-    <MobileDrawer open={open} onClose={() => setOpen(false)} />
+    <MobileDrawer open={open} onClose={() => setOpen(false)} locale={locale} mainNav={mainNav} pathname={pathname} />
     </>
   );
 }
@@ -191,9 +219,15 @@ function DesktopNavItem({ item, active }: { item: NavItem; active: boolean }) {
 function MobileDrawer({
   open,
   onClose,
+  locale,
+  mainNav,
+  pathname,
 }: {
   open: boolean;
   onClose: () => void;
+  locale: Locale;
+  mainNav: NavItem[];
+  pathname: string;
 }) {
   const [expanded, setExpanded] = useState<string | null>(null);
 
@@ -221,12 +255,12 @@ function MobileDrawer({
         )}
       >
         <div className="flex h-18 items-center justify-between border-b border-navy-100 px-5">
-          <Image src="/brand/logo.svg" alt="興毅基金會" width={200} height={35} className="h-8 w-auto" />
+          <Image src="/brand/logo.svg" alt={translate(locale, "興毅基金會")} width={200} height={35} className="h-8 w-auto" />
           <button
             type="button"
             onClick={onClose}
             className="inline-flex size-10 cursor-pointer items-center justify-center rounded-full text-navy-700 hover:bg-navy-50"
-            aria-label="關閉選單"
+            aria-label={translate(locale, "關閉選單")}
           >
             <X className="size-6" />
           </button>
@@ -299,6 +333,22 @@ function MobileDrawer({
         </nav>
 
         <div className="border-t border-navy-100 p-4">
+          <div className="mb-3 grid grid-cols-2 rounded-full border border-navy-100 bg-white p-1">
+            {(["tw", "en"] as const).map((item) => (
+              <a
+                key={item}
+                href={switchLocaleHref(pathname, item)}
+                hrefLang={item === "en" ? "en" : "zh-Hant-TW"}
+                onClick={onClose}
+                className={cn(
+                  "rounded-full px-3 py-2 text-center text-xs font-bold uppercase tracking-wide",
+                  locale === item ? "bg-navy-700 text-white" : "text-navy-600",
+                )}
+              >
+                {item === "tw" ? "繁中 TW" : "English EN"}
+              </a>
+            ))}
+          </div>
           <Button
             href={ONLINE_DONATION_URL}
             target="_blank"
@@ -307,7 +357,7 @@ function MobileDrawer({
             onClick={onClose}
           >
             <Heart className="size-4 fill-current text-rose-500" />
-            線上捐款
+            {translate(locale, "線上捐款")}
           </Button>
         </div>
       </div>

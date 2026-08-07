@@ -7,7 +7,9 @@ import {
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
-import { aboutConfig, type AboutValue } from "@/config/about";
+import { getAboutConfig, type AboutValue } from "@/config/about";
+import { getRequestLocale } from "@/i18n/request";
+import { translate } from "@/i18n/translations";
 
 const ICONS: Record<AboutValue["icon"], LucideIcon> = {
   heartHandshake: HeartHandshake,
@@ -15,17 +17,18 @@ const ICONS: Record<AboutValue["icon"], LucideIcon> = {
   users: Users,
 };
 
-export function CoreValues() {
-  const { values } = aboutConfig;
+export async function CoreValues() {
+  const locale = await getRequestLocale();
+  const { values } = await getAboutConfig();
 
   return (
     <section className="py-20">
       <Container>
         <SectionHeading
           align="center"
-          eyebrow="核心精神"
-          title="我們所堅持的事"
-          description="以人性至善為念，讓每一份善心都化為實際的陪伴與行動。"
+          eyebrow={translate(locale, "核心精神")}
+          title={translate(locale, "我們所堅持的事")}
+          description={translate(locale, "以人性至善為念，讓每一份善心都化為實際的陪伴與行動。")}
           className="mb-12"
         />
 

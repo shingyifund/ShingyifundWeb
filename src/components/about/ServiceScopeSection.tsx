@@ -13,7 +13,9 @@ import {
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
-import { aboutConfig, type ServiceScope } from "@/config/about";
+import { getAboutConfig, type ServiceScope } from "@/config/about";
+import { getRequestLocale } from "@/i18n/request";
+import { translate } from "@/i18n/translations";
 import { cn } from "@/lib/utils";
 
 const ICONS: Record<ServiceScope["icon"], LucideIcon> = {
@@ -45,16 +47,17 @@ const ACCENTS: Record<ServiceScope["icon"], Accent> = {
   bookOpen: { iconBg: "bg-amber-50", iconText: "text-amber-700", hoverIcon: "group-hover:bg-amber-600" },
 };
 
-export function ServiceScopeSection() {
-  const { services } = aboutConfig;
+export async function ServiceScopeSection() {
+  const locale = await getRequestLocale();
+  const { services } = await getAboutConfig();
 
   return (
     <section className="bg-mist/60 py-20">
       <Container>
         <SectionHeading
           align="center"
-          eyebrow="服務範圍"
-          title="多元服務，全面關懷"
+          eyebrow={translate(locale, "服務範圍")}
+          title={translate(locale, "多元服務，全面關懷")}
           description={services.intro}
           className="mb-12"
         />

@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { Download } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLocale } from "@/i18n/provider";
+import { translate } from "@/i18n/translations";
 
 const TARGET_ID = "relief-downloads";
 
@@ -13,6 +15,7 @@ const TARGET_ID = "relief-downloads";
  */
 export function ReliefDownloadFab() {
   const [visible, setVisible] = useState(false);
+  const locale = useLocale();
 
   useEffect(() => {
     const onScroll = () => {
@@ -55,7 +58,7 @@ export function ReliefDownloadFab() {
         className="relative inline-flex cursor-pointer items-center gap-2 rounded-full bg-amber-500 px-4 py-2.5 text-sm font-semibold text-navy-900 shadow-[0_10px_28px_-8px_rgb(245_166_35/0.9)] ring-1 ring-amber-300/60 transition-all duration-300 hover:-translate-y-0.5 hover:bg-amber-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy-700"
       >
         <Download className="size-4" strokeWidth={2} />
-        申請文件
+        {translate(locale, "申請文件")}
       </button>
     </div>
   );

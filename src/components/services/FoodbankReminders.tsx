@@ -2,10 +2,10 @@ import { Info } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
-import { foodbankConfig } from "@/config/foodbank";
+import { getFoodbankConfig } from "@/config/foodbank";
 
-export function FoodbankReminders() {
-  const { reminders } = foodbankConfig;
+export async function FoodbankReminders() {
+  const { reminders } = await getFoodbankConfig();
 
   return (
     <section className="bg-white py-20">

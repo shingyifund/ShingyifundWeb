@@ -5,13 +5,17 @@ import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { getFundraisingReports } from "@/lib/data/queries";
 import type { FundraisingReport } from "@/lib/types";
+import { getRequestLocale } from "@/i18n/request";
 
-export const metadata: Metadata = {
-  title: "勸募成果報告",
-  description: "興毅基金會年度勸募成果報告公開下載。",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getRequestLocale();
+  return locale === "en"
+    ? { title: "Fundraising Reports", description: "Download Shing Yi Foundation's annual fundraising outcome reports." }
+    : { title: "勸募成果報告", description: "興毅基金會年度勸募成果報告公開下載。" };
+}
 
 export default async function FundraisingReportsPage() {
+  const locale = await getRequestLocale();
   const reports = await getFundraisingReports();
   const [latestReport, ...pastReports] = reports;
 
@@ -21,12 +25,12 @@ export default async function FundraisingReportsPage() {
         image="/images/about-hero-bg.jpg"
         imagePosition="right"
         eyebrow="Fundraising Report"
-        title="勸募成果報告"
+        title={locale === "en" ? "Fundraising Reports" : "勸募成果報告"}
         align="left"
         overlay="gradient"
       >
         <p className="mt-6 max-w-xl text-base leading-relaxed text-navy-100/85 sm:text-lg">
-          年度勸募成果與公益支出公開下載，讓每一份支持都清楚透明。
+          {locale === "en" ? "Download annual fundraising results and charitable expenditure reports for a clear view of every contribution." : "年度勸募成果與公益支出公開下載，讓每一份支持都清楚透明。"}
         </p>
       </PageHero>
 
@@ -34,14 +38,14 @@ export default async function FundraisingReportsPage() {
         <Container>
           {latestReport ? (
             <section className="rounded-2xl border border-navy-100 bg-white p-6 shadow-card sm:p-8">
-              <p className="text-sm font-semibold text-amber-700">最新報告</p>
+              <p className="text-sm font-semibold text-amber-700">{locale === "en" ? "Latest Report" : "最新報告"}</p>
               <div className="mt-4 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                 <div className="min-w-0">
                   <h2 className="font-serif text-2xl font-black leading-snug text-navy-900 sm:text-3xl">
                     {latestReport.title}
                   </h2>
                   <p className="mt-3 text-sm text-muted-foreground">
-                    {latestReport.fiscalYear}年度 / PDF 格式
+                    {locale === "en" ? `Fiscal Year ${latestReport.fiscalYear} / PDF` : `${latestReport.fiscalYear}年度 / PDF 格式`}
                   </p>
                 </div>
                 <Button
@@ -49,7 +53,7 @@ export default async function FundraisingReportsPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  查看 PDF
+                  {locale === "en" ? "View PDF" : "查看 PDF"}
                   <ExternalLink />
                 </Button>
               </div>
@@ -57,10 +61,10 @@ export default async function FundraisingReportsPage() {
           ) : (
             <section className="rounded-2xl border border-dashed border-navy-200 bg-white p-8 text-center">
               <h2 className="font-serif text-2xl font-bold text-navy-900">
-                目前尚無勸募成果報告
+                {locale === "en" ? "No fundraising reports are currently available" : "目前尚無勸募成果報告"}
               </h2>
               <p className="mt-3 text-sm text-muted-foreground">
-                後台上傳 PDF 後，報告會顯示在此頁。
+                {locale === "en" ? "Reports will appear here after they are published." : "後台上傳 PDF 後，報告會顯示在此頁。"}
               </p>
             </section>
           )}
@@ -73,14 +77,14 @@ export default async function FundraisingReportsPage() {
                     Historical Reports
                   </p>
                   <h2 className="mt-1 font-serif text-2xl font-black text-navy-900">
-                    歷年勸募成果報告
+                    {locale === "en" ? "Past Fundraising Reports" : "歷年勸募成果報告"}
                   </h2>
                 </div>
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
                 {pastReports.map((report) => (
-                  <ReportCard key={report.id} report={report} />
+                  <ReportCard key={report.id} report={report} locale={locale} />
                 ))}
               </div>
             </section>
@@ -91,7 +95,7 @@ export default async function FundraisingReportsPage() {
   );
 }
 
-function ReportCard({ report }: { report: FundraisingReport }) {
+function ReportCard({ report, locale }: { report: FundraisingReport; locale: "tw" | "en" }) {
   return (
     <article className="flex h-full flex-col rounded-2xl border border-navy-100 bg-white p-5 shadow-card">
       <div className="flex items-start gap-4">
@@ -100,12 +104,12 @@ function ReportCard({ report }: { report: FundraisingReport }) {
         </span>
         <div className="min-w-0">
           <p className="text-sm font-semibold text-amber-700">
-            {report.fiscalYear}年度
+            {locale === "en" ? `Fiscal Year ${report.fiscalYear}` : `${report.fiscalYear}年度`}
           </p>
           <h3 className="mt-1 font-serif text-xl font-bold leading-snug text-navy-900">
             {report.title}
           </h3>
-          <p className="mt-2 text-sm text-muted-foreground">PDF 格式</p>
+          <p className="mt-2 text-sm text-muted-foreground">{locale === "en" ? "PDF" : "PDF 格式"}</p>
         </div>
       </div>
       <div className="mt-5">
@@ -116,7 +120,7 @@ function ReportCard({ report }: { report: FundraisingReport }) {
           variant="outline"
           className="w-full"
         >
-          查看 PDF
+          {locale === "en" ? "View PDF" : "查看 PDF"}
           <ExternalLink />
         </Button>
       </div>

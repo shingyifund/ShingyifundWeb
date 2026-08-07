@@ -7,8 +7,11 @@ import {
   getMonthlyDonationRegionLabel,
 } from "@/lib/monthly-donations";
 import type { MonthlyDonationReport } from "@/lib/types";
+import { getRequestLocale } from "@/i18n/request";
+import { localizeHref } from "@/i18n/config";
 
 export async function DonationMarquee() {
+  const locale = await getRequestLocale();
   const donors = await getRecentMonthlyDonors(24);
   if (donors.length === 0) return null;
 
@@ -22,13 +25,13 @@ export async function DonationMarquee() {
         <div className="mb-3 flex items-center gap-2 px-1">
           <Heart className="size-4 fill-current text-rose-500" strokeWidth={2} />
           <h2 className="text-sm font-semibold tracking-wide text-navy-800">
-            近期捐贈芳名
+            {locale === "en" ? "Recent Donations" : "近期捐贈芳名"}
           </h2>
           <Link
-            href="/transparency/monthly-donations"
+            href={localizeHref("/transparency/monthly-donations", locale)}
             className="ml-auto text-xs font-medium text-amber-700 transition-colors hover:text-amber-800"
           >
-            查看全部
+            {locale === "en" ? "View all" : "查看全部"}
           </Link>
         </div>
 
@@ -47,7 +50,7 @@ export async function DonationMarquee() {
             }}
           >
             {loop.map((donor, i) => (
-              <DonorChip key={`${donor.id}-${i}`} donor={donor} />
+              <DonorChip key={`${donor.id}-${i}`} donor={donor} locale={locale} />
             ))}
           </ul>
         </div>
@@ -56,17 +59,18 @@ export async function DonationMarquee() {
   );
 }
 
-function DonorChip({ donor }: { donor: MonthlyDonationReport }) {
+function DonorChip({ donor, locale }: { donor: MonthlyDonationReport; locale: "tw" | "en" }) {
   const name = getMonthlyDonationDonorDisplayName({
     donorName: donor.donorName,
     isAnonymous: donor.isAnonymous,
+    locale,
   });
-  const title = donor.title || `感謝 ${name} 捐贈物資`;
+  const title = donor.title || (locale === "en" ? `Thank you, ${name}, for your donation` : `感謝 ${name} 捐贈物資`);
 
   return (
     <li className="shrink-0">
       <Link
-        href={`/transparency/monthly-donations/${donor.id}`}
+        href={localizeHref(`/transparency/monthly-donations/${donor.id}`, locale)}
         className="flex items-center gap-1.5 rounded-full border border-navy-100 bg-white py-1.5 pr-3 pl-1.5 shadow-card transition-colors hover:border-amber-300 hover:bg-amber-50"
       >
         <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-amber-100 text-rose-500">
@@ -77,8 +81,8 @@ function DonorChip({ donor }: { donor: MonthlyDonationReport }) {
             {title}
           </span>
           <span className="mt-0.5 whitespace-nowrap text-[11px] text-ink-soft">
-            {formatMonthlyDonationPeriod(donor.westernYear, donor.month)} ·{" "}
-            {getMonthlyDonationRegionLabel(donor.region)}
+            {formatMonthlyDonationPeriod(donor.westernYear, donor.month, locale)} ·{" "}
+            {getMonthlyDonationRegionLabel(donor.region, locale)}
           </span>
         </span>
       </Link>

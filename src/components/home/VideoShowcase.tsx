@@ -3,10 +3,13 @@ import Image from "next/image";
 import { ArrowRight, Play } from "lucide-react";
 import { FaYoutube } from "react-icons/fa6";
 import { getYouTubeVideos } from "@/lib/data/queries";
-import { siteConfig } from "@/config/site";
+import { getSiteConfig } from "@/config/site.server";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import type { YouTubeVideo } from "@/lib/types";
+import { getRequestLocale } from "@/i18n/request";
+import { localeToIntl } from "@/i18n/config";
+import { translate } from "@/i18n/translations";
 
 function thumbUrl(id: string) {
   return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
@@ -16,8 +19,8 @@ function watchUrl(id: string) {
   return `https://www.youtube.com/watch?v=${id}`;
 }
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("zh-TW", {
+function formatDate(iso: string, locale: "tw" | "en") {
+  return new Date(iso).toLocaleDateString(localeToIntl(locale), {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
@@ -25,6 +28,8 @@ function formatDate(iso: string) {
 }
 
 export async function VideoShowcase() {
+  const locale = await getRequestLocale();
+  const siteConfig = await getSiteConfig();
   const videos = await getYouTubeVideos(4);
   if (videos.length === 0) return null;
 
@@ -63,19 +68,19 @@ export async function VideoShowcase() {
               />
               <div className="relative">
                 <span className="text-sm font-medium tracking-wide text-amber-300">
-                  影音專區
+                  {translate(locale, "影音專區")}
                 </span>
                 <h2 className="mt-3 line-clamp-2 font-serif text-2xl font-bold leading-snug sm:text-3xl">
                   {featured.title}
                 </h2>
                 <p className="mt-2 text-sm text-navy-100/70">
-                  {formatDate(featured.publishedAt)}
+                  {formatDate(featured.publishedAt, locale)}
                 </p>
 
                 {rest.length > 0 && (
                   <ul className="mt-6 space-y-3 border-t border-white/10 pt-6">
                     {rest.map((video) => (
-                      <VideoRow key={video.id} video={video} />
+                      <VideoRow key={video.id} video={video} locale={locale} />
                     ))}
                   </ul>
                 )}
@@ -87,7 +92,7 @@ export async function VideoShowcase() {
                   className="mt-7 inline-flex w-fit items-center gap-2 rounded-full bg-amber-500 px-6 py-3 text-[15px] font-medium text-navy-900 transition-all hover:-translate-y-0.5 hover:bg-amber-400 active:translate-y-0"
                 >
                   <FaYoutube className="size-5 text-[#FF0000]" />
-                  前往 YouTube 頻道
+                  {translate(locale, "前往 YouTube 頻道")}
                   <ArrowRight className="size-4" />
                 </Link>
               </div>
@@ -99,7 +104,7 @@ export async function VideoShowcase() {
   );
 }
 
-function VideoRow({ video }: { video: YouTubeVideo }) {
+function VideoRow({ video, locale }: { video: YouTubeVideo; locale: "tw" | "en" }) {
   return (
     <li>
       <Link
@@ -125,7 +130,7 @@ function VideoRow({ video }: { video: YouTubeVideo }) {
             {video.title}
           </p>
           <p className="mt-0.5 text-xs text-navy-100/60">
-            {formatDate(video.publishedAt)}
+            {formatDate(video.publishedAt, locale)}
           </p>
         </div>
       </Link>

@@ -7,10 +7,10 @@ import {
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
-import { reliefConfig } from "@/config/relief";
+import { getReliefConfig } from "@/config/relief";
 
-export function ReliefFaq() {
-  const { faq } = reliefConfig;
+export async function ReliefFaq() {
+  const { faq } = await getReliefConfig();
 
   return (
     <section className="bg-cream py-20">

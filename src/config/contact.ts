@@ -53,3 +53,10 @@ export const contactLocations: ContactLocation[] = [
     email: "syty@shingyifund.org",
   },
 ];
+
+import { getRequestLocale } from "@/i18n/request";
+import { translateDeep } from "@/i18n/translations";
+
+export async function getContactLocations() {
+  return translateDeep(await getRequestLocale(), contactLocations);
+}

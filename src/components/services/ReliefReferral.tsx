@@ -9,7 +9,7 @@ import {
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
-import { reliefConfig, type ReferralOrg } from "@/config/relief";
+import { getReliefConfig, type ReferralOrg } from "@/config/relief";
 
 const ICONS: Record<ReferralOrg["icon"], LucideIcon> = {
   government: Landmark,
@@ -19,8 +19,8 @@ const ICONS: Record<ReferralOrg["icon"], LucideIcon> = {
   other: Handshake,
 };
 
-export function ReliefReferral() {
-  const { referral } = reliefConfig;
+export async function ReliefReferral() {
+  const { referral } = await getReliefConfig();
 
   return (
     <section className="bg-mist/60 py-20">
@@ -58,7 +58,7 @@ export function ReliefReferral() {
         <Reveal delay={0.1}>
           <div className="mt-8 rounded-2xl border border-navy-100 bg-white p-6 shadow-card sm:p-8">
             <h3 className="font-serif text-lg font-bold text-navy-900">
-              轉介單位送件須知
+              {referral.instructionsTitle}
             </h3>
             <ol className="mt-4 space-y-4">
               {referral.steps.map((step, i) => (

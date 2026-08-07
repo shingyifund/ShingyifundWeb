@@ -1,10 +1,10 @@
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
-import { reliefConfig } from "@/config/relief";
+import { getReliefConfig } from "@/config/relief";
 
-export function ReliefAbout() {
-  const { about } = reliefConfig;
+export async function ReliefAbout() {
+  const { about } = await getReliefConfig();
 
   return (
     <section className="bg-white py-20">

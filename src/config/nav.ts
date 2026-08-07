@@ -49,3 +49,18 @@ export const mainNav: NavItem[] = [
     ],
   },
 ];
+
+import type { Locale } from "@/i18n/config";
+import { localizeHref } from "@/i18n/config";
+import { translateDeep } from "@/i18n/translations";
+
+export function getMainNav(locale: Locale): NavItem[] {
+  return translateDeep(locale, mainNav).map((item) => ({
+    ...item,
+    href: localizeHref(item.href, locale),
+    children: item.children?.map((child) => ({
+      ...child,
+      href: child.external ? child.href : localizeHref(child.href, locale),
+    })),
+  }));
+}

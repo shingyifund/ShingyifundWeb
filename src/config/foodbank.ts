@@ -33,6 +33,7 @@ export const foodbankConfig = {
     title: "本服務採實體據點制",
     lead: "不可直接到店領取物資，須先完成申請並取得會員資格。",
     body: "本會目前於台北、新北、桃園及台南設有服務據點。申請人如居住於各據點服務範圍內，請於服務時間先以電話聯繫鄰近據點，由工作人員說明申請方式、服務範圍及應備資料。",
+    helpTitle: "不在服務據點範圍內？",
     help: "其他縣市的民眾，建議洽詢所在地的食物銀行或社會福利服務單位，以利就近提出申請及領取物資。",
   },
 
@@ -202,3 +203,10 @@ export const foodbankConfig = {
     ] satisfies FoodbankFaqItem[],
   },
 } as const;
+
+import { getRequestLocale } from "@/i18n/request";
+import { translateDeep } from "@/i18n/translations";
+
+export async function getFoodbankConfig() {
+  return translateDeep(await getRequestLocale(), foodbankConfig);
+}

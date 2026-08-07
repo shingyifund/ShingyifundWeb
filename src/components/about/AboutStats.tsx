@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
-import { aboutConfig, type AboutStat } from "@/config/about";
+import { getAboutConfig, type AboutStat } from "@/config/about";
 
 const ICONS: Record<AboutStat["icon"], LucideIcon> = {
   calendar: CalendarDays,
@@ -16,8 +16,8 @@ const ICONS: Record<AboutStat["icon"], LucideIcon> = {
   target: Target,
 };
 
-export function AboutStats() {
-  const { stats } = aboutConfig;
+export async function AboutStats() {
+  const { stats } = await getAboutConfig();
 
   return (
     <section className="py-8">

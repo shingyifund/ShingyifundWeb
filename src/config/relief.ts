@@ -38,6 +38,7 @@ export const reliefConfig = {
     title: "本項服務採轉介申請",
     lead: "原則上不接受個人直接提出申請。",
     body: "有社會救助需求者，須由政府機關、社會福利機構、醫療院所、學校單位或其他相關服務單位協助轉介，並提供足以說明家庭狀況、急難原因及轉介需求的相關資料。",
+    helpTitle: "正面臨急難情況，該找誰？",
     help: "如您或家人目前正面臨急難情況，可先向所在地區公所、社會福利服務中心、醫院社工室、學校輔導單位，或目前正在提供服務的相關機構尋求協助。",
   },
 
@@ -55,6 +56,7 @@ export const reliefConfig = {
     eyebrow: "轉介單位",
     title: "可協助轉介的單位",
     description: "本會接受下列單位協助提出轉介申請。",
+    instructionsTitle: "轉介單位送件須知",
     orgs: [
       { icon: "government", title: "政府機關" },
       { icon: "welfare", title: "社會福利機構" },
@@ -179,6 +181,8 @@ export const reliefConfig = {
   downloads: {
     eyebrow: "文件下載",
     title: "申請文件",
+    downloadLabel: "下載文件",
+    pendingLabel: "檔案準備中",
     /** href 為 null 時顯示「準備中」停用狀態，待正式檔案上傳後補上路徑 */
     items: [
       {
@@ -258,3 +262,10 @@ export const reliefConfig = {
     ] satisfies FaqItem[],
   },
 } as const;
+
+import { getRequestLocale } from "@/i18n/request";
+import { translateDeep } from "@/i18n/translations";
+
+export async function getReliefConfig() {
+  return translateDeep(await getRequestLocale(), reliefConfig);
+}

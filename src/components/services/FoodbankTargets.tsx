@@ -10,7 +10,7 @@ import {
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
-import { foodbankConfig, type FoodbankTarget } from "@/config/foodbank";
+import { getFoodbankConfig, type FoodbankTarget } from "@/config/foodbank";
 
 const ICONS: Record<FoodbankTarget["icon"], LucideIcon> = {
   lowIncome: Scale,
@@ -21,8 +21,8 @@ const ICONS: Record<FoodbankTarget["icon"], LucideIcon> = {
   other: HeartHandshake,
 };
 
-export function FoodbankTargets() {
-  const { targets } = foodbankConfig;
+export async function FoodbankTargets() {
+  const { targets } = await getFoodbankConfig();
 
   return (
     <section className="bg-mist/60 py-20">

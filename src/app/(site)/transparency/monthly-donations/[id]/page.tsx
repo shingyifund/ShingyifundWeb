@@ -12,6 +12,8 @@ import {
   getMonthlyDonationDonorTypeLabel,
   getMonthlyDonationRegionLabel,
 } from "@/lib/monthly-donations";
+import { getRequestLocale } from "@/i18n/request";
+import { localizeHref } from "@/i18n/config";
 
 export async function generateMetadata({
   params,
@@ -19,13 +21,14 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
+  const locale = await getRequestLocale();
   const report = await getMonthlyDonationReportById(id);
 
-  if (!report) return { title: "每月捐物清單" };
+  if (!report) return { title: locale === "en" ? "Monthly In-kind Donations" : "每月捐物清單" };
 
   return {
     title: report.title,
-    description: "興毅基金會每月物資捐贈明細與照片。",
+    description: locale === "en" ? "Monthly in-kind donation details and photographs from Shing Yi Foundation." : "興毅基金會每月物資捐贈明細與照片。",
   };
 }
 
@@ -35,15 +38,17 @@ export default async function MonthlyDonationDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const locale = await getRequestLocale();
   const report = await getMonthlyDonationReportById(id);
   if (!report) notFound();
 
-  const period = formatMonthlyDonationPeriod(report.westernYear, report.month);
-  const regionLabel = getMonthlyDonationRegionLabel(report.region);
-  const donorTypeLabel = getMonthlyDonationDonorTypeLabel(report.donorType);
+  const period = formatMonthlyDonationPeriod(report.westernYear, report.month, locale);
+  const regionLabel = getMonthlyDonationRegionLabel(report.region, locale);
+  const donorTypeLabel = getMonthlyDonationDonorTypeLabel(report.donorType, locale);
   const donorName = getMonthlyDonationDonorDisplayName({
     donorName: report.donorName,
     isAnonymous: report.isAnonymous,
+    locale,
   });
   const imageGridClass =
     report.images.length === 1
@@ -77,12 +82,12 @@ export default async function MonthlyDonationDetailPage({
         <Container>
           <div className="mb-6">
             <Button
-              href="/transparency/monthly-donations"
+              href={localizeHref("/transparency/monthly-donations", locale)}
               variant="ghost"
               className="text-navy-700"
             >
               <ArrowLeft />
-              返回每月捐物清單
+              {locale === "en" ? "Back to monthly donations" : "返回每月捐物清單"}
             </Button>
           </div>
 
@@ -108,7 +113,7 @@ export default async function MonthlyDonationDetailPage({
                       <div className="relative aspect-video bg-muted">
                         <Image
                           src={image.imageUrl}
-                          alt={image.caption ?? image.fileName ?? `物品照片 ${index + 1}`}
+                          alt={image.caption ?? image.fileName ?? (locale === "en" ? `Donation item ${index + 1}` : `物品照片 ${index + 1}`)}
                           fill
                           sizes={imageSizes}
                           className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -124,7 +129,7 @@ export default async function MonthlyDonationDetailPage({
                 ))}
               </div>
             ) : (
-              <p className="mt-6 text-sm text-muted-foreground">尚無物品照片。</p>
+              <p className="mt-6 text-sm text-muted-foreground">{locale === "en" ? "No item photographs are available." : "尚無物品照片。"}</p>
             )}
           </section>
         </Container>

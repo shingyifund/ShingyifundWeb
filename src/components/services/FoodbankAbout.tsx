@@ -1,10 +1,10 @@
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
-import { foodbankConfig } from "@/config/foodbank";
+import { getFoodbankConfig } from "@/config/foodbank";
 
-export function FoodbankAbout() {
-  const { about } = foodbankConfig;
+export async function FoodbankAbout() {
+  const { about } = await getFoodbankConfig();
 
   return (
     <section className="bg-white py-20">

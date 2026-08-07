@@ -1,6 +1,9 @@
 import { Container } from "@/components/ui/Container";
+import { getRequestLocale } from "@/i18n/request";
+import { translate } from "@/i18n/translations";
 
-export function ContactHero() {
+export async function ContactHero() {
+  const locale = await getRequestLocale();
   return (
     <section className="relative overflow-hidden bg-navy-900 py-16 text-white sm:py-20">
       {/* 裝飾光暈 */}
@@ -14,12 +17,12 @@ export function ContactHero() {
           Contact Us
         </p>
         <h1 className="mt-4 font-serif text-4xl font-black tracking-wide sm:text-5xl">
-          聯絡我們
+          {translate(locale, "聯絡我們")}
         </h1>
         <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-navy-100/80 sm:text-lg">
-          興毅遍布北中南的服務據點，歡迎您就近聯繫，
-          <br className="hidden sm:block" />
-          一起讓愛延續、讓需要被看見。
+          {locale === "en"
+            ? "Our service locations support communities across Taiwan. Contact the location nearest you and help compassion continue."
+            : "興毅遍布北中南的服務據點，歡迎您就近聯繫，一起讓愛延續、讓需要被看見。"}
         </p>
       </Container>
     </section>

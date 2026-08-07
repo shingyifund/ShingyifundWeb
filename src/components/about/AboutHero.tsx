@@ -1,8 +1,8 @@
 import { PageHero } from "@/components/ui/PageHero";
-import { aboutConfig } from "@/config/about";
+import { getAboutConfig } from "@/config/about";
 
-export function AboutHero() {
-  const { en, title, couplet } = aboutConfig.hero;
+export async function AboutHero() {
+  const { en, title, couplet } = (await getAboutConfig()).hero;
 
   return (
     <PageHero

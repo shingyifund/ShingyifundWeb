@@ -2,10 +2,12 @@ import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
 import { ImagePlaceholder } from "@/components/ui/ImagePlaceholder";
-import { aboutConfig } from "@/config/about";
+import { getAboutConfig } from "@/config/about";
+import { getRequestLocale } from "@/i18n/request";
 
-export function OriginStory() {
-  const { origin } = aboutConfig;
+export async function OriginStory() {
+  const locale = await getRequestLocale();
+  const { origin } = await getAboutConfig();
 
   return (
     <section className="py-20">
@@ -16,9 +18,9 @@ export function OriginStory() {
             <div className="relative mx-auto max-w-sm lg:max-w-none">
               <ImagePlaceholder
                 src="/images/photo-a.jpg"
-                alt={`${origin.founder} 與興毅基金會`}
+                alt={locale === "en" ? `${origin.founder} and Shing Yi Foundation` : `${origin.founder} 與興毅基金會`}
                 tone="navy"
-                label="創辦人示意圖"
+                label={locale === "en" ? "Founder" : "創辦人示意圖"}
                 sizes="(max-width: 1024px) 60vw, 40vw"
                 className="aspect-[4/3] w-full rounded-[1.75rem] shadow-soft"
               />

@@ -15,6 +15,8 @@ import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
 import { cn } from "@/lib/utils";
+import { getRequestLocale } from "@/i18n/request";
+import { translate } from "@/i18n/translations";
 
 const ICONS: Record<TransparencyDoc["icon"], LucideIcon> = {
   sustainability: BookOpen,
@@ -69,6 +71,7 @@ const ACCENTS: Record<
 };
 
 export async function TransparencySection() {
+  const locale = await getRequestLocale();
   const docs = await getTransparencyDocs();
 
   return (
@@ -76,16 +79,16 @@ export async function TransparencySection() {
       <Container>
         <SectionHeading
           align="center"
-          eyebrow="公開透明"
-          title="永續與成果公開"
-          description="財務、勸募、受贈名單全面公開，讓您的愛心走得安心、走得長遠。"
+          eyebrow={translate(locale, "公開透明")}
+          title={translate(locale, "永續與成果公開")}
+          description={translate(locale, "財務、勸募、受贈名單全面公開，讓您的愛心走得安心、走得長遠。")}
           className="mb-12"
         />
 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
           {docs.map((doc, i) => (
             <Reveal key={doc.id} delay={i * 0.07}>
-              <DocCard doc={doc} />
+              <DocCard doc={doc} locale={locale} />
             </Reveal>
           ))}
         </div>
@@ -94,7 +97,7 @@ export async function TransparencySection() {
   );
 }
 
-function DocCard({ doc }: { doc: TransparencyDoc }) {
+function DocCard({ doc, locale }: { doc: TransparencyDoc; locale: "tw" | "en" }) {
   const Icon = ICONS[doc.icon];
   const a = ACCENTS[doc.icon];
 
@@ -136,7 +139,7 @@ function DocCard({ doc }: { doc: TransparencyDoc }) {
 
       {/* 查看詳情（hover 時箭頭浮現） */}
       <span className="relative mt-5 inline-flex items-center justify-center gap-1 text-xs font-semibold text-navy-500 transition-colors group-hover:text-navy-800">
-        查看詳情
+        {translate(locale, "查看詳情")}
         <ArrowUpRight className="size-3.5 -translate-x-1 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100" />
       </span>
     </Link>

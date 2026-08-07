@@ -2,10 +2,10 @@ import { FileCheck2, FileText } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
-import { reliefConfig } from "@/config/relief";
+import { getReliefConfig } from "@/config/relief";
 
-export function ReliefDocuments() {
-  const { documents } = reliefConfig;
+export async function ReliefDocuments() {
+  const { documents } = await getReliefConfig();
 
   const groups = [
     { ...documents.basic, icon: FileText, tone: "navy" as const },

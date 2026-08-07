@@ -1,6 +1,8 @@
 import Image from "next/image";
 import { Mail, MapPin, Phone, Printer } from "lucide-react";
-import { siteConfig } from "@/config/site";
+import { getSiteConfig } from "@/config/site.server";
+import { getRequestLocale } from "@/i18n/request";
+import { translate } from "@/i18n/translations";
 import {
   FaFacebookF,
   FaInstagram,
@@ -12,7 +14,9 @@ import { CopyButton } from "@/components/layout/CopyButton";
 /** 基金會已落實的 SDGs（依原站，跳過 6、14、15） */
 const SDG_NUMBERS = [1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 16, 17];
 
-export function SiteFooter() {
+export async function SiteFooter() {
+  const locale = await getRequestLocale();
+  const siteConfig = await getSiteConfig();
   const { contact, donation, registration } = siteConfig;
 
   return (
@@ -72,30 +76,30 @@ export function SiteFooter() {
 
         {/* 捐款資訊 */}
         <div className="lg:col-span-5 lg:col-start-8">
-          <h3 className="font-serif text-lg font-semibold text-white">愛心捐款</h3>
+          <h3 className="font-serif text-lg font-semibold text-white">{translate(locale, "愛心捐款")}</h3>
           <dl className="mt-5 space-y-3 pr-12 text-sm lg:pr-0">
             <div className="flex items-center justify-between gap-3 rounded-xl bg-white/4 px-4 py-2.5">
-              <dt className="shrink-0 text-navy-100/60">銀行匯款</dt>
+              <dt className="shrink-0 text-navy-100/60">{translate(locale, "銀行匯款")}</dt>
               <dd className="flex items-center gap-1.5">
                 <div className="text-right">
                   <p className="text-xs text-navy-100/60">{donation.bank}</p>
                   <p className="text-white">{donation.bankAccount}</p>
                 </div>
-                <CopyButton value={donation.bankAccount} label="銀行匯款" />
+                <CopyButton value={donation.bankAccount} label={translate(locale, "銀行匯款")} />
               </dd>
             </div>
-            <Row label="郵政劃撥" value={donation.postal} copyValue={donation.postal} />
+            <Row label={translate(locale, "郵政劃撥")} value={donation.postal} copyValue={donation.postal} />
             <Row
-              label="發票愛心碼"
+              label={translate(locale, "發票愛心碼")}
               value={donation.loveCode}
               copyValue={donation.loveCode}
               highlight
             />
           </dl>
           <p className="mt-5 text-xs leading-relaxed text-navy-100/50">
-            勸募字號：{registration.fundraising}
+            {translate(locale, "勸募字號")}：{registration.fundraising}
             <br />
-            立案：{registration.approval}
+            {translate(locale, "立案")}：{registration.approval}
           </p>
         </div>
       </div>
@@ -104,7 +108,7 @@ export function SiteFooter() {
       <div className="border-t border-white/10">
         <div className="container-x py-10">
           <p className="mb-6 text-center text-sm font-semibold tracking-wide text-navy-100/80">
-            已落實聯合國永續發展目標（SDGs）
+            {translate(locale, "已落實聯合國永續發展目標（SDGs）")}
           </p>
           <div className="mx-auto grid max-w-3xl grid-cols-4 gap-2 sm:grid-cols-7 sm:gap-2.5">
             {SDG_NUMBERS.map((n) => (
@@ -124,7 +128,7 @@ export function SiteFooter() {
       {/* 版權 */}
       <div className="border-t border-white/10">
         <div className="container-x flex flex-col items-center justify-between gap-2 py-5 text-xs text-navy-100/65 sm:flex-row">
-          <p>© {new Date().getFullYear()} {siteConfig.name}．版權所有</p>
+          <p>© {new Date().getFullYear()} {siteConfig.name} · {translate(locale, "版權所有")}</p>
           <p className="flex items-center gap-2">
             <span>{siteConfig.enName}</span>
             <span className="text-navy-100/30">·</span>

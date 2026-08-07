@@ -3,10 +3,10 @@ import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
-import { reliefConfig } from "@/config/relief";
+import { getReliefConfig } from "@/config/relief";
 
-export function ReliefDownloads() {
-  const { downloads } = reliefConfig;
+export async function ReliefDownloads() {
+  const { downloads } = await getReliefConfig();
 
   return (
     <section id="relief-downloads" className="scroll-mt-24 bg-mist/60 py-20">
@@ -42,12 +42,12 @@ export function ReliefDownloads() {
                       download={doc.fileName}
                     >
                       <Download className="size-4" />
-                      下載文件
+                      {downloads.downloadLabel}
                     </Button>
                   ) : (
                     <Button size="sm" variant="white" disabled>
                       <Download className="size-4" />
-                      檔案準備中
+                      {downloads.pendingLabel}
                     </Button>
                   )}
                 </div>

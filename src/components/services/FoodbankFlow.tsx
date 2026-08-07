@@ -9,7 +9,7 @@ import {
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
-import { foodbankConfig, type FoodbankFlowStep } from "@/config/foodbank";
+import { getFoodbankConfig, type FoodbankFlowStep } from "@/config/foodbank";
 
 const ICONS: Record<FoodbankFlowStep["icon"], LucideIcon> = {
   contact: PhoneCall,
@@ -19,8 +19,8 @@ const ICONS: Record<FoodbankFlowStep["icon"], LucideIcon> = {
   pickup: ShoppingBasket,
 };
 
-export function FoodbankFlow() {
-  const { flow } = foodbankConfig;
+export async function FoodbankFlow() {
+  const { flow } = await getFoodbankConfig();
 
   return (
     <section className="bg-white py-20">

@@ -1,14 +1,14 @@
 import { CircleAlert, LifeBuoy } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
-import { reliefConfig } from "@/config/relief";
+import { getReliefConfig } from "@/config/relief";
 
 /**
  * 申請前最重要的前置條件：本服務採轉介制。
  * 置於頁面最前段，避免民眾誤以為可直接送件而白跑一趟。
  */
-export function ReliefNotice() {
-  const { notice } = reliefConfig;
+export async function ReliefNotice() {
+  const { notice } = await getReliefConfig();
 
   return (
     <section className="bg-cream py-16 sm:py-20">
@@ -38,7 +38,7 @@ export function ReliefNotice() {
                 </span>
                 <div className="min-w-0">
                   <h3 className="font-serif text-lg font-bold text-navy-900">
-                    正面臨急難情況，該找誰？
+                    {notice.helpTitle}
                   </h3>
                   <p className="mt-1.5 text-sm leading-relaxed text-ink-soft">
                     {notice.help}

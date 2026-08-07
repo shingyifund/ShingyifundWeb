@@ -180,3 +180,10 @@ export const aboutConfig = {
     ],
   },
 } as const;
+
+import { getRequestLocale } from "@/i18n/request";
+import { translateDeep } from "@/i18n/translations";
+
+export async function getAboutConfig() {
+  return translateDeep(await getRequestLocale(), aboutConfig);
+}

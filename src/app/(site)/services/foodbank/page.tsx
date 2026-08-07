@@ -8,15 +8,17 @@ import { FoodbankPoints } from "@/components/services/FoodbankPoints";
 import { FoodbankPickup } from "@/components/services/FoodbankPickup";
 import { FoodbankReminders } from "@/components/services/FoodbankReminders";
 import { FoodbankFaq } from "@/components/services/FoodbankFaq";
-import { foodbankConfig } from "@/config/foodbank";
+import { getFoodbankConfig } from "@/config/foodbank";
+import { getRequestLocale } from "@/i18n/request";
 
-export const metadata: Metadata = {
-  title: "忠信食物銀行",
-  description: foodbankConfig.hero.intro,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const config = await getFoodbankConfig();
+  return { title: config.hero.title, description: config.hero.intro };
+}
 
-export default function FoodbankPage() {
-  const { hero } = foodbankConfig;
+export default async function FoodbankPage() {
+  await getRequestLocale();
+  const { hero } = await getFoodbankConfig();
 
   return (
     <>

@@ -7,10 +7,10 @@ import {
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
-import { foodbankConfig } from "@/config/foodbank";
+import { getFoodbankConfig } from "@/config/foodbank";
 
-export function FoodbankFaq() {
-  const { faq } = foodbankConfig;
+export async function FoodbankFaq() {
+  const { faq } = await getFoodbankConfig();
 
   return (
     <section className="bg-cream py-20">

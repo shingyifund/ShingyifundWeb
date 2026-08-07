@@ -1,14 +1,14 @@
 import { CircleAlert, MapPin } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
-import { foodbankConfig } from "@/config/foodbank";
+import { getFoodbankConfig } from "@/config/foodbank";
 
 /**
  * 申請前最重要的前置條件：採實體據點制、須先取得會員資格。
  * 置於頁面最前段，避免民眾誤以為可直接到店領取而白跑一趟。
  */
-export function FoodbankNotice() {
-  const { notice } = foodbankConfig;
+export async function FoodbankNotice() {
+  const { notice } = await getFoodbankConfig();
 
   return (
     <section className="bg-cream py-16 sm:py-20">
@@ -38,7 +38,7 @@ export function FoodbankNotice() {
                 </span>
                 <div className="min-w-0">
                   <h3 className="font-serif text-lg font-bold text-navy-900">
-                    不在服務據點範圍內？
+                    {notice.helpTitle}
                   </h3>
                   <p className="mt-1.5 text-sm leading-relaxed text-ink-soft">
                     {notice.help}

@@ -10,7 +10,7 @@ import {
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
-import { reliefConfig, type FlowStep } from "@/config/relief";
+import { getReliefConfig, type FlowStep } from "@/config/relief";
 
 const ICONS: Record<FlowStep["icon"], LucideIcon> = {
   seek: MessagesSquare,
@@ -21,8 +21,8 @@ const ICONS: Record<FlowStep["icon"], LucideIcon> = {
   notify: MailCheck,
 };
 
-export function ReliefFlow() {
-  const { flow } = reliefConfig;
+export async function ReliefFlow() {
+  const { flow } = await getReliefConfig();
 
   return (
     <section className="bg-white py-20">

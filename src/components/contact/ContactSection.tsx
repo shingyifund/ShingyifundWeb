@@ -2,24 +2,28 @@ import { MapPin, Phone, Printer, Mail, Navigation } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
-import { contactLocations, type ContactLocation } from "@/config/contact";
+import { getContactLocations, type ContactLocation } from "@/config/contact";
+import { getRequestLocale } from "@/i18n/request";
+import { translate } from "@/i18n/translations";
 
-export function ContactSection() {
+export async function ContactSection() {
+  const locale = await getRequestLocale();
+  const contactLocations = await getContactLocations();
   return (
     <section className="py-16">
       <Container>
         <SectionHeading
           align="center"
-          eyebrow="服務據點"
-          title="各地服務據點"
-          description="興毅遍布北中南的服務據點，歡迎您就近聯繫。"
+          eyebrow={translate(locale, "服務據點")}
+          title={translate(locale, "各地服務據點")}
+          description={translate(locale, "興毅遍布北中南的服務據點，歡迎您就近聯繫。")}
           className="mb-12"
         />
 
         <div className="grid gap-6 md:grid-cols-2">
           {contactLocations.map((loc, i) => (
             <Reveal key={loc.id} delay={(i % 2) * 0.08}>
-              <LocationCard loc={loc} />
+              <LocationCard loc={loc} locale={locale} />
             </Reveal>
           ))}
         </div>
@@ -28,13 +32,13 @@ export function ContactSection() {
   );
 }
 
-function LocationCard({ loc }: { loc: ContactLocation }) {
+function LocationCard({ loc, locale }: { loc: ContactLocation; locale: "tw" | "en" }) {
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
     loc.address,
   )}`;
   const embedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(
     loc.address,
-  )}&hl=zh-TW&z=16&output=embed`;
+  )}&hl=${locale === "en" ? "en" : "zh-TW"}&z=16&output=embed`;
 
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-navy-100 bg-white shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-soft">
@@ -42,7 +46,7 @@ function LocationCard({ loc }: { loc: ContactLocation }) {
       <div className="relative aspect-video w-full bg-mist">
         <iframe
           src={embedUrl}
-          title={`${loc.name} 地圖`}
+          title={`${loc.name} ${locale === "en" ? "map" : "地圖"}`}
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
           className="absolute inset-0 size-full border-0"
@@ -88,7 +92,7 @@ function LocationCard({ loc }: { loc: ContactLocation }) {
           className="mt-5 inline-flex items-center gap-1.5 self-start text-sm font-semibold text-amber-600 hover:text-amber-700"
         >
           <Navigation className="size-4" />
-          在 Google 地圖開啟
+          {locale === "en" ? "Open in Google Maps" : "在 Google 地圖開啟"}
         </a>
       </div>
     </div>

@@ -3,10 +3,13 @@ import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
 import { ImagePlaceholder } from "@/components/ui/ImagePlaceholder";
-import { aboutConfig } from "@/config/about";
+import { getAboutConfig } from "@/config/about";
+import { getRequestLocale } from "@/i18n/request";
+import { translate } from "@/i18n/translations";
 
-export function FoodbankSection() {
-  const { foodbank } = aboutConfig;
+export async function FoodbankSection() {
+  const locale = await getRequestLocale();
+  const { foodbank } = await getAboutConfig();
 
   return (
     <section className="py-20">
@@ -41,9 +44,9 @@ export function FoodbankSection() {
           <Reveal delay={0.1}>
             <ImagePlaceholder
               src="/images/photo-b.jpg"
-              alt="忠信食物銀行物資發放"
+              alt={translate(locale, "忠信食物銀行物資發放")}
               tone="amber"
-              label="食物銀行示意圖"
+              label={translate(locale, "食物銀行示意圖")}
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="aspect-video w-full rounded-[1.75rem] shadow-soft lg:order-last lg:aspect-[4/3]"
             />

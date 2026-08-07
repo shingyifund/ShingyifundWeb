@@ -1,7 +1,9 @@
 import { Loader2 } from "lucide-react";
 import { Container } from "@/components/ui/Container";
+import { getRequestLocale } from "@/i18n/request";
 
-export default function TransparencyLoading() {
+export default async function TransparencyLoading() {
+  const locale = await getRequestLocale();
   return (
     <>
       {/* navy hero 骨架 */}
@@ -25,7 +27,7 @@ export default function TransparencyLoading() {
             aria-live="polite"
           >
             <Loader2 className="size-8 animate-spin text-amber-500" />
-            <p className="font-serif text-sm font-medium">載入中…</p>
+            <p className="font-serif text-sm font-medium">{locale === "en" ? "Loading…" : "載入中…"}</p>
           </div>
         </Container>
       </main>

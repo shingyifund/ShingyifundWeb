@@ -6,6 +6,8 @@ import { siteConfig } from "@/config/site";
 import { ONLINE_DONATION_URL } from "@/config/nav";
 import { CopyButton } from "@/components/layout/CopyButton";
 import { Button } from "@/components/ui/Button";
+import { useLocale } from "@/i18n/provider";
+import { translate } from "@/i18n/translations";
 
 type Method = {
   icon: LucideIcon;
@@ -22,11 +24,12 @@ export function DonationModal({
   onClose: () => void;
 }) {
   const { donation } = siteConfig;
+  const locale = useLocale();
 
   const methods: Method[] = [
-    { icon: Landmark, label: "銀行匯款", primary: donation.bank, account: donation.bankAccount },
-    { icon: CreditCard, label: "郵政劃撥", primary: "劃撥帳號", account: donation.postal },
-    { icon: Receipt, label: "發票愛心碼", primary: "捐贈發票", account: donation.loveCode },
+    { icon: Landmark, label: translate(locale, "銀行匯款"), primary: locale === "en" ? "First Bank, Guting Branch" : donation.bank, account: donation.bankAccount },
+    { icon: CreditCard, label: translate(locale, "郵政劃撥"), primary: translate(locale, "劃撥帳號"), account: donation.postal },
+    { icon: Receipt, label: translate(locale, "發票愛心碼"), primary: translate(locale, "捐贈發票"), account: donation.loveCode },
   ];
 
   // Esc 關閉 + 鎖背景捲動
@@ -48,7 +51,7 @@ export function DonationModal({
       className="fixed inset-0 z-[200] flex items-start justify-center overflow-y-auto px-4 py-6"
       role="dialog"
       aria-modal="true"
-      aria-label="愛心捐款資訊"
+      aria-label={translate(locale, "愛心捐款資訊")}
     >
       {/* 背景遮罩 */}
       <div
@@ -66,7 +69,7 @@ export function DonationModal({
         <button
           type="button"
           onClick={onClose}
-          aria-label="關閉"
+          aria-label={locale === "en" ? "Close" : "關閉"}
           className="absolute right-4 top-4 z-10 inline-flex size-9 cursor-pointer items-center justify-center rounded-full bg-navy-900/10 text-navy-900 transition-colors hover:bg-navy-900/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy-700"
         >
           <X className="size-5" />
@@ -75,13 +78,13 @@ export function DonationModal({
         <div className="relative text-navy-900">
           <span className="inline-flex items-center gap-2 rounded-full bg-navy-900/10 px-4 py-1.5 text-sm font-semibold">
             <Heart className="size-4 fill-current text-rose-500" />
-            愛心捐款
+            {translate(locale, "愛心捐款")}
           </span>
           <h2 className="mt-4 font-serif text-2xl font-black leading-tight sm:text-3xl">
-            每一份捐款，<br className="sm:hidden" />都是弱勢家庭的一道光
+            {locale === "en" ? "Every donation brings hope to a family in need" : <>每一份捐款，<br className="sm:hidden" />都是弱勢家庭的一道光</>}
           </h2>
           <p className="mt-3 text-balance text-sm leading-relaxed text-navy-900/70">
-            無論金額多寡，您的心意都將化為實際的物資與服務，送到最需要的人手中。
+            {locale === "en" ? "Whatever the amount, your generosity becomes practical supplies and services for those who need them most." : "無論金額多寡，您的心意都將化為實際的物資與服務，送到最需要的人手中。"}
           </p>
 
           {/* 捐款方式 */}
@@ -125,7 +128,7 @@ export function DonationModal({
               onClick={onClose}
             >
               <Heart className="size-4 fill-current text-rose-500" />
-              線上捐款
+              {translate(locale, "線上捐款")}
             </Button>
           </div>
         </div>

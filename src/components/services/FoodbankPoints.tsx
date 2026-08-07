@@ -2,14 +2,14 @@ import { Check } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
-import { foodbankConfig } from "@/config/foodbank";
+import { getFoodbankConfig } from "@/config/foodbank";
 
 /**
  * 物資與點數說明 — 用深色區塊做視覺分隔，
  * 讓「300 點不是現金」這類期待管理的內容有足夠份量。
  */
-export function FoodbankPoints() {
-  const { points } = foodbankConfig;
+export async function FoodbankPoints() {
+  const { points } = await getFoodbankConfig();
 
   return (
     <section className="relative overflow-hidden bg-navy-900 py-20">

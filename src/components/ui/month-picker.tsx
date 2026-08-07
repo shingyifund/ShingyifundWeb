@@ -10,6 +10,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useLocale } from "@/i18n/provider";
 
 const MONTH_LABELS = [
   "1 月",
@@ -55,6 +56,7 @@ export function MonthPicker({
   disabled?: boolean;
   className?: string;
 }) {
+  const locale = useLocale();
   const [open, setOpen] = React.useState(false);
   const selected = parsePeriod(value);
 
@@ -69,7 +71,7 @@ export function MonthPicker({
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const label = selected
-    ? `${selected.year} 年 ${String(selected.month).padStart(2, "0")} 月`
+    ? locale === "en" ? `${selected.year}-${String(selected.month).padStart(2, "0")}` : `${selected.year} 年 ${String(selected.month).padStart(2, "0")} 月`
     : placeholder;
 
   function pick(month: number) {
@@ -107,7 +109,7 @@ export function MonthPicker({
             size="icon-sm"
             disabled={viewYear <= fromYear}
             onClick={() => setViewYear((y) => y - 1)}
-            aria-label="上一年"
+            aria-label={locale === "en" ? "Previous year" : "上一年"}
           >
             <ChevronLeft />
           </Button>
@@ -120,7 +122,7 @@ export function MonthPicker({
             size="icon-sm"
             disabled={viewYear >= toYear}
             onClick={() => setViewYear((y) => y + 1)}
-            aria-label="下一年"
+            aria-label={locale === "en" ? "Next year" : "下一年"}
           >
             <ChevronRight />
           </Button>
@@ -141,7 +143,7 @@ export function MonthPicker({
                 className="h-9 rounded-md px-0 text-sm font-normal"
                 onClick={() => pick(month)}
               >
-                {monthLabel}
+                {locale === "en" ? new Intl.DateTimeFormat("en-US", { month: "short", timeZone: "UTC" }).format(new Date(Date.UTC(2024, month - 1, 1))) : monthLabel}
               </Button>
             );
           })}

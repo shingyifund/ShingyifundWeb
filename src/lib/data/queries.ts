@@ -20,6 +20,9 @@ import {
   serviceFeatures,
   transparencyDocs,
 } from "./mock";
+import { getRequestLocale } from "@/i18n/request";
+import { localizeHref } from "@/i18n/config";
+import { translateDeep } from "@/i18n/translations";
 
 export async function getHeroSlides(): Promise<HeroSlide[]> {
   try {
@@ -58,10 +61,15 @@ export async function getHeroSlides(): Promise<HeroSlide[]> {
 }
 
 export async function getServiceFeatures() {
-  return serviceFeatures;
+  const locale = await getRequestLocale();
+  return translateDeep(locale, serviceFeatures).map((feature) => ({
+    ...feature,
+    href: localizeHref(feature.href, locale),
+  }));
 }
 
 export async function getImpactStats(): Promise<ImpactStat[]> {
+  const locale = await getRequestLocale();
   try {
     const supabase = await createClient();
     const { data, error } = await supabase
@@ -71,21 +79,28 @@ export async function getImpactStats(): Promise<ImpactStat[]> {
 
     if (error || !data) throw error;
 
-    return data.map((row) => ({
-      id: row.id,
-      icon: row.icon as ImpactStat["icon"],
-      topLabel: row.top_label,
-      value: row.value,
-      suffix: row.suffix,
-      bottomLabel: row.bottom_label,
-    }));
+    return translateDeep(
+      locale,
+      data.map((row) => ({
+        id: row.id,
+        icon: row.icon as ImpactStat["icon"],
+        topLabel: row.top_label,
+        value: row.value,
+        suffix: row.suffix,
+        bottomLabel: row.bottom_label,
+      })),
+    );
   } catch {
-    return impactStats;
+    return translateDeep(locale, impactStats);
   }
 }
 
 export async function getTransparencyDocs() {
-  return transparencyDocs;
+  const locale = await getRequestLocale();
+  return translateDeep(locale, transparencyDocs).map((doc) => ({
+    ...doc,
+    href: localizeHref(doc.href, locale),
+  }));
 }
 
 const YOUTUBE_CHANNEL_ID = "UCQgUmF4zZ8t8hWmgCXAFv2w"; // @shingyifund

@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { Bell, HandHeart, ImageIcon } from "lucide-react";
 import { FaFacebookF, FaInstagram, FaThreads } from "react-icons/fa6";
-import { siteConfig } from "@/config/site";
+import { getSiteConfig } from "@/config/site.server";
 import { Container } from "@/components/ui/Container";
 import { getFacebookPosts } from "@/lib/data/facebook";
 import { FacebookPosts } from "./FacebookPosts";
+import { getRequestLocale } from "@/i18n/request";
+import { translate, translateDeep } from "@/i18n/translations";
 
 const REASONS = [
   {
@@ -25,6 +27,9 @@ const REASONS = [
 ];
 
 export async function FacebookFeed() {
+  const locale = await getRequestLocale();
+  const siteConfig = await getSiteConfig();
+  const reasons = translateDeep(locale, REASONS);
   const posts = await getFacebookPosts(4);
 
   return (
@@ -47,16 +52,14 @@ export async function FacebookFeed() {
             <div>
               <span className="inline-flex items-center gap-2 text-sm font-medium tracking-wide text-amber-300">
                 <span className="h-px w-6 bg-current opacity-60" />
-                最新動態
+                {translate(locale, "最新動態")}
               </span>
               <h2 className="mt-3 font-serif text-3xl font-bold leading-tight text-white sm:text-4xl">
-                追蹤興毅，
-                <br />
-                看見愛心的流動
+                {translate(locale, "追蹤興毅，看見愛心的流動")}
               </h2>
 
               <ul className="mt-8 space-y-5">
-                {REASONS.map((reason) => {
+                {reasons.map((reason) => {
                   const Icon = reason.icon;
                   return (
                     <li key={reason.title} className="flex items-start gap-4">
@@ -82,7 +85,7 @@ export async function FacebookFeed() {
                   className="inline-flex items-center gap-2 rounded-full bg-[#1877F2] px-6 py-3 text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:shadow-md active:translate-y-0"
                 >
                   <FaFacebookF className="size-4" />
-                  追蹤粉絲專頁
+                  {translate(locale, "追蹤粉絲專頁")}
                 </Link>
 
                 <Link

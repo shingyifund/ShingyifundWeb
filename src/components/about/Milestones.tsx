@@ -1,19 +1,22 @@
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
-import { aboutConfig } from "@/config/about";
+import { getAboutConfig } from "@/config/about";
+import { getRequestLocale } from "@/i18n/request";
+import { translate } from "@/i18n/translations";
 
-export function Milestones() {
-  const { milestones } = aboutConfig;
+export async function Milestones() {
+  const locale = await getRequestLocale();
+  const { milestones } = await getAboutConfig();
 
   return (
     <section className="py-20">
       <Container>
         <SectionHeading
           align="center"
-          eyebrow="一路走來"
-          title="興毅大事紀"
-          description="從一念慈悲到遍地開花，每一步都是為了讓需要的人被看見。"
+          eyebrow={translate(locale, "一路走來")}
+          title={translate(locale, "興毅大事紀")}
+          description={translate(locale, "從一念慈悲到遍地開花，每一步都是為了讓需要的人被看見。")}
           className="mb-14"
         />
 

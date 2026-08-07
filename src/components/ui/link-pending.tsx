@@ -4,6 +4,7 @@ import type * as React from "react";
 import { useLinkStatus } from "next/link";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLocale } from "@/i18n/provider";
 
 /**
  * 顯示所屬 <Link> 的導航 pending 狀態（Next 16 useLinkStatus）。
@@ -11,11 +12,12 @@ import { cn } from "@/lib/utils";
  */
 export function LinkPending({ className }: { className?: string }) {
   const { pending } = useLinkStatus();
+  const locale = useLocale();
   if (!pending) return null;
   return (
     <Loader2
       className={cn("size-4 animate-spin", className)}
-      aria-label="載入中"
+      aria-label={locale === "en" ? "Loading" : "載入中"}
     />
   );
 }
@@ -32,10 +34,11 @@ export function LinkPendingIcon({
   className?: string;
 }) {
   const { pending } = useLinkStatus();
+  const locale = useLocale();
   return pending ? (
     <Loader2
       className={cn("size-4 animate-spin", className)}
-      aria-label="載入中"
+      aria-label={locale === "en" ? "Loading" : "載入中"}
     />
   ) : (
     <>{children}</>

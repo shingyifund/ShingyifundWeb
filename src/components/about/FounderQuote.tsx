@@ -1,10 +1,10 @@
 import { Quote } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
-import { aboutConfig } from "@/config/about";
+import { getAboutConfig } from "@/config/about";
 
-export function FounderQuote() {
-  const { quote } = aboutConfig;
+export async function FounderQuote() {
+  const { quote } = await getAboutConfig();
 
   return (
     <section className="py-12">

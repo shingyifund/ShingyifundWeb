@@ -5,13 +5,17 @@ import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { getFinancialReports } from "@/lib/data/queries";
 import type { FinancialReport } from "@/lib/types";
+import { getRequestLocale } from "@/i18n/request";
 
-export const metadata: Metadata = {
-  title: "財務報告",
-  description: "興毅基金會年度財務報表與會計師查核報告公開下載。",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getRequestLocale();
+  return locale === "en"
+    ? { title: "Financial Reports", description: "Download Shing Yi Foundation's annual financial statements and independent audit reports." }
+    : { title: "財務報告", description: "興毅基金會年度財務報表與會計師查核報告公開下載。" };
+}
 
 export default async function FinancialReportsPage() {
+  const locale = await getRequestLocale();
   const reports = await getFinancialReports();
   const [latestReport, ...pastReports] = reports;
 
@@ -21,12 +25,12 @@ export default async function FinancialReportsPage() {
         image="/images/about-hero-bg.jpg"
         imagePosition="right"
         eyebrow="Financial Report"
-        title="財務報告"
+        title={locale === "en" ? "Financial Reports" : "財務報告"}
         align="left"
         overlay="gradient"
       >
         <p className="mt-6 max-w-xl text-base leading-relaxed text-navy-100/85 sm:text-lg">
-          年度財務報表與會計師查核報告公開下載，讓每一份支持都清楚透明。
+          {locale === "en" ? "Download annual financial statements and independent audit reports. Every contribution is accounted for with clarity and transparency." : "年度財務報表與會計師查核報告公開下載，讓每一份支持都清楚透明。"}
         </p>
       </PageHero>
 
@@ -34,18 +38,18 @@ export default async function FinancialReportsPage() {
         <Container>
           {latestReport ? (
             <section className="rounded-2xl border border-navy-100 bg-white p-6 shadow-card sm:p-8">
-              <p className="text-sm font-semibold text-amber-700">最新報告</p>
+              <p className="text-sm font-semibold text-amber-700">{locale === "en" ? "Latest Report" : "最新報告"}</p>
               <div className="mt-4 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                 <div className="min-w-0">
                   <h2 className="font-serif text-2xl font-black leading-snug text-navy-900 sm:text-3xl">
                     {latestReport.title}
                   </h2>
                   <p className="mt-3 text-sm text-muted-foreground">
-                    {formatReportMeta(latestReport)} / PDF 格式
+                    {formatReportMeta(latestReport, locale)} / PDF
                   </p>
                 </div>
                 <Button href={latestReport.fileUrl} target="_blank" rel="noopener noreferrer">
-                  查看 PDF
+                  {locale === "en" ? "View PDF" : "查看 PDF"}
                   <ExternalLink />
                 </Button>
               </div>
@@ -53,10 +57,10 @@ export default async function FinancialReportsPage() {
           ) : (
             <section className="rounded-2xl border border-dashed border-navy-200 bg-white p-8 text-center">
               <h2 className="font-serif text-2xl font-bold text-navy-900">
-                目前尚無財務報告
+                {locale === "en" ? "No financial reports are currently available" : "目前尚無財務報告"}
               </h2>
               <p className="mt-3 text-sm text-muted-foreground">
-                後台上傳 PDF 後，報告會顯示在此頁。
+                {locale === "en" ? "Reports will appear here after they are published." : "後台上傳 PDF 後，報告會顯示在此頁。"}
               </p>
             </section>
           )}
@@ -69,14 +73,14 @@ export default async function FinancialReportsPage() {
                     Historical Reports
                   </p>
                   <h2 className="mt-1 font-serif text-2xl font-black text-navy-900">
-                    歷年財務報告
+                    {locale === "en" ? "Past Financial Reports" : "歷年財務報告"}
                   </h2>
                 </div>
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
                 {pastReports.map((report) => (
-                  <ReportCard key={report.id} report={report} />
+                  <ReportCard key={report.id} report={report} locale={locale} />
                 ))}
               </div>
             </section>
@@ -87,7 +91,7 @@ export default async function FinancialReportsPage() {
   );
 }
 
-function ReportCard({ report }: { report: FinancialReport }) {
+function ReportCard({ report, locale }: { report: FinancialReport; locale: "tw" | "en" }) {
   return (
     <article className="flex h-full flex-col rounded-2xl border border-navy-100 bg-white p-5 shadow-card">
       <div className="flex items-start gap-4">
@@ -96,13 +100,13 @@ function ReportCard({ report }: { report: FinancialReport }) {
         </span>
         <div className="min-w-0">
           <p className="text-sm font-semibold text-amber-700">
-            {formatReportYear(report)}
+            {formatReportYear(report, locale)}
           </p>
           <h3 className="mt-1 font-serif text-xl font-bold leading-snug text-navy-900">
             {report.title}
           </h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            {formatComparison(report)}PDF 格式
+            {formatComparison(report, locale)}PDF
           </p>
         </div>
       </div>
@@ -114,7 +118,7 @@ function ReportCard({ report }: { report: FinancialReport }) {
           variant="outline"
           className="w-full"
         >
-          查看 PDF
+          {locale === "en" ? "View PDF" : "查看 PDF"}
           <ExternalLink />
         </Button>
       </div>
@@ -122,17 +126,19 @@ function ReportCard({ report }: { report: FinancialReport }) {
   );
 }
 
-function formatReportYear(report: FinancialReport) {
-  return `${report.fiscalYear}年度`;
+function formatReportYear(report: FinancialReport, locale: "tw" | "en") {
+  return locale === "en" ? `Fiscal Year ${report.fiscalYear}` : `${report.fiscalYear}年度`;
 }
 
-function formatComparison(report: FinancialReport) {
+function formatComparison(report: FinancialReport, locale: "tw" | "en") {
   if (!report.comparisonYear) return "";
-  return `含 ${report.fiscalYear} 年度及 ${report.comparisonYear} 年度比較財務資訊 / `;
+  return locale === "en"
+    ? `Comparative information for ${report.fiscalYear} and ${report.comparisonYear} / `
+    : `含 ${report.fiscalYear} 年度及 ${report.comparisonYear} 年度比較財務資訊 / `;
 }
 
-function formatReportMeta(report: FinancialReport) {
-  return `${formatReportYear(report)} / ${formatComparison(report)}`.replace(
+function formatReportMeta(report: FinancialReport, locale: "tw" | "en") {
+  return `${formatReportYear(report, locale)} / ${formatComparison(report, locale)}`.replace(
     / \/ $/,
     "",
   );

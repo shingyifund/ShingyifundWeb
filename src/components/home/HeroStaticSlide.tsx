@@ -3,19 +3,23 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { ImagePlaceholder } from "@/components/ui/ImagePlaceholder";
 import { Play } from "lucide-react";
+import { getRequestLocale } from "@/i18n/request";
+import { translate } from "@/i18n/translations";
+import type { Locale } from "@/i18n/config";
 
-export function HeroStaticSlide({ slide }: { slide: HeroSlide }) {
+export async function HeroStaticSlide({ slide }: { slide: HeroSlide }) {
+  const locale = await getRequestLocale();
   return (
     <section className="pt-4 pb-14 sm:pb-16">
       <h1 className="sr-only">
-        財團法人興毅社會福利慈善事業基金會 — 讓愛延續，讓需要被看見
+        {locale === "en" ? "Shing Yi Social Welfare and Charity Foundation" : "財團法人興毅社會福利慈善事業基金會 — 讓愛延續，讓需要被看見"}
       </h1>
       <div className="container-x">
         <div className="overflow-hidden rounded-2xl">
           <div className="relative aspect-video w-full lg:aspect-[16/7]">
-            {slide.content_type === "image" && <StaticImageSlide slide={slide} />}
-            {slide.content_type === "image_text" && <StaticImageTextSlide slide={slide} />}
-            {slide.content_type === "youtube" && <StaticYoutubeSlide slide={slide} />}
+            {slide.content_type === "image" && <StaticImageSlide slide={slide} locale={locale} />}
+            {slide.content_type === "image_text" && <StaticImageTextSlide slide={slide} locale={locale} />}
+            {slide.content_type === "youtube" && <StaticYoutubeSlide slide={slide} locale={locale} />}
           </div>
         </div>
       </div>
@@ -23,14 +27,14 @@ export function HeroStaticSlide({ slide }: { slide: HeroSlide }) {
   );
 }
 
-function StaticImageSlide({ slide }: { slide: HeroSlide }) {
+function StaticImageSlide({ slide, locale }: { slide: HeroSlide; locale: Locale }) {
   const inner = (
     <>
       <ImagePlaceholder
         src={slide.image_url}
         alt=""
         tone="mist"
-        label="主視覺圖片"
+        label={translate(locale, "主視覺圖片")}
         priority
         sizes="100vw"
         className="absolute inset-0 size-full"
@@ -47,7 +51,7 @@ function StaticImageSlide({ slide }: { slide: HeroSlide }) {
         target="_blank"
         rel="noopener noreferrer"
         className="absolute inset-0"
-        aria-label="查看詳情"
+        aria-label={translate(locale, "查看詳情")}
       >
         {inner}
       </a>
@@ -57,14 +61,14 @@ function StaticImageSlide({ slide }: { slide: HeroSlide }) {
   return <>{inner}</>;
 }
 
-function StaticImageTextSlide({ slide }: { slide: HeroSlide }) {
+function StaticImageTextSlide({ slide, locale }: { slide: HeroSlide; locale: Locale }) {
   return (
     <>
       <ImagePlaceholder
         src={slide.image_url}
         alt={slide.title ?? ""}
         tone={slide.tone === "amber" ? "navy" : "mist"}
-        label="主視覺圖片"
+        label={translate(locale, "主視覺圖片")}
         priority
         sizes="100vw"
         className="absolute inset-0 size-full"
@@ -92,7 +96,7 @@ function StaticImageTextSlide({ slide }: { slide: HeroSlide }) {
                 variant="white"
                 className="h-11 px-6 text-base sm:h-12 sm:px-8"
               >
-                {slide.cta_label ?? "了解服務"}
+                {slide.cta_label ?? translate(locale, "了解服務")}
               </Button>
             </div>
           )}
@@ -102,7 +106,7 @@ function StaticImageTextSlide({ slide }: { slide: HeroSlide }) {
   );
 }
 
-function StaticYoutubeSlide({ slide }: { slide: HeroSlide }) {
+function StaticYoutubeSlide({ slide, locale }: { slide: HeroSlide; locale: Locale }) {
   const posterSrc =
     slide.poster_image_url ??
     (slide.youtube_video_id
@@ -116,7 +120,7 @@ function StaticYoutubeSlide({ slide }: { slide: HeroSlide }) {
           src={posterSrc}
           alt={slide.title ?? ""}
           tone="mist"
-          label="影片封面"
+          label={translate(locale, "影片封面")}
           priority
           sizes="100vw"
           className="absolute inset-0 size-full"
@@ -131,7 +135,7 @@ function StaticYoutubeSlide({ slide }: { slide: HeroSlide }) {
           target="_blank"
           rel="noopener noreferrer"
           className="absolute inset-0 flex items-center justify-center"
-          aria-label="在 YouTube 觀看影片"
+          aria-label={translate(locale, "在 YouTube 觀看影片")}
         >
           <span className="flex size-14 items-center justify-center rounded-full bg-white/90 text-red-600 shadow-lg transition hover:scale-105 hover:bg-white sm:size-16">
             <Play className="size-6 translate-x-0.5 fill-current sm:size-7" />

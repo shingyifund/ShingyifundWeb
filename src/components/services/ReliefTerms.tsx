@@ -2,14 +2,14 @@ import { Camera, ShieldCheck } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
-import { reliefConfig } from "@/config/relief";
+import { getReliefConfig } from "@/config/relief";
 
 /**
  * 訪視影像紀錄與個資保密 — 兩段皆為權益告知性質，
  * 併為同一區塊，避免頁面被過多同構的條列區塊拉長。
  */
-export function ReliefTerms() {
-  const { visit, privacy } = reliefConfig;
+export async function ReliefTerms() {
+  const { visit, privacy } = await getReliefConfig();
 
   return (
     <section className="bg-white py-20">

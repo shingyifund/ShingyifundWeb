@@ -15,6 +15,8 @@ import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { ImagePlaceholder } from "@/components/ui/ImagePlaceholder";
 import { cn } from "@/lib/utils";
+import { getRequestLocale } from "@/i18n/request";
+import { translate } from "@/i18n/translations";
 
 const BADGE_ICONS: Record<ServiceFeature["icon"], LucideIcon> = {
   relief: HandHeart,
@@ -31,6 +33,7 @@ const BULLET_ICONS: Record<ServiceBulletIcon, LucideIcon> = {
 };
 
 export async function FeatureCards() {
+  const locale = await getRequestLocale();
   const features = await getServiceFeatures();
 
   return (
@@ -39,7 +42,7 @@ export async function FeatureCards() {
         <div className="grid gap-6 md:grid-cols-2">
           {features.map((f, i) => (
             <Reveal key={f.id} delay={i * 0.1}>
-              <FeatureCard feature={f} />
+              <FeatureCard feature={f} locale={locale} />
             </Reveal>
           ))}
         </div>
@@ -48,7 +51,7 @@ export async function FeatureCards() {
   );
 }
 
-function FeatureCard({ feature }: { feature: ServiceFeature }) {
+function FeatureCard({ feature, locale }: { feature: ServiceFeature; locale: "tw" | "en" }) {
   const Badge = BADGE_ICONS[feature.icon];
   const isAmber = feature.accent === "amber";
 
@@ -76,7 +79,7 @@ function FeatureCard({ feature }: { feature: ServiceFeature }) {
           src={feature.image}
           alt={feature.title}
           tone={isAmber ? "amber" : "navy"}
-          label="示意圖片"
+          label={translate(locale, "示意圖片")}
           sizes="(max-width: 768px) 100vw, 50vw"
           className="absolute inset-0 size-full"
           imgClassName="object-top transition-transform duration-500 group-hover:scale-105"
@@ -132,7 +135,7 @@ function FeatureCard({ feature }: { feature: ServiceFeature }) {
               accent.btnHover,
             )}
           >
-            了解更多
+            {translate(locale, "了解更多")}
             <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
           </span>
         </div>

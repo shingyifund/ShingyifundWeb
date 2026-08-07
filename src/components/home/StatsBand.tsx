@@ -12,6 +12,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import type { ImpactStat } from "@/lib/types";
+import { useLocale } from "@/i18n/provider";
+import { translate } from "@/i18n/translations";
 
 const ICONS: Record<ImpactStat["icon"], LucideIcon> = {
   family: Users,
@@ -24,6 +26,7 @@ const ICONS: Record<ImpactStat["icon"], LucideIcon> = {
 export function StatsBand({ stats }: { stats: ImpactStat[] }) {
   const ref = useRef<HTMLDivElement>(null);
   const [start, setStart] = useState(false);
+  const locale = useLocale();
 
   useEffect(() => {
     const el = ref.current;
@@ -59,7 +62,7 @@ export function StatsBand({ stats }: { stats: ImpactStat[] }) {
               <Heart className="size-4 fill-current text-rose-500" />
             </span>
             <h2 className="font-serif text-3xl font-bold text-white sm:text-4xl">
-              我們的服務成效
+              {translate(locale, "我們的服務成效")}
             </h2>
             <span className="hidden items-center gap-2 sm:flex">
               <Heart className="size-4 fill-current text-rose-500" />
