@@ -87,12 +87,12 @@ export function SiteHeader() {
                 href={switchLocaleHref(pathname, item)}
                 hrefLang={item === "en" ? "en" : "zh-Hant-TW"}
                 className={cn(
-                  "rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wide transition-colors",
+                  "rounded-full px-3 py-1 text-xs font-bold tracking-wide transition-colors",
                   locale === item ? "bg-navy-700 text-white" : "text-navy-600 hover:bg-navy-50",
                 )}
                 aria-current={locale === item ? "true" : undefined}
               >
-                {item === "tw" ? "TW" : "EN"}
+                {item === "tw" ? "繁中" : "English"}
               </a>
             ))}
           </div>
@@ -341,11 +341,11 @@ function MobileDrawer({
                 hrefLang={item === "en" ? "en" : "zh-Hant-TW"}
                 onClick={onClose}
                 className={cn(
-                  "rounded-full px-3 py-2 text-center text-xs font-bold uppercase tracking-wide",
+                  "rounded-full px-3 py-2 text-center text-xs font-bold tracking-wide",
                   locale === item ? "bg-navy-700 text-white" : "text-navy-600",
                 )}
               >
-                {item === "tw" ? "繁中 TW" : "English EN"}
+                {item === "tw" ? "繁中" : "English"}
               </a>
             ))}
           </div>
