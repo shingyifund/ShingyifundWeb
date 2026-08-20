@@ -29,7 +29,14 @@ export const mainNav: NavItem[] = [
       { label: "忠信食物銀行", href: "/services/foodbank" },
     ],
   },
-  { label: "永續興毅", href: "/sustainability" },
+  {
+    label: "永續興毅",
+    href: "/sustainability",
+    children: [
+      { label: "永續報告", href: "/sustainability" },
+      { label: "興毅永續行動", href: "/sustainability/action" },
+    ],
+  },
   {
     label: "愛心捐獻",
     href: "/donate",

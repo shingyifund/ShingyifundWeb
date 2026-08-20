@@ -3,6 +3,7 @@ import {
   BarChart3,
   FileBarChart,
   ImageIcon,
+  Handshake,
   PackageOpen,
   Plus,
   TrendingUp,
@@ -33,6 +34,12 @@ const modules = [
     description: "管理徵信明細中的每月捐物文字明細與物品照片。",
     href: "/admin/monthly-donations",
     icon: PackageOpen,
+  },
+  {
+    title: "永續合作夥伴",
+    description: "上傳與管理興毅永續行動頁面的合作夥伴 Logo。",
+    href: "/admin/sustainability-partners",
+    icon: Handshake,
   },
   {
     title: "勸募成果報告",

@@ -13,6 +13,7 @@ import type {
   MonthlyDonationDonorType,
   MonthlyDonationImage,
   MonthlyDonationReport,
+  SustainabilityPartner,
   YouTubeVideo,
 } from "@/lib/types";
 import {
@@ -54,6 +55,30 @@ export async function getHeroSlides(): Promise<HeroSlide[]> {
       cta_href: row.cta_href,
       link_url: row.link_url,
       tone: row.tone as "navy" | "amber",
+    }));
+  } catch {
+    return [];
+  }
+}
+
+export async function getSustainabilityPartners(): Promise<SustainabilityPartner[]> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("sustainability_partners")
+      .select("id, name, name_en, logo_url, website_url")
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: true });
+
+    if (error || !data) throw error;
+
+    return data.map((row) => ({
+      id: row.id,
+      name: row.name,
+      nameEn: row.name_en,
+      logoUrl: row.logo_url,
+      websiteUrl: row.website_url,
     }));
   } catch {
     return [];

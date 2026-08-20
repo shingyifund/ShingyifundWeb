@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 const MOBILE_UA_PATTERN = /Android|iPhone|iPad|iPod|Mobile/i;
 
@@ -9,11 +9,9 @@ const MOBILE_UA_PATTERN = /Android|iPhone|iPad|iPod|Mobile/i;
  * SSR 階段永遠回傳 false，client hydrate 後更新。
  */
 export function useIsMobile(): boolean {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    setIsMobile(MOBILE_UA_PATTERN.test(navigator.userAgent));
-  }, []);
-
-  return isMobile;
+  return useSyncExternalStore(
+    () => () => {},
+    () => MOBILE_UA_PATTERN.test(navigator.userAgent),
+    () => false,
+  );
 }

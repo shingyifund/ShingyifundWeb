@@ -65,11 +65,6 @@ export function MonthPicker({
     selected?.year ?? new Date().getFullYear(),
   );
 
-  // 開啟時對齊已選年份
-  React.useEffect(() => {
-    if (open && selected) setViewYear(selected.year);
-  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
-
   const label = selected
     ? locale === "en" ? `${selected.year}-${String(selected.month).padStart(2, "0")}` : `${selected.year} 年 ${String(selected.month).padStart(2, "0")} 月`
     : placeholder;
@@ -79,8 +74,13 @@ export function MonthPicker({
     setOpen(false);
   }
 
+  function handleOpenChange(nextOpen: boolean) {
+    if (nextOpen && selected) setViewYear(selected.year);
+    setOpen(nextOpen);
+  }
+
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <Button
           id={id}

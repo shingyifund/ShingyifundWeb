@@ -25,9 +25,15 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
 
   useEffect(() => {
     if (!emblaApi) return;
-    onSelect();
     emblaApi.on("select", onSelect);
     emblaApi.on("reInit", onSelect);
+    const frame = requestAnimationFrame(onSelect);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      emblaApi.off("select", onSelect);
+      emblaApi.off("reInit", onSelect);
+    };
   }, [emblaApi, onSelect]);
 
   return (

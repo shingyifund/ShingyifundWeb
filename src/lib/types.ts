@@ -139,3 +139,11 @@ export type MonthlyDonationReport = {
   updatedAt: string | null;
   images: MonthlyDonationImage[];
 };
+
+export type SustainabilityPartner = {
+  id: string;
+  name: string;
+  nameEn: string | null;
+  logoUrl: string;
+  websiteUrl: string | null;
+};
