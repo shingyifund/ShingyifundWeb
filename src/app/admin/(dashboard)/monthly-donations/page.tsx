@@ -1,4 +1,5 @@
 import { Plus } from "lucide-react";
+import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import type { MonthlyDonationDonorType } from "@/lib/types";
 import { MonthlyDonationsListView } from "./_components/monthly-donations-list-view";
@@ -28,7 +29,19 @@ export default async function MonthlyDonationsAdminPage({
     pageSize: PAGE_SIZE,
   });
 
-  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
+  if (page > totalPages) {
+    const params = new URLSearchParams();
+    if (year) params.set("year", String(year));
+    if (month) params.set("month", String(month));
+    if (donorType) params.set("donorType", donorType);
+    if (donorName) params.set("donorName", donorName);
+    if (totalPages > 1) params.set("page", String(totalPages));
+
+    const queryString = params.toString();
+    redirect(`/admin/monthly-donations${queryString ? `?${queryString}` : ""}`);
+  }
 
   return (
     <div className="space-y-6">
