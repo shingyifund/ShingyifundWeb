@@ -1,11 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  CalendarDays,
-  Coins,
   Filter,
   HeartHandshake,
-  ListChecks,
   Search,
   X,
 } from "lucide-react";
@@ -127,25 +124,6 @@ export default async function DonorsPage({
             hasFilters={hasFilters}
           />
 
-          <div className="mt-6 grid gap-3 sm:grid-cols-3">
-            <SummaryCard
-              icon={ListChecks}
-              label={locale === "en" ? "Matching records" : "符合筆數"}
-              value={locale === "en" ? result.totalCount.toLocaleString("en-US") : `${result.totalCount.toLocaleString("zh-TW")} 筆`}
-            />
-            <SummaryCard
-              icon={Coins}
-              label={locale === "en" ? "Total amount" : "金額合計"}
-              value={formatDonationAmount(result.totalAmount, locale)}
-              accent
-            />
-            <SummaryCard
-              icon={CalendarDays}
-              label={locale === "en" ? "Covered periods" : "涵蓋月份"}
-              value={locale === "en" ? result.periodCount.toLocaleString("en-US") : `${result.periodCount.toLocaleString("zh-TW")} 個月`}
-            />
-          </div>
-
           <section className="mt-6 overflow-hidden rounded-2xl border border-navy-100 bg-white shadow-[0_18px_50px_-34px_rgb(15_38_71/0.5)]">
             <div className="flex flex-col gap-1 border-b border-navy-100 bg-navy-50/65 px-5 py-4 sm:flex-row sm:items-end sm:justify-between sm:px-6">
               <div>
@@ -157,6 +135,15 @@ export default async function DonorsPage({
                     ? locale === "en" ? "Search results" : "篩選結果"
                     : locale === "en" ? "All donations" : "全部捐款"}
                 </h2>
+                {hasFilters ? (
+                  <FilterSummary
+                    locale={locale}
+                    query={query}
+                    year={year}
+                    month={month}
+                    donationType={donationType}
+                  />
+                ) : null}
               </div>
               <p className="text-xs text-ink-muted">
                 {locale === "en" ? "Newest records first" : "依捐款日期由新到舊排列"}
@@ -296,26 +283,33 @@ function DonationFilters({
   );
 }
 
-function SummaryCard({
-  icon: Icon,
-  label,
-  value,
-  accent = false,
+function FilterSummary({
+  locale,
+  query,
+  year,
+  month,
+  donationType,
 }: {
-  icon: typeof Coins;
-  label: string;
-  value: string;
-  accent?: boolean;
+  locale: Locale;
+  query?: string;
+  year?: number;
+  month?: number;
+  donationType?: DonationType;
 }) {
+  const items = [
+    query ? `${locale === "en" ? "Name" : "姓名"}：${query}` : null,
+    year ? `${locale === "en" ? "Year" : "年份"}：${year}` : null,
+    month ? `${locale === "en" ? "Month" : "月份"}：${locale === "en" ? month : `${month} 月`}` : null,
+    donationType ? `${locale === "en" ? "Category" : "類別"}：${getDonationTypeLabel(donationType, locale)}` : null,
+  ].filter((item): item is string => Boolean(item));
+
   return (
-    <div className={`flex items-center gap-4 rounded-2xl border px-5 py-4 ${accent ? "border-amber-300 bg-amber-50" : "border-navy-100 bg-white"}`}>
-      <span className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${accent ? "bg-amber-500 text-navy-950" : "bg-navy-50 text-navy-600"}`}>
-        <Icon className="size-5" />
-      </span>
-      <div className="min-w-0">
-        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted">{label}</p>
-        <p className="mt-0.5 truncate font-serif text-xl font-bold text-navy-900 sm:text-2xl">{value}</p>
-      </div>
+    <div className="mt-2 flex flex-wrap gap-1.5" aria-label={locale === "en" ? "Applied filters" : "目前篩選條件"}>
+      {items.map((item) => (
+        <span key={item} className="rounded-full border border-navy-100 bg-white px-2.5 py-1 text-xs font-medium text-navy-700">
+          {item}
+        </span>
+      ))}
     </div>
   );
 }
