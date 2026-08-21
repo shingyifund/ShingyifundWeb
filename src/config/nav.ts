@@ -18,7 +18,6 @@ export const mainNav: NavItem[] = [
     children: [
       { label: "興毅緣起", href: "/about/origin" },
       { label: "聯絡我們", href: "/about/contact" },
-      { label: "興毅季刊", href: "/about/quarterly" },
     ],
   },
   {

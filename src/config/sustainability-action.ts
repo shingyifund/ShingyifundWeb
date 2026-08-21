@@ -55,9 +55,9 @@ const tw = {
   provide: "我有物資可以提供",
   cooperate: "洽談永續合作",
   contact: "聯絡我們",
-  formNote: "填寫後將開啟您的郵件程式寄送至興毅基金會；物資照片請在郵件開啟後附加。",
-  partnershipFormNote: "填寫後將開啟您的郵件程式，將合作需求寄送至興毅基金會。",
-  submit: "開啟郵件送出",
+  formNote: "填寫後將由網站直接寄送至興毅基金會；物資照片可一併附加（JPG／PNG／WebP，最大 5 MB）。",
+  partnershipFormNote: "填寫後將由網站直接寄送合作需求至興毅基金會。",
+  submit: "直接送出",
   fields: { name: "姓名／公司名稱", phone: "聯絡電話", email: "Email", item: "物資名稱及品項", quantity: "數量或箱數", expiry: "有效期限（如有）", storage: "保存方式", location: "物資目前所在地", available: "預計可提供的時間", photo: "物資照片", message: "合作需求／留言" },
 } as const;
 
@@ -109,9 +109,9 @@ const en = {
   provide: "I Have Supplies to Offer",
   cooperate: "Discuss a Partnership",
   contact: "Contact Us",
-  formNote: "Completing the form opens your email app to send the information to Shing Yi Foundation. Please attach supply photos in the email.",
-  partnershipFormNote: "Completing the form opens your email app to send your partnership request to Shing Yi Foundation.",
-  submit: "Open Email to Send",
+  formNote: "The website will send this form directly to Shing Yi Foundation. You may attach one JPG, PNG, or WebP photo up to 5 MB.",
+  partnershipFormNote: "The website will send your partnership request directly to Shing Yi Foundation.",
+  submit: "Send",
   fields: { name: "Name / Company", phone: "Phone", email: "Email", item: "Item name and type", quantity: "Quantity / Cartons", expiry: "Expiration date, if applicable", storage: "Storage method", location: "Current location", available: "Available date", photo: "Supply photos", message: "Partnership needs / Message" },
 } as const;
 

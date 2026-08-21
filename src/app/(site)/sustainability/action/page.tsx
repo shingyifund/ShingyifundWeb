@@ -34,7 +34,6 @@ import { localizeHref } from "@/i18n/config";
 import { getRequestLocale } from "@/i18n/request";
 import { getSustainabilityPartners } from "@/lib/data/queries";
 
-const CONTACT_EMAIL = "shingyifund@gmail.com";
 const recipientIcons = [ShoppingBasket, Building2, Users];
 const valueIcons = [Leaf, Recycle, ShieldCheck, Globe2];
 const infoIcons = [Box, Hash, CalendarDays, Snowflake, MapPin, Clock, Camera];
@@ -311,26 +310,36 @@ export default async function SustainabilityActionPage() {
               </div>
               <div className="grid gap-5 xl:grid-cols-2">
                 <SustainabilityEmailForm
-                  email={CONTACT_EMAIL}
                   title={c.provide}
-                  subject={`[${c.title}] ${c.provide}`}
-                  fields={[c.fields.name, c.fields.phone, c.fields.email, c.fields.item, c.fields.quantity, c.fields.expiry, c.fields.storage, c.fields.location, c.fields.available]}
-                  emailField={c.fields.email}
+                  fields={[
+                    { name: "name", label: c.fields.name },
+                    { name: "phone", label: c.fields.phone },
+                    { name: "contactEmail", label: c.fields.email, type: "email" },
+                    { name: "item", label: c.fields.item },
+                    { name: "quantity", label: c.fields.quantity },
+                    { name: "expiry", label: c.fields.expiry },
+                    { name: "storage", label: c.fields.storage },
+                    { name: "location", label: c.fields.location },
+                    { name: "available", label: c.fields.available },
+                  ]}
                   photoLabel={c.fields.photo}
                   note={c.formNote}
                   submitLabel={c.submit}
                   type="supplies"
+                  locale={locale}
                 />
                 <SustainabilityEmailForm
-                  email={CONTACT_EMAIL}
                   title={c.cooperate}
-                  subject={`[${c.title}] ${c.cooperate}`}
-                  fields={[c.fields.name, c.fields.phone, c.fields.email]}
-                  emailField={c.fields.email}
+                  fields={[
+                    { name: "name", label: c.fields.name },
+                    { name: "phone", label: c.fields.phone },
+                    { name: "contactEmail", label: c.fields.email, type: "email" },
+                  ]}
                   messageLabel={c.fields.message}
                   note={c.partnershipFormNote}
                   submitLabel={c.submit}
                   type="partnership"
+                  locale={locale}
                 />
               </div>
             </div>
