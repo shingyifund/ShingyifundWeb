@@ -5,6 +5,7 @@ import {
   FileBarChart,
   ImageIcon,
   Handshake,
+  HandHeart,
   PackageOpen,
   Plus,
   TrendingUp,
@@ -29,6 +30,12 @@ const modules = [
     description: "上傳 Excel、預覽並更新前台公開捐款紀錄與查詢資料。",
     href: "/admin/donations",
     icon: Coins,
+  },
+  {
+    title: "受贈者名單",
+    description: "上傳 Excel、預覽並更新前台公開受贈對象與金額資料。",
+    href: "/admin/recipients",
+    icon: HandHeart,
   },
   {
     title: "財務報告",
