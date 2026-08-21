@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   BarChart3,
+  Coins,
   FileBarChart,
   ImageIcon,
   Handshake,
@@ -22,6 +23,12 @@ const modules = [
     description: "維護首頁「我們的服務成效」區塊的五項指標數字。",
     href: "/admin/stats",
     icon: BarChart3,
+  },
+  {
+    title: "捐款芳名錄",
+    description: "上傳 Excel、預覽並更新前台公開捐款紀錄與查詢資料。",
+    href: "/admin/donations",
+    icon: Coins,
   },
   {
     title: "財務報告",
