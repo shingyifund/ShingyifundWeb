@@ -21,6 +21,10 @@ import {
   type DonationType,
 } from "@/lib/donation-registry";
 import { searchPublicDonations } from "@/lib/donation-registry-server";
+import {
+  DonationFilterForm,
+  DonationSearchButton,
+} from "./_components/donation-filter-form";
 import { DonationFilterSelect } from "./_components/donation-filter-select";
 
 const PAGE_SIZE = 50;
@@ -238,7 +242,7 @@ function DonationFilters({
   ];
 
   return (
-    <form
+    <DonationFilterForm
       action={localizeHref("/transparency/donors", locale)}
       className="rounded-2xl border border-navy-100 bg-white p-4 shadow-card sm:p-5"
     >
@@ -280,10 +284,7 @@ function DonationFilters({
           options={typeOptions}
         />
         <div className="flex gap-2">
-          <Button type="submit" size="md" className="flex-1 md:flex-none">
-            <Search className="size-4" />
-            {locale === "en" ? "Search" : "查詢"}
-          </Button>
+          <DonationSearchButton locale={locale} className="flex-1 md:flex-none" />
           {hasFilters ? (
             <Button href={localizeHref("/transparency/donors", locale)} variant="outline" size="md" aria-label={locale === "en" ? "Clear filters" : "清除篩選"}>
               <X className="size-4" />
@@ -291,7 +292,7 @@ function DonationFilters({
           ) : null}
         </div>
       </div>
-    </form>
+    </DonationFilterForm>
   );
 }
 
