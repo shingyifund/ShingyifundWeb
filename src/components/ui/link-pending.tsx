@@ -16,7 +16,7 @@ export function LinkPending({ className }: { className?: string }) {
   if (!pending) return null;
   return (
     <Loader2
-      className={cn("size-4 animate-spin", className)}
+      className={cn("size-4 animate-spin motion-reduce:animate-none", className)}
       aria-label={locale === "en" ? "Loading" : "載入中"}
     />
   );
@@ -37,7 +37,7 @@ export function LinkPendingIcon({
   const locale = useLocale();
   return pending ? (
     <Loader2
-      className={cn("size-4 animate-spin", className)}
+      className={cn("size-4 animate-spin motion-reduce:animate-none", className)}
       aria-label={locale === "en" ? "Loading" : "載入中"}
     />
   ) : (

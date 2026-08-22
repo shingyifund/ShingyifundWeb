@@ -8,6 +8,7 @@ import { ChevronDown, Heart, Menu, X } from "lucide-react";
 import { getMainNav, ONLINE_DONATION_URL, type NavItem } from "@/config/nav";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
+import { LinkPending } from "@/components/ui/link-pending";
 import { useLocale } from "@/i18n/provider";
 import { localizeHref, switchLocaleHref, type Locale } from "@/i18n/config";
 import { translate } from "@/i18n/translations";
@@ -60,7 +61,7 @@ export function SiteHeader() {
     >
       <div className="container-x flex h-18 items-center justify-between gap-4">
         {/* Logo */}
-        <Link href={localizeHref("/", locale)} className="flex shrink-0 items-center" aria-label={translate(locale, "興毅基金會首頁")}>
+        <Link href={localizeHref("/", locale)} className="flex shrink-0 items-center gap-2" aria-label={translate(locale, "興毅基金會首頁")}>
           <Image
             src="/brand/logo.svg"
             alt={translate(locale, "興毅基金會")}
@@ -69,6 +70,9 @@ export function SiteHeader() {
             priority
             className="h-9 w-auto sm:h-10"
           />
+          <span className="inline-flex size-4 shrink-0 items-center justify-center">
+            <LinkPending className="size-3.5 text-amber-600" />
+          </span>
         </Link>
 
         {/* 桌機主選單 */}
@@ -149,6 +153,9 @@ function DesktopNavItem({ item, active }: { item: NavItem; active: boolean }) {
         )}
       >
         {item.label}
+        <span className="inline-flex size-3.5 shrink-0 items-center justify-center">
+          <LinkPending className="size-3.5 text-amber-600" />
+        </span>
       </Link>
     );
   }
@@ -187,7 +194,7 @@ function DesktopNavItem({ item, active }: { item: NavItem; active: boolean }) {
         <div className="overflow-hidden rounded-2xl border border-navy-100 bg-white p-2 shadow-[0_18px_44px_-18px_rgb(15_38_71/0.35)]">
           {item.children.map((child) => {
             const childClass =
-              "block rounded-xl px-4 py-2.5 text-sm text-ink-soft transition-colors hover:bg-amber-50 hover:text-navy-700";
+              "flex items-center justify-between gap-3 rounded-xl px-4 py-2.5 text-sm text-ink-soft transition-colors hover:bg-amber-50 hover:text-navy-700";
             return child.external ? (
               <a
                 key={child.href}
@@ -207,6 +214,9 @@ function DesktopNavItem({ item, active }: { item: NavItem; active: boolean }) {
                 className={childClass}
               >
                 {child.label}
+                <span className="inline-flex size-3.5 shrink-0 items-center justify-center">
+                  <LinkPending className="size-3.5 text-amber-600" />
+                </span>
               </Link>
             );
           })}
@@ -292,7 +302,7 @@ function MobileDrawer({
                       <div className="overflow-hidden">
                         {item.children.map((child) => {
                           const childClass =
-                            "block rounded-lg px-3 py-2 text-sm text-ink-soft hover:bg-amber-50 hover:text-navy-700";
+                            "flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm text-ink-soft hover:bg-amber-50 hover:text-navy-700";
                           return child.external ? (
                             <a
                               key={child.href}
@@ -312,6 +322,9 @@ function MobileDrawer({
                               className={childClass}
                             >
                               {child.label}
+                              <span className="inline-flex size-3.5 shrink-0 items-center justify-center">
+                                <LinkPending className="size-3.5 text-amber-600" />
+                              </span>
                             </Link>
                           );
                         })}
@@ -322,9 +335,12 @@ function MobileDrawer({
                   <Link
                     href={item.href}
                     onClick={onClose}
-                    className="block py-3.5 text-[15px] font-medium text-navy-800"
+                    className="flex items-center justify-between gap-3 py-3.5 text-[15px] font-medium text-navy-800"
                   >
                     {item.label}
+                    <span className="inline-flex size-3.5 shrink-0 items-center justify-center">
+                      <LinkPending className="size-3.5 text-amber-600" />
+                    </span>
                   </Link>
                 )}
               </div>
