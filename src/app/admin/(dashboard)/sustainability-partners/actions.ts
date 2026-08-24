@@ -122,6 +122,58 @@ export async function createSustainabilityPartner(
   return { ok: true };
 }
 
+export async function updateSustainabilityPartner(
+  id: string,
+  formData: FormData,
+): Promise<PartnerActionResult> {
+  await assertAdmin();
+  const name = textValue(formData, "name");
+  if (!name) return { ok: false, message: "請輸入合作夥伴名稱" };
+
+  const supabase = await createAdminClient();
+  const { data: existing, error: readError } = await supabase
+    .from("sustainability_partners")
+    .select("logo_path")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (readError) return { ok: false, message: readError.message };
+  if (!existing) return { ok: false, message: "找不到這筆合作夥伴資料" };
+
+  const logoFile = formData.get("logo_file");
+  const shouldReplaceLogo = logoFile instanceof File && logoFile.size > 0;
+  const upload = shouldReplaceLogo ? await uploadLogo(logoFile) : null;
+  if (upload && !upload.ok) return upload;
+
+  const updates: Record<string, string | null> = {
+    name,
+    name_en: textValue(formData, "name_en"),
+    website_url: textValue(formData, "website_url"),
+  };
+
+  if (upload?.ok) {
+    updates.logo_url = upload.url;
+    updates.logo_path = upload.path;
+  }
+
+  const { error } = await supabase
+    .from("sustainability_partners")
+    .update(updates)
+    .eq("id", id);
+
+  if (error) {
+    if (upload?.ok) await supabase.storage.from(BUCKET).remove([upload.path]);
+    return { ok: false, message: error.message };
+  }
+
+  if (upload?.ok && existing.logo_path && existing.logo_path !== upload.path) {
+    await supabase.storage.from(BUCKET).remove([existing.logo_path]);
+  }
+
+  revalidatePartners();
+  return { ok: true };
+}
+
 export async function toggleSustainabilityPartner(
   id: string,
   isActive: boolean,
