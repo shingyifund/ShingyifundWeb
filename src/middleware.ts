@@ -5,6 +5,19 @@ import { defaultLocale, isLocale } from "@/i18n/config";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const normalizedPathname = pathname
+    .replace(/%5c/gi, "/")
+    .replace(/\\/g, "/")
+    .replace(/\/{2,}/g, "/")
+    .replace(/\/$/, "") || "/";
+
+  // 避免錯誤複製的反斜線（例如結尾的 %5C）被 Vercel 當成不存在的 route module。
+  if (normalizedPathname !== pathname) {
+    const url = request.nextUrl.clone();
+    url.pathname = normalizedPathname;
+    return NextResponse.redirect(url, 308);
+  }
+
   const firstSegment = pathname.split("/")[1];
 
   if (isLocale(firstSegment)) {

@@ -2,16 +2,22 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { FileText } from "lucide-react";
+import { FileText, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { UploadTrigger } from "@/components/admin/upload-trigger";
+import { createClient } from "@/lib/supabase/client";
 import {
   createFinancialReport,
+  prepareFinancialReportUpload,
   type FinancialReportRecord,
   updateFinancialReport,
 } from "../actions";
+
+const MAX_PDF_FILE_SIZE = 50 * 1024 * 1024;
+
+type SubmitPhase = "idle" | "preparing" | "uploading" | "saving";
 
 function defaultTitle(year: string) {
   if (!year) return "";
@@ -38,7 +44,18 @@ export function FinancialReportForm({
   const title = customTitle ?? defaultTitle(fiscalYear);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [submitPhase, setSubmitPhase] = useState<SubmitPhase>("idle");
   const [isPending, startTransition] = useTransition();
+  const isSubmitting = isPending || submitPhase !== "idle";
+
+  function validatePdf(file: File) {
+    const isPdf =
+      file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+    if (!isPdf) return "檔案格式需為 PDF";
+    if (file.size <= 0) return "PDF 檔案不可為空白";
+    if (file.size > MAX_PDF_FILE_SIZE) return "PDF 檔案不可超過 50MB";
+    return null;
+  }
 
   function handleSubmit(formData: FormData) {
     setMessage(null);
@@ -46,26 +63,82 @@ export function FinancialReportForm({
       setMessage("請選擇 PDF 檔案");
       return;
     }
+
+    if (pdfFile) {
+      const validationError = validatePdf(pdfFile);
+      if (validationError) {
+        setMessage(validationError);
+        return;
+      }
+    }
+
     formData.set("fiscal_year", fiscalYear);
     formData.set("comparison_year", comparisonYear);
     formData.set("title", title);
-    if (pdfFile) formData.set("pdf_file", pdfFile);
 
     startTransition(async () => {
-      const result =
-        report === undefined
-          ? await createFinancialReport(formData)
-          : await updateFinancialReport(report.id, formData);
+      try {
+        if (pdfFile) {
+          setSubmitPhase("preparing");
+          const prepared = await prepareFinancialReportUpload({
+            fiscalYear: Number(fiscalYear),
+            fileName: pdfFile.name,
+            fileSize: pdfFile.size,
+            fileType: pdfFile.type,
+          });
 
-      if (!result.ok) {
-        setMessage(result.message ?? "儲存失敗");
-        return;
+          if (!prepared.ok) {
+            setMessage(prepared.message);
+            return;
+          }
+
+          setSubmitPhase("uploading");
+          const supabase = createClient();
+          const { error } = await supabase.storage
+            .from("financial-reports")
+            .uploadToSignedUrl(prepared.path, prepared.token, pdfFile, {
+              contentType: "application/pdf",
+            });
+
+          if (error) {
+            setMessage(`PDF 上傳失敗：${error.message}`);
+            return;
+          }
+
+          formData.set("uploaded_file_path", prepared.path);
+          formData.set("uploaded_file_name", pdfFile.name);
+          formData.set("uploaded_file_size", String(pdfFile.size));
+        }
+
+        setSubmitPhase("saving");
+        const result =
+          report === undefined
+            ? await createFinancialReport(formData)
+            : await updateFinancialReport(report.id, formData);
+
+        if (!result.ok) {
+          setMessage(result.message ?? "儲存失敗");
+          return;
+        }
+
+        router.push("/admin/financial-reports");
+        router.refresh();
+      } catch (error) {
+        setMessage(error instanceof Error ? error.message : "儲存失敗，請稍後再試");
+      } finally {
+        setSubmitPhase("idle");
       }
-
-      router.push("/admin/financial-reports");
-      router.refresh();
     });
   }
+
+  const submitLabel =
+    submitPhase === "preparing"
+      ? "準備上傳..."
+      : submitPhase === "uploading"
+        ? "PDF 上傳中..."
+        : submitPhase === "saving"
+          ? "儲存資料中..."
+          : "儲存";
 
   return (
     <form action={handleSubmit} className="space-y-5">
@@ -80,6 +153,7 @@ export function FinancialReportForm({
             value={fiscalYear}
             onChange={(e) => setFiscalYear(e.target.value)}
             placeholder="例：113"
+            disabled={isSubmitting}
             required
           />
           <p className="text-xs text-muted-foreground">
@@ -97,6 +171,7 @@ export function FinancialReportForm({
             value={comparisonYear}
             onChange={(e) => setComparisonYear(e.target.value)}
             placeholder="例：112"
+            disabled={isSubmitting}
           />
           <p className="text-xs text-muted-foreground">
             選填；用於說明 PDF 內含比較資訊。
@@ -111,6 +186,7 @@ export function FinancialReportForm({
           value={title}
           onChange={(e) => setCustomTitle(e.target.value)}
           placeholder="113年度財務報表及會計師查核報告"
+          disabled={isSubmitting}
           required
         />
         <p className="text-xs text-muted-foreground">
@@ -125,11 +201,16 @@ export function FinancialReportForm({
           label={pdfFile ? pdfFile.name : "選擇 PDF 檔案"}
           hint={
             isEdit
-              ? "不選擇檔案會保留目前 PDF；選擇新檔會替換並刪除舊檔。"
-              : "新增財務報告需上傳 PDF。"
+              ? "不選擇檔案會保留目前 PDF；選擇新檔會替換並刪除舊檔（上限 50MB）。"
+              : "新增財務報告需上傳 PDF（上限 50MB）。"
           }
           icon={<FileText className="size-5" strokeWidth={1.8} />}
-          onFilesSelected={(files) => setPdfFile(files[0] ?? null)}
+          disabled={isSubmitting}
+          onFilesSelected={(files) => {
+            const file = files[0] ?? null;
+            setPdfFile(file);
+            setMessage(file ? validatePdf(file) : null);
+          }}
         />
       </div>
 
@@ -148,10 +229,16 @@ export function FinancialReportForm({
       {message && <p className="text-sm text-destructive">{message}</p>}
 
       <div className="flex gap-3 pt-2">
-        <Button type="submit" disabled={isPending}>
-          {isPending ? "儲存中..." : "儲存"}
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting && <Loader2 className="size-4 animate-spin" />}
+          {submitLabel}
         </Button>
-        <Button type="button" variant="outline" onClick={() => router.back()}>
+        <Button
+          type="button"
+          variant="outline"
+          disabled={isSubmitting}
+          onClick={() => router.back()}
+        >
           取消
         </Button>
       </div>

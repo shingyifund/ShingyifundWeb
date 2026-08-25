@@ -5,6 +5,8 @@ import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
 const BUCKET = "financial-reports";
+const MAX_PDF_FILE_SIZE = 50 * 1024 * 1024;
+const PDF_PATH_PATTERN = /^\d{1,3}-[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.pdf$/i;
 const SELECT_COLS =
   "id, title, fiscal_year, comparison_year, file_url, file_path, file_name, file_size, created_at, updated_at";
 
@@ -25,6 +27,10 @@ export type ActionResult = {
   ok: boolean;
   message?: string;
 };
+
+export type PrepareUploadResult =
+  | { ok: true; path: string; token: string }
+  | { ok: false; message: string };
 
 async function getAuthorizedAdmin() {
   const supabase = await createClient();
@@ -110,47 +116,84 @@ export async function getFinancialReportById(
   return data;
 }
 
-async function uploadPdfFile(
-  file: FormDataEntryValue | null,
-  fiscalYear: number,
-): Promise<
-  | {
-      ok: true;
-      url: string;
-      path: string;
-      fileName: string;
-      fileSize: number;
-    }
-  | { ok: false; message: string }
-> {
-  if (!(file instanceof File) || file.size === 0) {
-    return { ok: false, message: "請選擇 PDF 檔案" };
+function validatePdfMetadata(fileName: string, fileSize: number, fileType: string) {
+  if (!fileName || !Number.isInteger(fileSize) || fileSize <= 0) {
+    return "請選擇 PDF 檔案";
+  }
+  if (fileType !== "application/pdf" && !fileName.toLowerCase().endsWith(".pdf")) {
+    return "檔案格式需為 PDF";
+  }
+  if (fileSize > MAX_PDF_FILE_SIZE) {
+    return "PDF 檔案不可超過 50MB";
+  }
+  return null;
+}
+
+export async function prepareFinancialReportUpload(input: {
+  fiscalYear: number;
+  fileName: string;
+  fileSize: number;
+  fileType: string;
+}): Promise<PrepareUploadResult> {
+  const user = await getAuthorizedAdmin();
+  if (!user) return { ok: false, message: "未授權" };
+
+  if (!Number.isInteger(input.fiscalYear) || input.fiscalYear < 1 || input.fiscalYear > 999) {
+    return { ok: false, message: "請輸入有效主要年度" };
   }
 
-  if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
-    return { ok: false, message: "檔案格式需為 PDF" };
-  }
+  const validationError = validatePdfMetadata(input.fileName, input.fileSize, input.fileType);
+  if (validationError) return { ok: false, message: validationError };
 
+  const path = `${input.fiscalYear}-${crypto.randomUUID()}.pdf`;
   const supabase = await createAdminClient();
-  const path = `${fiscalYear}-${crypto.randomUUID()}.pdf`;
-  const bytes = await file.arrayBuffer();
-
   const { data, error } = await supabase.storage
     .from(BUCKET)
-    .upload(path, bytes, { contentType: "application/pdf", upsert: false });
+    .createSignedUploadUrl(path);
 
   if (error) return { ok: false, message: error.message };
+  return { ok: true, path: data.path, token: data.token };
+}
+
+async function getUploadedPdf(formData: FormData, fiscalYear: number) {
+  const path = textValue(formData, "uploaded_file_path");
+  const fileName = textValue(formData, "uploaded_file_name");
+  const claimedFileSize = Number(textValue(formData, "uploaded_file_size"));
+
+  if (!path || !fileName || !PDF_PATH_PATTERN.test(path) || !path.startsWith(`${fiscalYear}-`)) {
+    return { ok: false as const, message: "PDF 上傳資料無效，請重新選擇檔案" };
+  }
+
+  const metadataError = validatePdfMetadata(fileName, claimedFileSize, "application/pdf");
+  if (metadataError) return { ok: false as const, message: metadataError };
+
+  const supabase = await createAdminClient();
+  const { data: fileInfo, error } = await supabase.storage.from(BUCKET).info(path);
+  if (error || !fileInfo) {
+    return { ok: false as const, message: "找不到已上傳的 PDF，請重新上傳" };
+  }
+
+  if (fileInfo.contentType && fileInfo.contentType !== "application/pdf") {
+    await supabase.storage.from(BUCKET).remove([path]);
+    return { ok: false as const, message: "檔案格式需為 PDF" };
+  }
+
+  const actualFileSize = fileInfo.size ?? claimedFileSize;
+  if (actualFileSize <= 0 || actualFileSize > MAX_PDF_FILE_SIZE) {
+    await supabase.storage.from(BUCKET).remove([path]);
+    return { ok: false as const, message: "PDF 檔案不可超過 50MB" };
+  }
 
   const {
     data: { publicUrl },
-  } = supabase.storage.from(BUCKET).getPublicUrl(data.path);
+  } = supabase.storage.from(BUCKET).getPublicUrl(path);
 
   return {
-    ok: true,
+    ok: true as const,
     url: publicUrl,
-    path: data.path,
-    fileName: file.name,
-    fileSize: file.size,
+    path,
+    fileName: fileName.slice(0, 255),
+    fileSize: actualFileSize,
   };
 }
 
@@ -163,10 +206,7 @@ export async function createFinancialReport(
   const payload = reportPayload(formData);
   if ("error" in payload) return { ok: false, message: payload.error };
 
-  const upload = await uploadPdfFile(
-    formData.get("pdf_file"),
-    payload.data.fiscal_year,
-  );
+  const upload = await getUploadedPdf(formData, payload.data.fiscal_year);
   if (!upload.ok) return { ok: false, message: upload.message };
 
   const supabase = await createAdminClient();
@@ -208,13 +248,9 @@ export async function updateFinancialReport(
   if (fetchError) return { ok: false, message: fetchError.message };
   if (!existing) return { ok: false, message: "找不到財務報告" };
 
-  const file = formData.get("pdf_file");
-  const hasNewFile = file instanceof File && file.size > 0;
+  const hasNewFile = Boolean(textValue(formData, "uploaded_file_path"));
   const upload = hasNewFile
-      ? await uploadPdfFile(
-        file,
-        payload.data.fiscal_year,
-      )
+    ? await getUploadedPdf(formData, payload.data.fiscal_year)
     : null;
 
   if (upload && !upload.ok) return { ok: false, message: upload.message };
