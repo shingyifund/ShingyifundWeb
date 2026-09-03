@@ -132,6 +132,7 @@ export type MonthlyDonationReport = {
   region: MonthlyDonationRegion;
   donorType: MonthlyDonationDonorType;
   donorName: string | null;
+  donationContent: string;
   isAnonymous: boolean;
   sortOrder: number;
   isPublished: boolean;

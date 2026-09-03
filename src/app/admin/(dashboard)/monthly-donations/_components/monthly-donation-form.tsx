@@ -10,6 +10,7 @@ import { FormAlert } from "@/components/ui/form-alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { MonthPicker } from "@/components/ui/month-picker";
 import { UploadTrigger } from "@/components/admin/upload-trigger";
@@ -124,6 +125,9 @@ export function MonthlyDonationForm({
     MonthlyDonationReportRecord["donor_type"]
   >(report?.donor_type ?? "individual");
   const [donorName, setDonorName] = useState(report?.donor_name ?? "");
+  const [donationContent, setDonationContent] = useState(
+    report?.donation_content ?? "",
+  );
   const [isAnonymous, setIsAnonymous] = useState(report?.is_anonymous ?? false);
   const [isPublished, setIsPublished] = useState(report?.is_published ?? true);
   const [customTitle, setCustomTitle] = useState<string | null>(() => {
@@ -132,6 +136,7 @@ export function MonthlyDonationForm({
       buildMonthlyDonationTitle({
         donorName: report.donor_name,
         isAnonymous: report.is_anonymous,
+        donationContent: report.donation_content,
       })
       ? report.title
       : null;
@@ -155,8 +160,13 @@ export function MonthlyDonationForm({
   const [isPending, startTransition] = useTransition();
   const title = useMemo(
     () =>
-      customTitle ?? buildMonthlyDonationTitle({ donorName: donorName || null, isAnonymous }),
-    [customTitle, donorName, isAnonymous],
+      customTitle ??
+      buildMonthlyDonationTitle({
+        donorName: donorName || null,
+        isAnonymous,
+        donationContent,
+      }),
+    [customTitle, donationContent, donorName, isAnonymous],
   );
   const busy = submitStarted || isPending || processingImages;
   const busyText = processingImages ? "正在壓縮並加入浮水印..." : "正在儲存...";
@@ -242,6 +252,7 @@ export function MonthlyDonationForm({
     formData.set("region", region);
     formData.set("donor_type", donorType);
     formData.set("donor_name", donorName);
+    formData.set("donation_content", donationContent);
     formData.set("is_anonymous", String(isAnonymous));
     formData.set("title", title);
     formData.set("is_published", String(isPublished));
@@ -357,16 +368,29 @@ export function MonthlyDonationForm({
       )}
 
       <div className="space-y-2">
+        <Label htmlFor="donation_content">捐贈內容</Label>
+        <Textarea
+          id="donation_content"
+          value={donationContent}
+          onChange={(event) => setDonationContent(event.target.value)}
+          placeholder="例：白米、食用油、罐頭"
+          maxLength={500}
+          required
+          className="min-h-24 resize-y"
+        />
+      </div>
+
+      <div className="space-y-2">
         <Label htmlFor="title">標題</Label>
         <Input
           id="title"
           value={title}
           onChange={(event) => setCustomTitle(event.target.value)}
-          placeholder="感謝 善心人士 捐贈物資"
+          placeholder="感謝 善心人士 捐贈 物資 一批"
           required
         />
         <p className="text-xs text-muted-foreground">
-          標題會依捐贈者名稱自動產生，也可手動修改。
+          標題會依捐贈者名稱與捐贈內容自動產生，也可手動修改。
         </p>
       </div>
 

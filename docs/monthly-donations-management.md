@@ -18,8 +18,8 @@
 - **一筆資料代表：一位捐贈者（個人或團體）在某月某區的一次捐贈。**
   - 同一個「年 + 月 + 區域 + 分類」底下可有多筆（多位捐贈者），無 unique 約束。
 - 捐贈者可匿名：`is_anonymous = true` 時前台顯示「善心人士」，後台仍保留真實姓名。
-- 標題自動產生「感謝 {捐贈者名稱／善心人士} 捐贈物資」，可手動修改。
-- 物資內容描述放在每張圖片的 `caption`，不再使用單一大文字框（content_text 移除）。
+- 表單使用獨立的「捐贈內容」欄位，標題自動產生「感謝 {捐贈者名稱／善心人士} 捐贈 {捐贈內容} 一批」，並可手動修改。
+- 每張圖片的 `caption` 仍可補充該張照片的物資說明。
 - 後台可新增、編輯、刪除資料。
 - 後台可多圖上傳，每張圖可填說明（caption），圖片上傳到 Cloudinary。
 - 刪除資料時同步刪除 Cloudinary 圖片。
@@ -68,6 +68,7 @@ Cloudinary 資料夾路徑加上 `report_id` 一層，避免同月同區的圖�
 | region | text | `taipei` / `new_taipei` / `taoyuan` / `tainan` |
 | donor_type | text | `individual` / `organization` |
 | donor_name | text | 捐贈者名稱（匿名時可空） |
+| donation_content | text | 捐贈內容，1-500 字 |
 | is_anonymous | boolean | 前台是否遮成「善心人士」 |
 | sort_order | smallint | 同月同區捐贈者顯示排序 |
 | is_published | boolean | 是否前台公開 |
@@ -108,6 +109,7 @@ create table monthly_donation_reports (
   region text not null check (region in ('taipei', 'new_taipei', 'taoyuan', 'tainan')),
   donor_type text not null check (donor_type in ('individual', 'organization')),
   donor_name text,
+  donation_content text not null check (char_length(btrim(donation_content)) between 1 and 500),
   is_anonymous boolean not null default false,
   sort_order smallint not null default 1,
   is_published boolean not null default true,
@@ -195,9 +197,9 @@ with check (true);
 
 ## 程式碼需配合修改的重點（v1 → v2）
 
-1. **型別 / 欄位**：移除 `content_text`，新增 `donor_name`、`is_anonymous`、`sort_order`（reports）與 `caption`（images）。
-2. **後台表單**：移除「捐贈明細」大文字框；新增捐贈者名稱輸入、匿名 switch、每張圖的說明輸入。
+1. **型別 / 欄位**：新增 `donor_name`、`donation_content`、`is_anonymous`、`sort_order`（reports）與 `caption`（images）。
+2. **後台表單**：新增捐贈者名稱、捐贈內容、匿名 switch，以及每張圖的說明輸入。
 3. **slug**：`monthlyDonationSlug` / `parseMonthlyDonationSlug` 改為直接用 `report_id`，前台詳細頁路由改 `[id]`。
 4. **前台列表 `buildArchives`**：改為列出每位捐贈者（不再把同月同區合併成一張卡）。
 5. **Cloudinary folder**：路徑加 `report_id` 一層。
-6. **標題自動產生**：`感謝 {is_anonymous ? "善心人士" : donor_name} 捐贈物資`。
+6. **標題自動產生**：`感謝 {is_anonymous ? "善心人士" : donor_name} 捐贈 {donation_content} 一批`。

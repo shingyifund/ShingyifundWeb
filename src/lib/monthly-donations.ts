@@ -62,13 +62,16 @@ export function getMonthlyDonationDonorDisplayName({
   return donorName;
 }
 
-/** 標題自動產生：感謝 {善心人士／捐贈者名稱} 捐贈物資 */
+/** 標題自動產生：感謝 {善心人士／捐贈者名稱} 捐贈 {捐贈內容} 一批 */
 export function buildMonthlyDonationTitle({
   donorName,
   isAnonymous,
+  donationContent,
 }: {
   donorName: string | null;
   isAnonymous: boolean;
+  donationContent: string | null;
 }) {
-  return `感謝 ${getMonthlyDonationDonorDisplayName({ donorName, isAnonymous })} 捐贈物資`;
+  const content = donationContent?.trim() || "物資";
+  return `感謝 ${getMonthlyDonationDonorDisplayName({ donorName, isAnonymous })} 捐贈 ${content} 一批`;
 }

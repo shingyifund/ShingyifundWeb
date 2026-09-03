@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/Button";
 import { getMonthlyDonationReportById } from "@/lib/data/queries";
 import {
   formatMonthlyDonationPeriod,
-  getMonthlyDonationDonorDisplayName,
   getMonthlyDonationDonorTypeLabel,
   getMonthlyDonationRegionLabel,
 } from "@/lib/monthly-donations";
@@ -45,11 +44,12 @@ export default async function MonthlyDonationDetailPage({
   const period = formatMonthlyDonationPeriod(report.westernYear, report.month, locale);
   const regionLabel = getMonthlyDonationRegionLabel(report.region, locale);
   const donorTypeLabel = getMonthlyDonationDonorTypeLabel(report.donorType, locale);
-  const donorName = getMonthlyDonationDonorDisplayName({
-    donorName: report.donorName,
-    isAnonymous: report.isAnonymous,
-    locale,
-  });
+  const donationTypeLabel =
+    locale === "en"
+      ? report.donorType === "organization"
+        ? "Organization Donation"
+        : "Individual Donation"
+      : `${donorTypeLabel}捐贈`;
   const imageGridClass =
     report.images.length === 1
       ? "mt-8 max-w-4xl"
@@ -69,12 +69,12 @@ export default async function MonthlyDonationDetailPage({
         image="/images/about-hero-bg.jpg"
         imagePosition="right"
         eyebrow="Monthly Donations"
-        title={report.title}
+        title={locale === "en" ? "Monthly In-kind Donations" : "每月捐物清單"}
         align="left"
         overlay="gradient"
       >
         <p className="mt-6 max-w-xl text-base leading-relaxed text-navy-100/85 sm:text-lg">
-          {period} · {regionLabel} · {donorTypeLabel}
+          {period} · {regionLabel} · {donationTypeLabel}
         </p>
       </PageHero>
 
@@ -92,9 +92,9 @@ export default async function MonthlyDonationDetailPage({
           </div>
 
           <section className="rounded-2xl border border-navy-100 bg-white p-6 shadow-card sm:p-8">
-            <p className="text-sm font-semibold text-amber-700">{donorTypeLabel}</p>
+            <p className="text-sm font-semibold text-amber-700">{donationTypeLabel}</p>
             <h1 className="mt-1 font-serif text-2xl font-black text-navy-900 sm:text-3xl">
-              {donorName}
+              {report.title}
             </h1>
 
             {report.images.length > 0 ? (

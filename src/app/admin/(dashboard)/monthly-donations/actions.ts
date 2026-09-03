@@ -15,7 +15,7 @@ import type {
 import { revalidatePath } from "next/cache";
 
 const REPORT_COLS =
-  "id, title, western_year, month, region, donor_type, donor_name, is_anonymous, sort_order, is_published, created_at, updated_at";
+  "id, title, western_year, month, region, donor_type, donor_name, donation_content, is_anonymous, sort_order, is_published, created_at, updated_at";
 const IMAGE_COLS =
   "id, report_id, public_id, image_url, caption, file_name, file_size, width, height, sort_order, created_at";
 const MAX_IMAGE_BYTES = 500 * 1024;
@@ -44,6 +44,7 @@ export type MonthlyDonationReportRecord = {
   region: MonthlyDonationRegion;
   donor_type: MonthlyDonationDonorType;
   donor_name: string | null;
+  donation_content: string;
   is_anonymous: boolean;
   sort_order: number;
   is_published: boolean;
@@ -112,6 +113,7 @@ function reportPayload(formData: FormData) {
     | null;
   const isAnonymous = formData.get("is_anonymous") === "true";
   const donorName = textValue(formData, "donor_name");
+  const donationContent = textValue(formData, "donation_content");
 
   if (!period) return { error: "請選擇有效年月" as const };
   if (!region || !MONTHLY_DONATION_REGIONS.some((item) => item.value === region)) {
@@ -126,10 +128,16 @@ function reportPayload(formData: FormData) {
   if (!isAnonymous && !donorName) {
     return { error: "請輸入捐贈者名稱，或開啟匿名" as const };
   }
+  if (!donationContent) {
+    return { error: "請輸入捐贈內容" as const };
+  }
+  if (donationContent.length > 500) {
+    return { error: "捐贈內容不可超過 500 個字" as const };
+  }
 
   const title =
     textValue(formData, "title") ??
-    buildMonthlyDonationTitle({ donorName, isAnonymous });
+    buildMonthlyDonationTitle({ donorName, isAnonymous, donationContent });
 
   return {
     data: {
@@ -139,6 +147,7 @@ function reportPayload(formData: FormData) {
       region,
       donor_type: donorType,
       donor_name: donorName,
+      donation_content: donationContent,
       is_anonymous: isAnonymous,
       is_published: formData.get("is_published") === "true",
       updated_at: new Date().toISOString(),

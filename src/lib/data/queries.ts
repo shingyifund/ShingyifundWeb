@@ -230,7 +230,7 @@ export async function getFinancialReports(): Promise<FinancialReport[]> {
 }
 
 const MONTHLY_DONATION_REPORT_COLS =
-  "id, title, western_year, month, region, donor_type, donor_name, is_anonymous, sort_order, is_published, created_at, updated_at";
+  "id, title, western_year, month, region, donor_type, donor_name, donation_content, is_anonymous, sort_order, is_published, created_at, updated_at";
 
 const MONTHLY_DONATION_IMAGE_COLS =
   "id, report_id, public_id, image_url, caption, file_name, file_size, width, height, sort_order, created_at";
@@ -243,6 +243,7 @@ type MonthlyDonationReportRow = {
   region: MonthlyDonationReport["region"];
   donor_type: MonthlyDonationReport["donorType"];
   donor_name: string | null;
+  donation_content: string;
   is_anonymous: boolean;
   sort_order: number;
   is_published: boolean;
@@ -292,6 +293,7 @@ function mapMonthlyDonationReport(
     region: row.region,
     donorType: row.donor_type,
     donorName: row.donor_name,
+    donationContent: row.donation_content,
     isAnonymous: row.is_anonymous,
     sortOrder: row.sort_order,
     isPublished: row.is_published,
@@ -462,6 +464,7 @@ export async function getMonthlyDonationReportsPaged({
         region: base.region,
         donorType: base.donorType,
         donorName: base.donorName,
+        donationContent: base.donationContent,
         isAnonymous: base.isAnonymous,
         sortOrder: base.sortOrder,
         isPublished: base.isPublished,
