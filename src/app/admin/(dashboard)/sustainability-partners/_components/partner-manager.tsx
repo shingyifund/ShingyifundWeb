@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { ArrowDown, ArrowUp, ExternalLink, ImagePlus, Loader2, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, ExternalLink, ImagePlus, Loader2, Pencil, Save, Trash2 } from "lucide-react";
 import { UploadTrigger } from "@/components/admin/upload-trigger";
 import { Button } from "@/components/ui/Button";
 import {
@@ -25,6 +25,7 @@ import {
   deleteSustainabilityPartner,
   moveSustainabilityPartner,
   toggleSustainabilityPartner,
+  updateSustainabilityPartner,
   type SustainabilityPartnerRecord,
 } from "../actions";
 
@@ -164,6 +165,7 @@ function PartnerRow({ partner, isFirst, isLast }: { partner: SustainabilityPartn
 
       <div className="flex items-center justify-end gap-2">
         {isPending && <Loader2 className="size-4 animate-spin text-muted-foreground" />}
+        <EditPartnerDialog partner={partner} />
         <div className="flex items-center gap-2">
           <Switch id={`partner-${partner.id}`} checked={active} onCheckedChange={toggle} />
           <Label htmlFor={`partner-${partner.id}`} className="cursor-pointer text-xs text-muted-foreground">{active ? "顯示" : "停用"}</Label>
@@ -174,6 +176,129 @@ function PartnerRow({ partner, isFirst, isLast }: { partner: SustainabilityPartn
         <DeletePartnerDialog partner={partner} />
       </div>
     </div>
+  );
+}
+
+function EditPartnerDialog({ partner }: { partner: SustainabilityPartnerRecord }) {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
+  function handleOpenChange(nextOpen: boolean) {
+    setOpen(nextOpen);
+    if (!nextOpen) {
+      setLogoFile(null);
+      setMessage(null);
+    }
+  }
+
+  function handleUpdate(formData: FormData) {
+    setMessage(null);
+    if (logoFile) formData.set("logo_file", logoFile);
+
+    startTransition(async () => {
+      const result = await updateSustainabilityPartner(partner.id, formData);
+      if (!result.ok) {
+        setMessage(result.message ?? "更新失敗");
+        return;
+      }
+
+      setOpen(false);
+      setLogoFile(null);
+      router.refresh();
+    });
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogTrigger asChild>
+        <Button variant="ghost" size="icon-sm" aria-label={`編輯 ${partner.name}`}>
+          <Pencil />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>編輯合作夥伴</DialogTitle>
+          <DialogDescription>修改名稱、官方網站或更換 Logo。未選擇新圖片時會保留目前 Logo。</DialogDescription>
+        </DialogHeader>
+
+        <form action={handleUpdate} className="space-y-5">
+          <div className="grid gap-5 sm:grid-cols-[10rem_1fr]">
+            <div className="space-y-2">
+              <Label>目前 Logo</Label>
+              <div className="flex h-28 items-center justify-center rounded-lg border bg-white p-4">
+                <Image
+                  src={partner.logo_url}
+                  alt={partner.name}
+                  width={144}
+                  height={96}
+                  className="max-h-full max-w-full object-contain"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>更換 Logo</Label>
+              <UploadTrigger
+                accept="image/png,image/jpeg,image/webp"
+                label={logoFile?.name ?? "選擇新 Logo（選填）"}
+                hint="未選擇會保留原圖；JPG、PNG、WebP，最多 5MB"
+                icon={<ImagePlus className="size-5" />}
+                disabled={isPending}
+                onFilesSelected={(files) => setLogoFile(files[0] ?? null)}
+              />
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor={`partner-edit-name-${partner.id}`}>中文名稱</Label>
+              <Input
+                id={`partner-edit-name-${partner.id}`}
+                name="name"
+                defaultValue={partner.name}
+                required
+                disabled={isPending}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor={`partner-edit-name-en-${partner.id}`}>英文名稱</Label>
+              <Input
+                id={`partner-edit-name-en-${partner.id}`}
+                name="name_en"
+                defaultValue={partner.name_en ?? ""}
+                placeholder="選填"
+                disabled={isPending}
+              />
+            </div>
+            <div className="space-y-2 sm:col-span-2">
+              <Label htmlFor={`partner-edit-website-${partner.id}`}>官方網站</Label>
+              <Input
+                id={`partner-edit-website-${partner.id}`}
+                name="website_url"
+                type="url"
+                defaultValue={partner.website_url ?? ""}
+                placeholder="https://（選填，點 Logo 時開啟）"
+                disabled={isPending}
+              />
+            </div>
+          </div>
+
+          <FormAlert message={message} />
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="outline" disabled={isPending}>取消</Button>
+            </DialogClose>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
+              {isPending ? "儲存中..." : "儲存變更"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
 
