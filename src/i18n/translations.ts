@@ -16,6 +16,7 @@ const en = {
   "企業合作": "Corporate Partnership",
   "永續報告": "Sustainability Report",
   "興毅永續行動": "Shing Yi Sustainability Action",
+  "桃園市優食計畫": "Taoyuan Food Plan",
   "網站快捷選單": "Website quick actions",
   "線上捐款": "Donate Online",
   "徵信明細": "Transparency",

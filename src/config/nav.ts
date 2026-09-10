@@ -34,6 +34,7 @@ export const mainNav: NavItem[] = [
     children: [
       { label: "永續報告", href: "/sustainability" },
       { label: "興毅永續行動", href: "/sustainability/action" },
+      { label: "桃園市優食計畫", href: "/sustainability/food-plan" },
     ],
   },
   {
