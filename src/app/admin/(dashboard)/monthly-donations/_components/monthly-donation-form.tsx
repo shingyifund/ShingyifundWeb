@@ -2,10 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useIsMobile } from "@/hooks/use-is-mobile";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Camera, Loader2, Save, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { CloudinaryImage } from "@/components/ui/CloudinaryImage";
 import { FormAlert } from "@/components/ui/form-alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -406,7 +406,7 @@ export function MonthlyDonationForm({
                   className="group overflow-hidden rounded-lg border bg-white"
                 >
                   <div className="relative aspect-video bg-muted">
-                    <Image
+                    <CloudinaryImage
                       src={image.image_url}
                       alt={image.file_name ?? "捐贈物資照片"}
                       fill

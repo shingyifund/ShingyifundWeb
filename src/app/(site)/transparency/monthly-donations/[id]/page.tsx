@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
+import { CloudinaryImage } from "@/components/ui/CloudinaryImage";
 import { PageHero } from "@/components/ui/PageHero";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
@@ -111,7 +111,7 @@ export default async function MonthlyDonationDetailPage({
                       className="group block"
                     >
                       <div className="relative aspect-video bg-muted">
-                        <Image
+                        <CloudinaryImage
                           src={image.imageUrl}
                           alt={image.caption ?? image.fileName ?? (locale === "en" ? `Donation item ${index + 1}` : `物品照片 ${index + 1}`)}
                           fill
