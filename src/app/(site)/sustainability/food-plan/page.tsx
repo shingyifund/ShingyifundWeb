@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import {
   ArrowRight,
   Building2,
@@ -22,6 +23,7 @@ import { getRequestLocale } from "@/i18n/request";
 
 const APPLICATION_URL = "https://forms.gle/JajsgXJNHn77o2Pn6";
 const PDF_URL = "/taoyuan-food-plan-visit-guide.pdf";
+const FACEBOOK_URL = "https://www.facebook.com/TyChunghsinFoodbank/";
 
 const content = {
   tw: {
@@ -35,6 +37,8 @@ const content = {
     apply: "申請團體參訪",
     readPdf: "閱讀參訪規範 PDF",
     applyHint: "請於預計參訪日前 14 至 30 天提出申請",
+    basePhotoLabel: "桃園惜食基地",
+    launchPhotoLabel: "優食計畫攜手啟動",
     factsLabel: "參訪前，先確認這些資訊",
     factsTitle: "一眼掌握參訪條件",
     facts: [
@@ -52,6 +56,17 @@ const content = {
       { time: "20 分鐘", title: "惜食簡報", text: "認識計畫緣起、續食與格外品，以及基地串聯量販店、市場和弱勢關懷據點的方式。" },
       { time: "40 分鐘", title: "實地導覽", text: "走訪物資接收區、食安檢驗、分揀流程與低溫冷藏庫，理解基地的日常運作。" },
       { time: "20 分鐘", title: "反思與互動", text: "透過惜食遊戲與問答，把「吃多少、點多少」及剩食打包帶回生活。" },
+    ],
+    storiesLabel: "優食現場",
+    storiesTitle: "一份食物，串起一群人的日常",
+    storiesIntro: "從志工備餐、社區共餐到物資分享，惜食不是一句口號，而是一群人每天一起完成的事。",
+    facebook: "追蹤桃園忠信食物銀行 Facebook",
+    stories: [
+      { alt: "志工在桃園優食計畫現場為民眾盛裝餐食", caption: "把合宜的食物，送到需要的人手中" },
+      { alt: "桃園優食計畫社區夥伴與準備完成的餐點合影", caption: "在地夥伴，是惜食網絡重要的一環" },
+      { alt: "社區共餐現場由志工為長者分送餐點", caption: "一餐飯，也是一份陪伴" },
+      { alt: "社區民眾依序領取志工準備的飯菜", caption: "共享，讓食物的價值繼續延伸" },
+      { alt: "志工在廚房分裝剛完成的餐點", caption: "從細心備餐開始，守住每一份安心" },
     ],
     processLabel: "申請流程",
     processTitle: "送出表單後，接下來會發生什麼？",
@@ -85,6 +100,8 @@ const content = {
     apply: "Apply for a group visit",
     readPdf: "Read the visit guide PDF",
     applyHint: "Please apply 14–30 days before your preferred visit date",
+    basePhotoLabel: "Taoyuan Food Rescue Base",
+    launchPhotoLabel: "Launching the Food Plan together",
     factsLabel: "Before your visit",
     factsTitle: "Key visit requirements",
     facts: [
@@ -102,6 +119,17 @@ const content = {
       { time: "20 min", title: "Food rescue briefing", text: "Learn how the plan connects retailers, markets, and community support locations." },
       { time: "40 min", title: "Facility tour", text: "Visit receiving, food safety inspection, sorting, and cold storage areas." },
       { time: "20 min", title: "Reflection and activity", text: "Use games and Q&A to turn food-saving ideas into daily habits." },
+    ],
+    storiesLabel: "From the field",
+    storiesTitle: "One meal connects a whole community",
+    storiesIntro: "From volunteer preparation and community meals to food sharing, rescuing food is daily work made possible by many hands.",
+    facebook: "Follow Taoyuan Zhongxin Food Bank on Facebook",
+    stories: [
+      { alt: "Volunteers serving food at a Taoyuan Food Plan community event", caption: "Bringing good food to people who need it" },
+      { alt: "Community partners posing with prepared food", caption: "Local partners make the food rescue network possible" },
+      { alt: "Volunteers serving a community meal to older residents", caption: "A shared meal is also a form of companionship" },
+      { alt: "Community members receiving meals prepared by volunteers", caption: "Sharing extends the value of every meal" },
+      { alt: "Volunteers packing freshly prepared meals", caption: "Careful preparation keeps every serving safe" },
     ],
     processLabel: "Application process",
     processTitle: "What happens after you submit the form?",
@@ -128,6 +156,21 @@ const content = {
 
 const factIcons = [Building2, Users, CalendarCheck, Clock3, Sparkles, CheckCircle2];
 const safetyIcons = [Footprints, Snowflake, Users, Camera];
+const storyImages = [
+  "/images/taoyuan-food-plan/meal-service.jpg",
+  "/images/taoyuan-food-plan/community-team.jpg",
+  "/images/taoyuan-food-plan/community-meal.jpg",
+  "/images/taoyuan-food-plan/meal-line.jpg",
+  "/images/taoyuan-food-plan/meal-prep.jpg",
+] as const;
+
+const storyLayouts = [
+  "col-span-2 row-span-2 md:col-span-7 md:row-span-2",
+  "md:col-span-5",
+  "md:col-span-5",
+  "md:col-span-5",
+  "md:col-span-7",
+] as const;
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
@@ -170,26 +213,36 @@ export default async function FoodPlanPage() {
           </Reveal>
 
           <Reveal delay={0.12}>
-            <div className="relative mx-auto aspect-square w-full max-w-[430px]">
-              <div className="absolute inset-[8%] rounded-full border border-white/15" />
-              <div className="absolute inset-[22%] rounded-full border border-amber-300/45" />
-              <div className="absolute inset-[37%] flex items-center justify-center rounded-full bg-amber-400 text-navy-950 shadow-[0_0_80px_rgb(245_166_35/0.28)]">
-                <Wheat className="size-16" strokeWidth={1.25} />
-              </div>
-              {["接收", "檢驗", "分揀", "配送"].map((label, index) => (
-                <div
-                  key={label}
-                  className="absolute flex size-20 items-center justify-center rounded-full border border-white/20 bg-navy-800/90 font-serif text-base font-bold text-white shadow-lg backdrop-blur-sm"
-                  style={[
-                    { left: "4%", top: "40%" },
-                    { left: "40%", top: "3%" },
-                    { right: "3%", top: "40%" },
-                    { bottom: "3%", left: "40%" },
-                  ][index]}
-                >
-                  {locale === "tw" ? label : ["Receive", "Inspect", "Sort", "Deliver"][index]}
-                </div>
-              ))}
+            <div className="relative mx-auto w-full max-w-[500px] pb-12 sm:pl-10">
+              <figure className="relative aspect-[4/3] overflow-hidden rounded-[2rem] border border-white/15 bg-navy-800 shadow-[0_30px_80px_-28px_rgb(0_0_0/0.75)]">
+                <Image
+                  src="/images/taoyuan-food-plan/base.webp"
+                  alt={c.basePhotoLabel}
+                  fill
+                  priority
+                  sizes="(min-width: 1024px) 42vw, 90vw"
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-linear-to-t from-navy-950/55 via-transparent to-transparent" />
+                <figcaption className="absolute bottom-5 left-5 flex items-center gap-2 rounded-full border border-white/20 bg-navy-950/65 px-4 py-2 text-sm font-semibold backdrop-blur-md">
+                  <Wheat className="size-4 text-amber-300" strokeWidth={1.5} />
+                  {c.basePhotoLabel}
+                </figcaption>
+              </figure>
+              <figure className="absolute bottom-0 left-0 aspect-[4/3] w-[46%] overflow-hidden rounded-2xl border-4 border-navy-900 bg-navy-800 shadow-2xl">
+                <Image
+                  src="/images/taoyuan-food-plan/launch.jpg"
+                  alt={c.launchPhotoLabel}
+                  fill
+                  sizes="(min-width: 1024px) 19vw, 42vw"
+                  className="object-cover"
+                />
+                <figcaption className="absolute inset-x-0 bottom-0 bg-linear-to-t from-navy-950/90 to-transparent px-3 pb-3 pt-7 text-xs font-semibold text-white">
+                  {c.launchPhotoLabel}
+                </figcaption>
+              </figure>
+              <div className="pointer-events-none absolute -right-4 top-10 size-24 rounded-full border border-amber-300/30" />
+              <div className="pointer-events-none absolute -right-8 top-24 size-3 rounded-full bg-amber-300" />
             </div>
           </Reveal>
         </Container>
@@ -249,6 +302,46 @@ export default async function FoodPlanPage() {
                 </Reveal>
               ))}
             </div>
+          </div>
+        </Container>
+      </section>
+
+      <section className="bg-mist/60 py-16 sm:py-24">
+        <Container>
+          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <Reveal>
+              <header className="max-w-3xl">
+                <p className="text-sm font-bold tracking-[0.18em] text-amber-700">{c.storiesLabel}</p>
+                <h2 className="mt-3 max-w-2xl font-serif text-3xl font-black leading-tight text-navy-900 sm:text-4xl">{c.storiesTitle}</h2>
+                <p className="mt-5 max-w-2xl leading-8 text-ink-soft">{c.storiesIntro}</p>
+              </header>
+            </Reveal>
+            <Reveal delay={0.08}>
+              <Button href={FACEBOOK_URL} target="_blank" rel="noopener noreferrer" variant="white" size="md">
+                {c.facebook}
+                <ExternalLink data-icon="inline-end" />
+              </Button>
+            </Reveal>
+          </div>
+
+          <div className="mt-10 grid auto-rows-[10rem] grid-cols-2 gap-3 md:auto-rows-[13rem] md:grid-cols-12">
+            {c.stories.map((story, index) => (
+              <Reveal key={story.alt} delay={index * 0.05} className={storyLayouts[index]}>
+                <figure className="group relative h-full min-h-0 overflow-hidden rounded-2xl bg-navy-100 shadow-card">
+                  <Image
+                    src={storyImages[index]}
+                    alt={story.alt}
+                    fill
+                    sizes={index === 0 ? "(min-width: 768px) 58vw, 100vw" : "(min-width: 768px) 42vw, 50vw"}
+                    className="object-cover transition duration-700 ease-out group-hover:scale-[1.035]"
+                  />
+                  <div className="absolute inset-0 bg-linear-to-t from-navy-950/80 via-navy-950/5 to-transparent" />
+                  <figcaption className="absolute inset-x-0 bottom-0 max-w-md p-4 text-sm font-semibold leading-6 text-white sm:p-5 sm:text-base">
+                    {story.caption}
+                  </figcaption>
+                </figure>
+              </Reveal>
+            ))}
           </div>
         </Container>
       </section>
@@ -324,6 +417,15 @@ export default async function FoodPlanPage() {
                   <ExternalLink data-icon="inline-end" />
                 </Button>
               </div>
+              <a
+                href={FACEBOOK_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-navy-600 underline decoration-amber-400 decoration-2 underline-offset-4 transition hover:text-amber-700 focus-visible:rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-500"
+              >
+                {c.facebook}
+                <ExternalLink className="size-4" />
+              </a>
             </div>
           </Reveal>
         </Container>
