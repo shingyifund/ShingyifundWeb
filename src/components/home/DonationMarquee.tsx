@@ -18,6 +18,8 @@ export async function DonationMarquee() {
   // 資料少時加長軌道，避免內容寬度接近視窗時看起來像沒有移動。
   const repeatCount = donors.length < 8 ? 4 : 2;
   const loop = Array.from({ length: repeatCount }, () => donors).flat();
+  // marquee 會移動半條軌道；依實際經過的項目數分配時間，避免資料越多跑得越快。
+  const animationDurationSeconds = Math.max(32, Math.round(loop.length / 2) * 7);
 
   return (
     <section className="bg-cream pt-2">
@@ -44,7 +46,7 @@ export async function DonationMarquee() {
             className="donation-marquee-track flex w-max gap-3 will-change-transform"
             style={{
               animationName: "marquee",
-              animationDuration: "60s",
+              animationDuration: `${animationDurationSeconds}s`,
               animationTimingFunction: "linear",
               animationIterationCount: "infinite",
             }}
