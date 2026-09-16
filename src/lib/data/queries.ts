@@ -328,23 +328,38 @@ async function getMonthlyDonationImagesByReportIds(reportIds: string[]) {
 }
 
 /** 首頁跑馬燈用：最新捐贈者資訊，不帶圖片以省查詢 */
-export async function getRecentMonthlyDonors(
-  limit = 20,
-): Promise<MonthlyDonationReport[]> {
+export async function getRecentMonthlyDonors(): Promise<MonthlyDonationReport[]> {
   try {
     const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("monthly_donation_reports")
-      .select(MONTHLY_DONATION_REPORT_COLS)
-      .eq("is_published", true)
-      .order("western_year", { ascending: false })
-      .order("month", { ascending: false })
-      .order("sort_order", { ascending: true })
-      .limit(limit);
-
-    if (error || !data) throw error;
-
-    return (data as MonthlyDonationReportRow[]).map((row) =>
+    const today = new Date();
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: "Asia/Taipei", year: "numeric", month: "numeric",
+    }).formatToParts(today);
+    const year = Number(parts.find((part) => part.type === "year")?.value);
+    const month = Number(parts.find((part) => part.type === "month")?.value);
+    const periods = Array.from({ length: 3 }, (_, offset) => {
+      const date = new Date(Date.UTC(year, month - 1 - offset, 1));
+      return `and(western_year.eq.${date.getUTCFullYear()},month.eq.${date.getUTCMonth() + 1})`;
+    }).join(",");
+    const rows: MonthlyDonationReportRow[] = [];
+    // Fetch every candidate, including lists larger than the API's page limit.
+    const pageSize = 500;
+    for (let from = 0; ; from += pageSize) {
+      const { data, error } = await supabase
+        .from("monthly_donation_reports")
+        .select(MONTHLY_DONATION_REPORT_COLS)
+        .eq("is_published", true)
+        .or(periods)
+        .order("western_year", { ascending: false })
+        .order("month", { ascending: false })
+        .order("sort_order", { ascending: true })
+        .order("id", { ascending: true })
+        .range(from, from + pageSize - 1);
+      if (error || !data) throw error;
+      rows.push(...data as MonthlyDonationReportRow[]);
+      if (data.length < pageSize) break;
+    }
+    return rows.map((row) =>
       mapMonthlyDonationReport(row, []),
     );
   } catch {

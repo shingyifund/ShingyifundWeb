@@ -199,6 +199,7 @@
   }
 
   .donation-marquee-track:hover,
+  .donation-marquee-track:focus-within,
   .group:hover .donation-marquee-track {
     animation-play-state: paused !important;
   }
