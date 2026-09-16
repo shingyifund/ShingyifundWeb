@@ -87,7 +87,13 @@ export function DonationMarqueeTrack({ donors, locale }: { donors: MarqueeDonor[
 
   return (
     <ul ref={track} className="donation-marquee-track flex w-max gap-3 will-change-transform"
-      style={{ animationDuration: `${duration}ms`, visibility: progress ? "visible" : "hidden" }}>
+      style={{
+        animationName: "marquee",
+        animationDuration: `${duration}ms`,
+        animationTimingFunction: "linear",
+        animationIterationCount: "infinite",
+        visibility: progress ? "visible" : "hidden",
+      }}>
       {loop.map((donor, i) => <DonorChip key={`${donor.id}-${i}`} donor={donor} locale={locale} />)}
     </ul>
   );
