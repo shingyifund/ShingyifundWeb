@@ -16,12 +16,13 @@ import { MonthPicker } from "@/components/ui/month-picker";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { LinkPendingIcon } from "@/components/ui/link-pending";
 import {
+  MONTHLY_DONATION_REGIONS,
   formatMonthlyDonationPeriod,
   getMonthlyDonationDonorDisplayName,
   getMonthlyDonationDonorTypeLabel,
   getMonthlyDonationRegionLabel,
 } from "@/lib/monthly-donations";
-import type { MonthlyDonationDonorType } from "@/lib/types";
+import type { MonthlyDonationDonorType, MonthlyDonationRegion } from "@/lib/types";
 import type { MonthlyDonationListItem } from "@/lib/data/queries";
 import { useLocale } from "@/i18n/provider";
 import { localizeHref } from "@/i18n/config";
@@ -35,6 +36,7 @@ type Props = {
   currentYear?: number;
   currentMonth?: number;
   currentDonorType?: MonthlyDonationDonorType;
+  currentRegion?: MonthlyDonationRegion;
 };
 
 export function MonthlyDonationLedger({
@@ -46,6 +48,7 @@ export function MonthlyDonationLedger({
   currentYear,
   currentMonth,
   currentDonorType,
+  currentRegion,
 }: Props) {
   const router = useRouter();
   const locale = useLocale();
@@ -58,12 +61,14 @@ export function MonthlyDonationLedger({
     year?: string;
     month?: string;
     donorType?: string;
+    region?: string;
     page?: string;
   }) {
     const base = {
       year: currentYear ? String(currentYear) : undefined,
       month: currentMonth ? String(currentMonth) : undefined,
       donorType: currentDonorType,
+      region: currentRegion,
       page: page > 1 ? String(page) : undefined,
     };
     const merged = { ...base, ...overrides };
@@ -110,12 +115,21 @@ export function MonthlyDonationLedger({
     });
   }
 
+  function handleRegionChange(value: string) {
+    setPendingPageDirection(null);
+    startTransition(() => {
+      router.push(
+        buildUrl({ region: value === "all" || !value ? undefined : value, page: undefined }),
+      );
+    });
+  }
+
   const periodValue =
     currentYear && currentMonth
       ? `${currentYear}-${String(currentMonth).padStart(2, "0")}`
       : "";
 
-  const hasFilter = periodValue || currentDonorType;
+  const hasFilter = periodValue || currentDonorType || currentRegion;
   const rangeStart = total === 0 ? 0 : (page - 1) * pageSize + 1;
   const rangeEnd = Math.min(page * pageSize, total);
 
@@ -171,6 +185,26 @@ export function MonthlyDonationLedger({
               <ToggleGroupItem value="all" className="text-sm">{locale === "en" ? "All" : "全部"}</ToggleGroupItem>
               <ToggleGroupItem value="individual" className="text-sm">{locale === "en" ? "Individual" : "個人"}</ToggleGroupItem>
               <ToggleGroupItem value="organization" className="text-sm">{locale === "en" ? "Organization" : "團體"}</ToggleGroupItem>
+            </ToggleGroup>
+
+            <ToggleGroup
+              type="single"
+              value={currentRegion ?? "all"}
+              onValueChange={handleRegionChange}
+              spacing={0}
+              variant="outline"
+              disabled={isPending}
+              aria-label={locale === "en" ? "Filter by region" : "依區域篩選"}
+              className="max-w-full flex-wrap"
+            >
+              <ToggleGroupItem value="all">
+                {locale === "en" ? "All regions" : "全部區域"}
+              </ToggleGroupItem>
+              {MONTHLY_DONATION_REGIONS.map(({ value }) => (
+                <ToggleGroupItem key={value} value={value}>
+                  {getMonthlyDonationRegionLabel(value, locale)}
+                </ToggleGroupItem>
+              ))}
             </ToggleGroup>
 
             {hasFilter && (

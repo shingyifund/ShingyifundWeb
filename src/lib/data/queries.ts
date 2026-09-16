@@ -12,6 +12,7 @@ import type {
   ImpactStat,
   MonthlyDonationDonorType,
   MonthlyDonationImage,
+  MonthlyDonationRegion,
   MonthlyDonationReport,
   SustainabilityPartner,
   YouTubeVideo,
@@ -416,12 +417,14 @@ export async function getMonthlyDonationReportsPaged({
   year,
   month,
   donorType,
+  region,
   page,
   pageSize,
 }: {
   year?: number;
   month?: number;
   donorType?: MonthlyDonationDonorType;
+  region?: MonthlyDonationRegion;
   page: number;
   pageSize: number;
 }): Promise<{ rows: MonthlyDonationListItem[]; total: number }> {
@@ -447,6 +450,7 @@ export async function getMonthlyDonationReportsPaged({
     if (year !== undefined) query = query.eq("western_year", year);
     if (month !== undefined) query = query.eq("month", month);
     if (donorType !== undefined) query = query.eq("donor_type", donorType);
+    if (region !== undefined) query = query.eq("region", region);
 
     const { data, count, error } = await query;
     if (error || !data) throw error;

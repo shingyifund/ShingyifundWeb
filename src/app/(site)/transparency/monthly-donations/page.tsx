@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { getMonthlyDonationReportsPaged } from "@/lib/data/queries";
 import type { MonthlyDonationDonorType } from "@/lib/types";
+import { MONTHLY_DONATION_REGIONS } from "@/lib/monthly-donations";
 import { MonthlyDonationLedger } from "./_components/monthly-donation-ledger";
 import { getRequestLocale } from "@/i18n/request";
 
@@ -27,12 +28,14 @@ export default async function MonthlyDonationsPage({
   const year = sp.year ? Number(sp.year) : undefined;
   const month = sp.month ? Number(sp.month) : undefined;
   const donorType = sp.donorType as MonthlyDonationDonorType | undefined;
+  const region = MONTHLY_DONATION_REGIONS.find((item) => item.value === sp.region)?.value;
   const page = Math.max(1, Number(sp.page) || 1);
 
   const { rows, total } = await getMonthlyDonationReportsPaged({
     year,
     month,
     donorType,
+    region,
     page,
     pageSize: PAGE_SIZE,
   });
@@ -81,6 +84,7 @@ export default async function MonthlyDonationsPage({
               currentYear={year}
               currentMonth={month}
               currentDonorType={donorType}
+              currentRegion={region}
             />
           </Suspense>
         </Container>
