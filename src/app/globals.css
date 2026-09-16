@@ -204,11 +204,6 @@
     animation-play-state: paused !important;
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .donation-marquee-track {
-      animation: none;
-    }
-  }
 }
 
 @theme inline {

@@ -1,7 +1,7 @@
 import { Container } from "@/components/ui/Container";
 import { cn } from "@/lib/utils";
 
-const pulse = "animate-pulse motion-reduce:animate-none";
+const pulse = "animate-pulse";
 
 function Skeleton({ className }: { className?: string }) {
   return <div aria-hidden="true" className={cn("rounded-xl bg-navy-100/75", pulse, className)} />;
