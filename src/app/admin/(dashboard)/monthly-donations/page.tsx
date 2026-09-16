@@ -2,6 +2,7 @@ import { Plus } from "lucide-react";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import type { MonthlyDonationDonorType } from "@/lib/types";
+import { MONTHLY_DONATION_REGIONS } from "@/lib/monthly-donations";
 import { MonthlyDonationsListView } from "./_components/monthly-donations-list-view";
 import { listMonthlyDonationReportsPaged } from "./actions";
 
@@ -18,6 +19,7 @@ export default async function MonthlyDonationsAdminPage({
   const month = sp.month ? Number(sp.month) : undefined;
   const donorType = sp.donorType as MonthlyDonationDonorType | undefined;
   const donorName = sp.donorName?.trim() || undefined;
+  const region = MONTHLY_DONATION_REGIONS.find((item) => item.value === sp.region)?.value;
   const page = Math.max(1, Number(sp.page) || 1);
 
   const { rows, total } = await listMonthlyDonationReportsPaged({
@@ -25,6 +27,7 @@ export default async function MonthlyDonationsAdminPage({
     month,
     donorType,
     donorName,
+    region,
     page,
     pageSize: PAGE_SIZE,
   });
@@ -37,6 +40,7 @@ export default async function MonthlyDonationsAdminPage({
     if (month) params.set("month", String(month));
     if (donorType) params.set("donorType", donorType);
     if (donorName) params.set("donorName", donorName);
+    if (region) params.set("region", region);
     if (totalPages > 1) params.set("page", String(totalPages));
 
     const queryString = params.toString();
@@ -70,6 +74,7 @@ export default async function MonthlyDonationsAdminPage({
         currentMonth={month}
         currentDonorType={donorType}
         currentDonorName={donorName ?? ""}
+        currentRegion={region}
       />
     </div>
   );

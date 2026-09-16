@@ -253,6 +253,7 @@ export type MonthlyDonationListParams = {
   month?: number;
   donorType?: MonthlyDonationDonorType;
   donorName?: string;
+  region?: MonthlyDonationRegion;
   page: number;
   pageSize: number;
 };
@@ -267,7 +268,7 @@ export async function listMonthlyDonationReportsPaged(
 ): Promise<MonthlyDonationListResult> {
   await assertAdmin();
 
-  const { year, month, donorType, donorName, page, pageSize } = params;
+  const { year, month, donorType, donorName, region, page, pageSize } = params;
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
@@ -289,6 +290,7 @@ export async function listMonthlyDonationReportsPaged(
   if (month !== undefined) query = query.eq("month", month);
   if (donorType !== undefined) query = query.eq("donor_type", donorType);
   if (donorName) query = query.ilike("donor_name", `%${donorName}%`);
+  if (region !== undefined) query = query.eq("region", region);
 
   const { data: rawData, count, error } = await query;
 

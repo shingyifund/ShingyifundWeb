@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/Button";
 import { MonthPicker } from "@/components/ui/month-picker";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import type { MonthlyDonationDonorType } from "@/lib/types";
+import type { MonthlyDonationDonorType, MonthlyDonationRegion } from "@/lib/types";
+import { MONTHLY_DONATION_REGIONS } from "@/lib/monthly-donations";
 import type { MonthlyDonationListRecord } from "../actions";
 import { MonthlyDonationsTable } from "./monthly-donations-table";
 
@@ -21,6 +22,7 @@ type Props = {
   currentMonth?: number;
   currentDonorType?: MonthlyDonationDonorType;
   currentDonorName: string;
+  currentRegion?: MonthlyDonationRegion;
 };
 
 export function MonthlyDonationsListView({
@@ -33,6 +35,7 @@ export function MonthlyDonationsListView({
   currentMonth,
   currentDonorType,
   currentDonorName,
+  currentRegion,
 }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -50,6 +53,7 @@ export function MonthlyDonationsListView({
     currentDonorType ?? "all",
   );
   const [localDonorName, setLocalDonorName] = useState(currentDonorName);
+  const [localRegion, setLocalRegion] = useState<string>(currentRegion ?? "all");
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -65,6 +69,7 @@ export function MonthlyDonationsListView({
       params.set("donorType", localDonorType);
     }
     const name = localDonorName.trim();
+    if (localRegion !== "all") params.set("region", localRegion);
     if (name) params.set("donorName", name);
 
     startTransition(() => {
@@ -77,6 +82,7 @@ export function MonthlyDonationsListView({
     setLocalPeriod("");
     setLocalDonorType("all");
     setLocalDonorName("");
+    setLocalRegion("all");
     startTransition(() => {
       router.push("?");
     });
@@ -95,7 +101,7 @@ export function MonthlyDonationsListView({
   );
 
   const hasActiveFilters =
-    currentYear ?? currentMonth ?? currentDonorType ?? currentDonorName;
+    currentYear || currentMonth || currentDonorType || currentDonorName || currentRegion;
 
   const rangeStart = total === 0 ? 0 : (page - 1) * pageSize + 1;
   const rangeEnd = Math.min(page * pageSize, total);
@@ -154,6 +160,22 @@ export function MonthlyDonationsListView({
             <ToggleGroupItem value="all" className="text-sm">全部</ToggleGroupItem>
             <ToggleGroupItem value="individual" className="text-sm">個人</ToggleGroupItem>
             <ToggleGroupItem value="organization" className="text-sm">團體</ToggleGroupItem>
+          </ToggleGroup>
+
+          <ToggleGroup
+            type="single"
+            value={localRegion}
+            onValueChange={(value) => setLocalRegion(value || "all")}
+            spacing={0}
+            variant="outline"
+            disabled={isPending}
+            aria-label="依區域篩選"
+            className="max-w-full flex-wrap"
+          >
+            <ToggleGroupItem value="all">全部區域</ToggleGroupItem>
+            {MONTHLY_DONATION_REGIONS.map(({ value, label }) => (
+              <ToggleGroupItem key={value} value={value}>{label}</ToggleGroupItem>
+            ))}
           </ToggleGroup>
 
           <Button type="submit" size="sm" disabled={isPending}>
