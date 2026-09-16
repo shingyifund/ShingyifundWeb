@@ -150,7 +150,7 @@ function PartnerRow({ partner, isFirst, isLast }: { partner: SustainabilityPartn
     <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center">
       <div className="flex min-w-0 flex-1 items-center gap-4">
         <div className="flex h-20 w-32 shrink-0 items-center justify-center rounded-md border bg-white p-3">
-          <Image src={partner.logo_url} alt={partner.name} width={128} height={80} className="max-h-full max-w-full object-contain" />
+          <Image src={partner.logo_url} alt={partner.name} width={128} height={80} unoptimized className="max-h-full max-w-full object-contain" />
         </div>
         <div className="min-w-0">
           <p className="truncate font-medium text-foreground">{partner.name}</p>
@@ -234,6 +234,7 @@ function EditPartnerDialog({ partner }: { partner: SustainabilityPartnerRecord }
                   alt={partner.name}
                   width={144}
                   height={96}
+                  unoptimized
                   className="max-h-full max-w-full object-contain"
                 />
               </div>

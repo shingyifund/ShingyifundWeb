@@ -24,6 +24,7 @@ export default async function LoginPage({
             width={196}
             height={35}
             priority
+            unoptimized
             className="mb-5 h-9 w-auto"
           />
           <h1 className="mt-2 text-2xl font-semibold text-foreground">後台管理</h1>

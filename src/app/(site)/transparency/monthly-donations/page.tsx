@@ -47,6 +47,7 @@ export default async function MonthlyDonationsPage({
           alt=""
           fill
           priority
+          unoptimized
           sizes="100vw"
           className="pointer-events-none object-cover object-right opacity-70"
         />

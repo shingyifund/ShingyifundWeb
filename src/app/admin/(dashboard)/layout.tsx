@@ -23,6 +23,7 @@ export default async function AdminLayout({
               width={196}
               height={35}
               priority
+              unoptimized
               className="h-9 w-auto"
             />
             <span className="hidden h-6 w-px bg-border sm:block" />

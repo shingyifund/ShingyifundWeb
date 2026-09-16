@@ -29,6 +29,7 @@ export async function SiteFooter() {
             alt={siteConfig.shortName}
             width={245}
             height={43}
+            unoptimized
             className="h-11 w-auto rounded-md bg-white/95 p-1.5"
           />
           <p className="mt-5 max-w-md text-sm leading-relaxed text-navy-100/70">
@@ -118,6 +119,7 @@ export async function SiteFooter() {
                 alt={`SDG ${n}`}
                 width={160}
                 height={160}
+                unoptimized
                 className="w-full rounded-md shadow-sm transition-transform hover:scale-105"
               />
             ))}

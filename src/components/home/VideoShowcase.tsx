@@ -51,6 +51,7 @@ export async function VideoShowcase() {
                 src={thumbUrl(featured.id)}
                 alt={featured.title}
                 fill
+                unoptimized
                 sizes="(max-width: 1024px) 100vw, 55vw"
                 className="object-cover"
               />
@@ -118,6 +119,7 @@ function VideoRow({ video, locale }: { video: YouTubeVideo; locale: "tw" | "en" 
             src={thumbUrl(video.id)}
             alt=""
             fill
+            unoptimized
             sizes="96px"
             className="object-cover"
           />

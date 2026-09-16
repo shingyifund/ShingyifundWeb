@@ -34,6 +34,7 @@ export function ImagePlaceholder({
           alt={alt}
           fill
           priority={priority}
+          unoptimized
           sizes={sizes ?? "100vw"}
           className={cn("object-cover", imgClassName)}
         />

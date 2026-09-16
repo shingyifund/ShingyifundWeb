@@ -258,6 +258,7 @@ export default async function SustainabilityActionPage() {
                         src={partner.logoUrl}
                         alt={name}
                         fill
+                        unoptimized
                         sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px"
                         className="object-contain"
                       />

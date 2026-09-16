@@ -37,6 +37,7 @@ export function PageHero({
         alt={imageAlt}
         fill
         priority
+        unoptimized
         sizes="100vw"
         className={cn(
           "pointer-events-none object-cover opacity-95",

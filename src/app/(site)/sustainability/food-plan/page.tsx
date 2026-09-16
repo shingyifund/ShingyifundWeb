@@ -220,6 +220,7 @@ export default async function FoodPlanPage() {
                   alt={c.basePhotoLabel}
                   fill
                   priority
+                  unoptimized
                   sizes="(min-width: 1024px) 42vw, 90vw"
                   className="object-cover"
                 />
@@ -234,6 +235,7 @@ export default async function FoodPlanPage() {
                   src="/images/taoyuan-food-plan/launch.jpg"
                   alt={c.launchPhotoLabel}
                   fill
+                  unoptimized
                   sizes="(min-width: 1024px) 19vw, 42vw"
                   className="object-cover"
                 />
@@ -332,6 +334,7 @@ export default async function FoodPlanPage() {
                     src={storyImages[index]}
                     alt={story.alt}
                     fill
+                    unoptimized
                     sizes={index === 0 ? "(min-width: 768px) 58vw, 100vw" : "(min-width: 768px) 42vw, 50vw"}
                     className="object-cover transition duration-700 ease-out group-hover:scale-[1.035]"
                   />

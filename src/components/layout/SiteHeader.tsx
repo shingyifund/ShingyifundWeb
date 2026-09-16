@@ -68,6 +68,7 @@ export function SiteHeader() {
             width={245}
             height={43}
             priority
+            unoptimized
             className="h-9 w-auto sm:h-10"
           />
           <span className="inline-flex size-4 shrink-0 items-center justify-center">
@@ -265,7 +266,7 @@ function MobileDrawer({
         )}
       >
         <div className="flex h-18 items-center justify-between border-b border-navy-100 px-5">
-          <Image src="/brand/logo.svg" alt={translate(locale, "興毅基金會")} width={200} height={35} className="h-8 w-auto" />
+          <Image src="/brand/logo.svg" alt={translate(locale, "興毅基金會")} width={200} height={35} unoptimized className="h-8 w-auto" />
           <button
             type="button"
             onClick={onClose}

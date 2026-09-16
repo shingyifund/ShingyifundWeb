@@ -44,6 +44,7 @@ export default async function SustainabilityPage() {
                 alt={`SDG ${n}`}
                 width={160}
                 height={160}
+                unoptimized
                 className="w-full rounded-md shadow-sm transition-transform hover:scale-105"
               />
             ))}

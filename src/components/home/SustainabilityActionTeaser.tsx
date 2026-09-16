@@ -21,6 +21,7 @@ export async function SustainabilityActionTeaser() {
                 src="/images/sustainability-action.jpg"
                 alt={content.title}
                 fill
+                unoptimized
                 sizes="(max-width: 1024px) 100vw, 62vw"
                 className="object-cover"
               />
