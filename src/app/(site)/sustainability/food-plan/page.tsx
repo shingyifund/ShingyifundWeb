@@ -197,10 +197,6 @@ export default async function FoodPlanPage() {
             </h1>
             <p className="mt-7 max-w-2xl text-base leading-8 text-navy-100 sm:text-lg">{c.intro}</p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <Button href={APPLICATION_URL} target="_blank" rel="noopener noreferrer" size="lg">
-                {c.apply}
-                <ExternalLink data-icon="inline-end" />
-              </Button>
               <Button href={PDF_URL} target="_blank" rel="noopener noreferrer" variant="white" size="lg">
                 <FileText data-icon="inline-start" />
                 {c.readPdf}

@@ -47,8 +47,8 @@ export const contactLocations: ContactLocation[] = [
   },
   {
     id: "taoyuan",
-    name: "桃園惜食基地",
-    address: "桃園市八德區重慶街36號",
+    name: "桃園市政府優食計畫惜食基地",
+    address: "334桃園市八德區大愛里重慶街36號S12",
     tel: "(03)365-5336",
     email: "syty@shingyifund.org",
   },
