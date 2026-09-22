@@ -60,7 +60,7 @@ const content = {
     storiesLabel: "優食現場",
     storiesTitle: "一份食物，串起一群人的日常",
     storiesIntro: "從志工備餐、社區共餐到物資分享，惜食不是一句口號，而是一群人每天一起完成的事。",
-    facebook: "追蹤桃園忠信食物銀行 Facebook",
+    facebook: "追蹤 桃園市政府優食計畫 - 惜食基地 Facebook",
     stories: [
       { alt: "志工在桃園優食計畫現場為民眾盛裝餐食", caption: "把合宜的食物，送到需要的人手中" },
       { alt: "桃園優食計畫社區夥伴與準備完成的餐點合影", caption: "在地夥伴，是惜食網絡重要的一環" },
