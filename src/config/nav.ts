@@ -2,6 +2,11 @@
 export const ONLINE_DONATION_URL =
   "https://shingyifund.neticrm.tw/civicrm/contribute/transact?reset=1&id=2";
 
+export const GENERAL_DONATION_URL =
+  "https://shingyifund.neticrm.tw/civicrm/contribute/transact?reset=1&id=3";
+
+export const PROJECT_DONATION_URL = ONLINE_DONATION_URL;
+
 /** 導覽列結構（單一來源；桌機與手機共用） */
 export type NavChild = { label: string; href: string; external?: boolean };
 export type NavItem = {
@@ -41,7 +46,8 @@ export const mainNav: NavItem[] = [
     label: "愛心捐獻",
     href: "/donate",
     children: [
-      { label: "線上捐款", href: ONLINE_DONATION_URL, external: true },
+      { label: "一般捐款", href: GENERAL_DONATION_URL, external: true },
+      { label: "專案捐款", href: PROJECT_DONATION_URL, external: true },
     ],
   },
   {

@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { CreditCard, Heart, Landmark, Receipt, X, type LucideIcon } from "lucide-react";
 import { siteConfig } from "@/config/site";
-import { ONLINE_DONATION_URL } from "@/config/nav";
+import { GENERAL_DONATION_URL } from "@/config/nav";
 import { CopyButton } from "@/components/layout/CopyButton";
 import { Button } from "@/components/ui/Button";
 import { useLocale } from "@/i18n/provider";
@@ -120,7 +120,7 @@ export function DonationModal({
 
           <div className="mt-6 flex items-center justify-center">
             <Button
-              href={ONLINE_DONATION_URL}
+              href={GENERAL_DONATION_URL}
               target="_blank"
               rel="noopener noreferrer"
               variant="secondary"

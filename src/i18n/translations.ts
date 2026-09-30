@@ -19,6 +19,8 @@ const en = {
   "桃園市優食計畫": "Taoyuan Food Plan",
   "網站快捷選單": "Website quick actions",
   "線上捐款": "Donate Online",
+  "一般捐款": "General Donation",
+  "專案捐款": "Project Donation",
   "徵信明細": "Transparency",
   "捐款芳名錄": "Donor Recognition",
   "受贈者名單": "Beneficiary List",
