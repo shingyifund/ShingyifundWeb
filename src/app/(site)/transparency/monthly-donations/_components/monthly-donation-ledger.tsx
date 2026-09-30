@@ -4,7 +4,6 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  ArrowRight,
   Building2,
   ImageIcon,
   Loader2,
@@ -14,7 +13,6 @@ import {
 import { Button } from "@/components/ui/Button";
 import { MonthPicker } from "@/components/ui/month-picker";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { LinkPendingIcon } from "@/components/ui/link-pending";
 import {
   MONTHLY_DONATION_REGIONS,
   formatMonthlyDonationPeriod,
@@ -240,12 +238,11 @@ export function MonthlyDonationLedger({
       ) : (
         <>
           <div className="overflow-hidden rounded-2xl bg-white shadow-[0_16px_44px_-28px_rgb(15_38_71/0.45)] ring-1 ring-navy-100">
-            <div className="hidden grid-cols-[112px_150px_250px_minmax(0,1fr)_6rem] gap-4 border-b border-navy-100 bg-navy-50/70 px-4 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted md:grid">
+            <div className="hidden grid-cols-[112px_150px_250px_minmax(0,1fr)] gap-4 border-b border-navy-100 bg-navy-50/70 px-4 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted md:grid">
               <span>{locale === "en" ? "Image" : "圖片"}</span>
               <span>{locale === "en" ? "Month / Region" : "月份 / 區域"}</span>
               <span>{locale === "en" ? "Donor" : "捐贈者"}</span>
               <span>{locale === "en" ? "Item" : "項目"}</span>
-              <span className="text-center">{locale === "en" ? "Details" : "明細"}</span>
             </div>
 
             {reports.length === 0 ? (
@@ -337,6 +334,8 @@ function DonationLedgerRow({ report, locale }: { report: MonthlyDonationListItem
   const period = formatMonthlyDonationPeriod(report.westernYear, report.month, locale);
   const regionLabel = getMonthlyDonationRegionLabel(report.region, locale);
   const typeLabel = getMonthlyDonationDonorTypeLabel(report.donorType, locale);
+  const detailHref = localizeHref(`/transparency/monthly-donations/${report.id}`, locale);
+  const titleLinkClass = "rounded-sm underline-offset-4 transition-colors hover:text-amber-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy-700 focus-visible:ring-offset-2";
 
   return (
     <article className="group bg-white transition-colors hover:bg-amber-50/45">
@@ -349,21 +348,16 @@ function DonationLedgerRow({ report, locale }: { report: MonthlyDonationListItem
               {period} · {regionLabel} · {typeLabel}
             </p>
             <h3 className="mt-0.5 line-clamp-2 font-serif text-base font-bold leading-snug text-navy-900">
-              {report.title}
+              <Link href={detailHref} className={titleLinkClass}>
+                {report.title}
+              </Link>
             </h3>
             <p className="mt-0.5 text-xs font-semibold text-amber-700">{donorName}</p>
-            <Link
-              href={localizeHref(`/transparency/monthly-donations/${report.id}`, locale)}
-              className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-navy-700 underline-offset-2 hover:underline"
-            >
-              {locale === "en" ? "View details" : "查看明細"}
-              <ArrowRight className="size-3.5" />
-            </Link>
           </div>
         </div>
 
         {/* Desktop */}
-        <div className="hidden md:grid md:grid-cols-[112px_150px_250px_minmax(0,1fr)_6rem] md:items-center md:gap-4">
+        <div className="hidden md:grid md:grid-cols-[112px_150px_250px_minmax(0,1fr)] md:items-center md:gap-4">
           <Thumbnail url={report.firstImageUrl} />
 
           <div className="space-y-0.5">
@@ -381,18 +375,10 @@ function DonationLedgerRow({ report, locale }: { report: MonthlyDonationListItem
           </div>
 
           <h3 className="line-clamp-2 font-serif text-base font-bold leading-snug text-navy-900">
-            {report.title}
+            <Link href={detailHref} className={titleLinkClass}>
+              {report.title}
+            </Link>
           </h3>
-
-          <Link
-            href={localizeHref(`/transparency/monthly-donations/${report.id}`, locale)}
-            className="inline-flex items-center justify-center gap-1.5 justify-self-center rounded-full border border-navy-100 bg-white px-3 py-2 text-sm font-semibold text-navy-900 transition-colors hover:border-amber-300 hover:bg-white"
-          >
-            {locale === "en" ? "View" : "查看"}
-            <LinkPendingIcon>
-              <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
-            </LinkPendingIcon>
-          </Link>
         </div>
       </div>
     </article>
