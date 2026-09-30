@@ -108,7 +108,7 @@ export default async function MonthlyDonationDetailPage({
                       href={image.imageUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group block"
+                      className="block"
                     >
                       <div className="relative aspect-video bg-muted">
                         <CloudinaryImage
@@ -116,7 +116,7 @@ export default async function MonthlyDonationDetailPage({
                           alt={image.caption ?? image.fileName ?? (locale === "en" ? `Donation item ${index + 1}` : `物品照片 ${index + 1}`)}
                           fill
                           sizes={imageSizes}
-                          className="object-cover transition-transform duration-300 group-hover:scale-105"
+                          className="object-contain"
                         />
                       </div>
                     </a>
