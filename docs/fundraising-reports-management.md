@@ -61,23 +61,19 @@
 
 Supabase Dashboard → Storage → New bucket，名稱 `fundraising-reports`，勾選 Public。
 
-不要設 file size limit 與 allowed mime types（留 unset，對齊 financial-reports；type 檢查已在 `uploadPdfFile` 程式內做）。bucket 大小沿用專案全域上限（預設 50MB）。
+不要設 file size limit 與 allowed mime types（留 unset，對齊 financial-reports；格式與大小檢查由表單、`prepareFundraisingReportUpload` 與儲存前的 Storage metadata 驗證負責）。bucket 大小沿用專案全域上限（預設 50MB）。
 
-### 上傳大小限制
+### 上傳流程與大小限制
 
-1. Supabase bucket / 專案全域上限：預設 50MB，bucket 個別 `file_size_limit` 留 null。
-2. Next.js Server Action `bodySizeLimit`（`next.config.mjs`）：需 >= 預期最大檔案，目前設 50mb。超過會噴 `Unexpected end of form`。改 config 後要重啟 dev server。
-   - 本專案同時設定頂層 `serverActions` 與 `experimental.serverActions`，兩邊值一致，避免 Next 版本差異導致設定被忽略。
-3. Next.js dev/proxy request body 上限：`experimental.proxyClientMaxBodySize` 也需 >= 預期最大檔案，否則 multipart form 可能在 Server Action 解析前被截斷。
-   ```js
-   const nextConfig = {
-     serverActions: { bodySizeLimit: "50mb" },
-     experimental: {
-       proxyClientMaxBodySize: "50mb",
-       serverActions: { bodySizeLimit: "50mb" },
-     },
-   };
-   ```
+1. 表單先檢查 PDF 格式、非空檔案與 50MB 上限。
+2. `prepareFundraisingReportUpload` 驗證管理員身分與檔案資料後，產生 Supabase 簽名上傳 token。
+3. 瀏覽器透過 `uploadToSignedUrl` 直接上傳 PDF 到 `fundraising-reports` bucket，檔案內容不經過 Next.js Server Action 或 Vercel Function。
+4. 新增／更新 Server Action 只接收年度、標題、檔案路徑、原始檔名與大小；儲存前會檢查路徑、Storage 檔案存在、實際 MIME type 與大小。
+5. 資料庫寫入失敗時刪除新檔；成功替換 PDF 後才刪除舊檔。編輯時未選新檔則保留原 PDF。
+
+Vercel Function 的 request body 上限為 4.5MB，增加 `next.config.mjs` 的 `bodySizeLimit` 無法解除此限制。勸募報告採直接上傳 Storage 的流程，比照財務報告，不依賴這項設定。
+
+Supabase bucket / 專案全域上限仍需允許預期檔案大小；本功能允許最高 50MB，bucket 個別 `file_size_limit` 維持 null。
 
 ### 2. 建立 table、grant、RLS policy
 
