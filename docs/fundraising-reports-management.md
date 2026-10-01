@@ -129,6 +129,15 @@ create policy "admin delete fundraising report files" on storage.objects
 
 完成這三步即可正常運作，不需要任何額外 policy。
 
+## 上傳錯誤提示
+
+勸募報告與財務報告共用 `report-upload-feedback.ts` 的檢查與錯誤訊息，以及 `ReportFormFeedback` 提示元件。
+
+- 表單自行檢查年度、標題、PDF 格式、空檔案與 50MB 上限，避免瀏覽器驗證阻止送出時缺少表單內提示。
+- 錯誤顯示在表單上方，並自動捲動及聚焦到提示框。
+- 訊息區分準備上傳、PDF 上傳與儲存報告階段，說明登入／授權失效、權限不足、大小限制、格式限制、儲存空間缺失或網路連線失敗。
+- Server Action 捕捉例外並回傳提示；完整例外仍記錄於伺服器 log，避免正式環境只顯示 Next.js 的通用錯誤。
+
 ## 程式碼對應檔案
 
 | 層 | 路徑 |

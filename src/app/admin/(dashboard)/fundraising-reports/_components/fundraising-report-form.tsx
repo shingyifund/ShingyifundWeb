@@ -6,7 +6,13 @@ import { FileText, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FormAlert } from "@/components/ui/form-alert";
+import { ReportFormFeedback } from "@/components/admin/report-form-feedback";
+import {
+  getReportErrorMessage,
+  validateReportFields,
+  validateReportPdf,
+  type ReportSubmitPhase,
+} from "@/lib/report-upload-feedback";
 import { UploadTrigger } from "@/components/admin/upload-trigger";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -15,10 +21,6 @@ import {
   type FundraisingReportRecord,
   updateFundraisingReport,
 } from "../actions";
-
-const MAX_PDF_FILE_SIZE = 50 * 1024 * 1024;
-
-type SubmitPhase = "idle" | "preparing" | "uploading" | "saving";
 
 function defaultTitle(year: string) {
   if (!year) return "";
@@ -42,29 +44,26 @@ export function FundraisingReportForm({
   const title = customTitle ?? defaultTitle(fiscalYear);
   const [message, setMessage] = useState<string | null>(null);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
-  const [submitPhase, setSubmitPhase] = useState<SubmitPhase>("idle");
+  const [submitPhase, setSubmitPhase] = useState<ReportSubmitPhase>("idle");
   const [isPending, startTransition] = useTransition();
 
   const isSubmitting = isPending || submitPhase !== "idle";
 
-  function validatePdf(file: File) {
-    const isPdf =
-      file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
-    if (!isPdf) return "檔案格式需為 PDF";
-    if (file.size <= 0) return "PDF 檔案不可為空白";
-    if (file.size > MAX_PDF_FILE_SIZE) return "PDF 檔案不可超過 50MB";
-    return null;
-  }
-
   function handleSubmit(formData: FormData) {
+    if (isSubmitting) return;
     setMessage(null);
+    const fieldError = validateReportFields(fiscalYear, title);
+    if (fieldError) {
+      setMessage(fieldError);
+      return;
+    }
     if (!isEdit && !pdfFile) {
       setMessage("請選擇 PDF 檔案");
       return;
     }
 
     if (pdfFile) {
-      const validationError = validatePdf(pdfFile);
+      const validationError = validateReportPdf(pdfFile);
       if (validationError) {
         setMessage(validationError);
         return;
@@ -75,6 +74,7 @@ export function FundraisingReportForm({
     formData.set("title", title);
 
     startTransition(async () => {
+      let currentPhase: ReportSubmitPhase = "preparing";
       try {
         if (pdfFile) {
           setSubmitPhase("preparing");
@@ -86,11 +86,12 @@ export function FundraisingReportForm({
           });
 
           if (!prepared.ok) {
-            setMessage(prepared.message);
+            setMessage(getReportErrorMessage(prepared.message, "preparing"));
             return;
           }
 
-          setSubmitPhase("uploading");
+          currentPhase = "uploading";
+          setSubmitPhase(currentPhase);
           const supabase = createClient();
           const { error } = await supabase.storage
             .from("fundraising-reports")
@@ -99,7 +100,7 @@ export function FundraisingReportForm({
             });
 
           if (error) {
-            setMessage(`PDF 上傳失敗：${error.message}`);
+            setMessage(getReportErrorMessage(error, currentPhase));
             return;
           }
 
@@ -108,21 +109,27 @@ export function FundraisingReportForm({
           formData.set("uploaded_file_size", String(pdfFile.size));
         }
 
-        setSubmitPhase("saving");
+        currentPhase = "saving";
+        setSubmitPhase(currentPhase);
         const result =
           report === undefined
             ? await createFundraisingReport(formData)
             : await updateFundraisingReport(report.id, formData);
 
         if (!result.ok) {
-          setMessage(result.message ?? "儲存失敗");
+          setMessage(getReportErrorMessage(result.message, currentPhase));
           return;
         }
 
         router.push("/admin/fundraising-reports");
         router.refresh();
       } catch (error) {
-        setMessage(error instanceof Error ? error.message : "儲存失敗，請稍後再試");
+        setMessage(
+          getReportErrorMessage(
+            typeof navigator !== "undefined" && !navigator.onLine ? "network offline" : error,
+            currentPhase,
+          ),
+        );
       } finally {
         setSubmitPhase("idle");
       }
@@ -139,7 +146,8 @@ export function FundraisingReportForm({
           : "儲存";
 
   return (
-    <form action={handleSubmit} className="space-y-5">
+    <form action={handleSubmit} noValidate className="space-y-5">
+      <ReportFormFeedback message={message} />
       <div className="space-y-2">
         <Label htmlFor="fiscal_year">年度</Label>
         <Input
@@ -186,7 +194,7 @@ export function FundraisingReportForm({
           onFilesSelected={(files) => {
             const file = files[0] ?? null;
             setPdfFile(file);
-            setMessage(file ? validatePdf(file) : null);
+            setMessage(file ? validateReportPdf(file) : null);
           }}
         />
       </div>
@@ -202,8 +210,6 @@ export function FundraisingReportForm({
           查看目前 PDF
         </Button>
       )}
-
-      <FormAlert message={message} />
 
       <div className="flex gap-3 pt-2">
         <Button type="submit" disabled={isSubmitting}>

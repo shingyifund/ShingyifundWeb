@@ -2,6 +2,7 @@
 
 import { isAuthorizedAdminEmail } from "@/lib/admin-auth";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
+import { getReportErrorMessage } from "@/lib/report-upload-feedback";
 import { revalidatePath } from "next/cache";
 
 const BUCKET = "fundraising-reports";
@@ -35,7 +36,9 @@ async function getAuthorizedAdmin() {
   const supabase = await createClient();
   const {
     data: { user },
+    error,
   } = await supabase.auth.getUser();
+  if (error) throw error;
   if (!isAuthorizedAdminEmail(user?.email)) return null;
   return user;
 }
@@ -123,24 +126,29 @@ export async function prepareFundraisingReportUpload(input: {
   fileSize: number;
   fileType: string;
 }): Promise<PrepareUploadResult> {
-  const user = await getAuthorizedAdmin();
-  if (!user) return { ok: false, message: "未授權" };
+  try {
+    const user = await getAuthorizedAdmin();
+    if (!user) return { ok: false, message: "未授權" };
 
-  if (!Number.isInteger(input.fiscalYear) || input.fiscalYear < 1 || input.fiscalYear > 999) {
-    return { ok: false, message: "請輸入有效年度" };
+    if (!Number.isInteger(input.fiscalYear) || input.fiscalYear < 1 || input.fiscalYear > 999) {
+      return { ok: false, message: "請輸入有效年度" };
+    }
+
+    const validationError = validatePdfMetadata(input.fileName, input.fileSize, input.fileType);
+    if (validationError) return { ok: false, message: validationError };
+
+    const path = `${input.fiscalYear}-${crypto.randomUUID()}.pdf`;
+    const supabase = await createAdminClient();
+    const { data, error } = await supabase.storage
+      .from(BUCKET)
+      .createSignedUploadUrl(path);
+
+    if (error) return { ok: false, message: error.message };
+    return { ok: true, path: data.path, token: data.token };
+  } catch (error) {
+    console.error("Fundraising report preparing failed", error);
+    return { ok: false, message: getReportErrorMessage(error, "preparing") };
   }
-
-  const validationError = validatePdfMetadata(input.fileName, input.fileSize, input.fileType);
-  if (validationError) return { ok: false, message: validationError };
-
-  const path = `${input.fiscalYear}-${crypto.randomUUID()}.pdf`;
-  const supabase = await createAdminClient();
-  const { data, error } = await supabase.storage
-    .from(BUCKET)
-    .createSignedUploadUrl(path);
-
-  if (error) return { ok: false, message: error.message };
-  return { ok: true, path: data.path, token: data.token };
 }
 
 async function getUploadedPdf(formData: FormData, fiscalYear: number) {
@@ -157,7 +165,8 @@ async function getUploadedPdf(formData: FormData, fiscalYear: number) {
 
   const supabase = await createAdminClient();
   const { data: fileInfo, error } = await supabase.storage.from(BUCKET).info(path);
-  if (error || !fileInfo) {
+  if (error) return { ok: false as const, message: error.message };
+  if (!fileInfo) {
     return { ok: false as const, message: "找不到已上傳的 PDF，請重新上傳" };
   }
 
@@ -188,90 +197,100 @@ async function getUploadedPdf(formData: FormData, fiscalYear: number) {
 export async function createFundraisingReport(
   formData: FormData,
 ): Promise<ActionResult> {
-  const user = await getAuthorizedAdmin();
-  if (!user) return { ok: false, message: "未授權" };
+  try {
+    const user = await getAuthorizedAdmin();
+    if (!user) return { ok: false, message: "未授權" };
 
-  const payload = reportPayload(formData);
-  if ("error" in payload) return { ok: false, message: payload.error };
+    const payload = reportPayload(formData);
+    if ("error" in payload) return { ok: false, message: payload.error };
 
-  const upload = await getUploadedPdf(formData, payload.data.fiscal_year);
-  if (!upload.ok) return { ok: false, message: upload.message };
+    const upload = await getUploadedPdf(formData, payload.data.fiscal_year);
+    if (!upload.ok) return { ok: false, message: upload.message };
 
-  const supabase = await createAdminClient();
-  const { error } = await supabase.from("fundraising_reports").insert({
-    ...payload.data,
-    file_url: upload.url,
-    file_path: upload.path,
-    file_name: upload.fileName,
-    file_size: upload.fileSize,
-    updated_at: new Date().toISOString(),
-  });
+    const supabase = await createAdminClient();
+    const { error } = await supabase.from("fundraising_reports").insert({
+      ...payload.data,
+      file_url: upload.url,
+      file_path: upload.path,
+      file_name: upload.fileName,
+      file_size: upload.fileSize,
+      updated_at: new Date().toISOString(),
+    });
 
-  if (error) {
-    await supabase.storage.from(BUCKET).remove([upload.path]);
-    return { ok: false, message: error.message };
+    if (error) {
+      await supabase.storage.from(BUCKET).remove([upload.path]);
+      return { ok: false, message: error.message };
+    }
+
+    revalidateFundraisingReports();
+    return { ok: true };
+  } catch (error) {
+    console.error("Fundraising report saving failed", error);
+    return { ok: false, message: getReportErrorMessage(error, "saving") };
   }
-
-  revalidateFundraisingReports();
-  return { ok: true };
 }
 
 export async function updateFundraisingReport(
   id: string,
   formData: FormData,
 ): Promise<ActionResult> {
-  const user = await getAuthorizedAdmin();
-  if (!user) return { ok: false, message: "未授權" };
+  try {
+    const user = await getAuthorizedAdmin();
+    if (!user) return { ok: false, message: "未授權" };
 
-  const payload = reportPayload(formData);
-  if ("error" in payload) return { ok: false, message: payload.error };
+    const payload = reportPayload(formData);
+    if ("error" in payload) return { ok: false, message: payload.error };
 
-  const supabase = await createAdminClient();
-  const { data: existing, error: fetchError } = await supabase
-    .from("fundraising_reports")
-    .select("file_path")
-    .eq("id", id)
-    .maybeSingle();
+    const supabase = await createAdminClient();
+    const { data: existing, error: fetchError } = await supabase
+      .from("fundraising_reports")
+      .select("file_path")
+      .eq("id", id)
+      .maybeSingle();
 
-  if (fetchError) return { ok: false, message: fetchError.message };
-  if (!existing) return { ok: false, message: "找不到勸募成果報告" };
+    if (fetchError) return { ok: false, message: fetchError.message };
+    if (!existing) return { ok: false, message: "找不到勸募成果報告" };
 
-  const hasNewFile = Boolean(textValue(formData, "uploaded_file_path"));
-  const upload = hasNewFile
-    ? await getUploadedPdf(formData, payload.data.fiscal_year)
-    : null;
+    const hasNewFile = Boolean(textValue(formData, "uploaded_file_path"));
+    const upload = hasNewFile
+      ? await getUploadedPdf(formData, payload.data.fiscal_year)
+      : null;
 
-  if (upload && !upload.ok) return { ok: false, message: upload.message };
+    if (upload && !upload.ok) return { ok: false, message: upload.message };
 
-  const updatePayload = {
-    ...payload.data,
-    ...(upload?.ok
-      ? {
-          file_url: upload.url,
-          file_path: upload.path,
-          file_name: upload.fileName,
-          file_size: upload.fileSize,
-        }
-      : {}),
-    updated_at: new Date().toISOString(),
-  };
+    const updatePayload = {
+      ...payload.data,
+      ...(upload?.ok
+        ? {
+            file_url: upload.url,
+            file_path: upload.path,
+            file_name: upload.fileName,
+            file_size: upload.fileSize,
+          }
+        : {}),
+      updated_at: new Date().toISOString(),
+    };
 
-  const { error } = await supabase
-    .from("fundraising_reports")
-    .update(updatePayload)
-    .eq("id", id);
+    const { error } = await supabase
+      .from("fundraising_reports")
+      .update(updatePayload)
+      .eq("id", id);
 
-  if (error) {
-    if (upload?.ok) await supabase.storage.from(BUCKET).remove([upload.path]);
-    return { ok: false, message: error.message };
+    if (error) {
+      if (upload?.ok) await supabase.storage.from(BUCKET).remove([upload.path]);
+      return { ok: false, message: error.message };
+    }
+
+    if (upload?.ok && existing.file_path) {
+      await supabase.storage.from(BUCKET).remove([existing.file_path]);
+    }
+
+    revalidateFundraisingReports();
+    return { ok: true };
+  } catch (error) {
+    console.error("Fundraising report saving failed", error);
+    return { ok: false, message: getReportErrorMessage(error, "saving") };
   }
-
-  if (upload?.ok && existing.file_path) {
-    await supabase.storage.from(BUCKET).remove([existing.file_path]);
-  }
-
-  revalidateFundraisingReports();
-  return { ok: true };
 }
 
 export async function deleteFundraisingReport(id: string): Promise<ActionResult> {
