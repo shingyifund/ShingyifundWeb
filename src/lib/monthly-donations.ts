@@ -48,30 +48,37 @@ export function formatMonthlyDonationPeriod(westernYear: number, month: number, 
     : `${westernYear}年${String(month).padStart(2, "0")}月`;
 }
 
-/** 匿名時前台顯示「善心人士」，否則顯示捐贈者名稱 */
+/** 匿名或未填名稱時，依類型顯示「善心人士」或「慈善團體」。 */
 export function getMonthlyDonationDonorDisplayName({
   donorName,
+  donorType = "individual",
   isAnonymous,
   locale = "tw",
 }: {
   donorName: string | null;
+  donorType?: MonthlyDonationDonorType;
   isAnonymous: boolean;
   locale?: Locale;
 }) {
-  if (isAnonymous || !donorName) return locale === "en" ? "Anonymous donor" : "善心人士";
+  if (isAnonymous || !donorName) {
+    if (donorType === "organization") return locale === "en" ? "Charitable organization" : "慈善團體";
+    return locale === "en" ? "Anonymous donor" : "善心人士";
+  }
   return donorName;
 }
 
 /** 標題自動產生：感謝 {善心人士／捐贈者名稱} 捐贈 {捐贈內容} 一批 */
 export function buildMonthlyDonationTitle({
   donorName,
+  donorType,
   isAnonymous,
   donationContent,
 }: {
   donorName: string | null;
+  donorType?: MonthlyDonationDonorType;
   isAnonymous: boolean;
   donationContent: string | null;
 }) {
   const content = donationContent?.trim() || "物資";
-  return `感謝 ${getMonthlyDonationDonorDisplayName({ donorName, isAnonymous })} 捐贈 ${content} 一批`;
+  return `感謝 ${getMonthlyDonationDonorDisplayName({ donorName, donorType, isAnonymous })} 捐贈 ${content} 一批`;
 }

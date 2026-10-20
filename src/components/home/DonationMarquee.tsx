@@ -38,6 +38,7 @@ export async function DonationMarquee() {
             month: donor.month,
             region: donor.region,
             donorName: donor.isAnonymous ? null : donor.donorName,
+            donorType: donor.donorType,
             isAnonymous: donor.isAnonymous,
           }))} locale={locale} />
         </div>

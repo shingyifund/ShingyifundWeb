@@ -327,6 +327,7 @@ function Thumbnail({
 function DonationLedgerRow({ report, locale }: { report: MonthlyDonationListItem; locale: "tw" | "en" }) {
   const donorName = getMonthlyDonationDonorDisplayName({
     donorName: report.donorName,
+    donorType: report.donorType,
     isAnonymous: report.isAnonymous,
     locale,
   });

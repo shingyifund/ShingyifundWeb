@@ -135,6 +135,7 @@ export function MonthlyDonationForm({
     return report.title !==
       buildMonthlyDonationTitle({
         donorName: report.donor_name,
+        donorType: report.donor_type,
         isAnonymous: report.is_anonymous,
         donationContent: report.donation_content,
       })
@@ -163,10 +164,11 @@ export function MonthlyDonationForm({
       customTitle ??
       buildMonthlyDonationTitle({
         donorName: donorName || null,
+        donorType,
         isAnonymous,
         donationContent,
       }),
-    [customTitle, donationContent, donorName, isAnonymous],
+    [customTitle, donationContent, donorName, donorType, isAnonymous],
   );
   const busy = submitStarted || isPending || processingImages;
   const busyText = processingImages ? "正在壓縮並加入浮水印..." : "正在儲存...";
@@ -345,7 +347,7 @@ export function MonthlyDonationForm({
         <div>
           <Label htmlFor="is_anonymous">匿名捐贈</Label>
           <p className="mt-1 text-xs text-muted-foreground">
-            開啟後前台顯示「善心人士」，不公開姓名。
+            開啟後前台顯示「{donorType === "organization" ? "慈善團體" : "善心人士"}」，不公開姓名。
           </p>
         </div>
         <Switch
@@ -386,7 +388,7 @@ export function MonthlyDonationForm({
           id="title"
           value={title}
           onChange={(event) => setCustomTitle(event.target.value)}
-          placeholder="感謝 善心人士 捐贈 物資 一批"
+          placeholder={donorType === "organization" ? "感謝 慈善團體 捐贈 物資 一批" : "感謝 善心人士 捐贈 物資 一批"}
           required
         />
         <p className="text-xs text-muted-foreground">

@@ -137,7 +137,7 @@ function reportPayload(formData: FormData) {
 
   const title =
     textValue(formData, "title") ??
-    buildMonthlyDonationTitle({ donorName, isAnonymous, donationContent });
+    buildMonthlyDonationTitle({ donorName, donorType, isAnonymous, donationContent });
 
   return {
     data: {

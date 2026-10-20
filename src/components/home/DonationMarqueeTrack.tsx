@@ -15,7 +15,7 @@ import { localizeHref } from "@/i18n/config";
 
 const STORAGE_KEY = "donation-marquee-v1";
 type MarqueeDonor = Pick<MonthlyDonationReport,
-  "id" | "title" | "westernYear" | "month" | "region" | "donorName" | "isAnonymous"
+  "id" | "title" | "westernYear" | "month" | "region" | "donorName" | "donorType" | "isAnonymous"
 >;
 type Progress = { ids: string[]; cursor: number; elapsed: number };
 
@@ -101,6 +101,7 @@ export function DonationMarqueeTrack({ donors, locale }: { donors: MarqueeDonor[
 function DonorChip({ donor, locale }: { donor: MarqueeDonor; locale: "tw" | "en" }) {
   const name = getMonthlyDonationDonorDisplayName({
     donorName: donor.donorName,
+    donorType: donor.donorType,
     isAnonymous: donor.isAnonymous,
     locale,
   });
