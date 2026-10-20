@@ -88,7 +88,7 @@ export default async function DonationAdminPage() {
                 <div className="min-w-0">
                   <h3 className="truncate font-semibold text-navy-900">{batch.file_name}</h3>
                   <p className="mt-1 text-xs leading-5 text-ink-muted">
-                    {new Intl.DateTimeFormat("zh-TW", { dateStyle: "medium", timeStyle: "short" }).format(new Date(batch.created_at))}
+                    {new Intl.DateTimeFormat("zh-TW", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Taipei" }).format(new Date(batch.created_at))}
                     {" · "}{formatBytes(batch.file_size)}
                     {" · "}{batch.period_count} 個月份／類別
                   </p>

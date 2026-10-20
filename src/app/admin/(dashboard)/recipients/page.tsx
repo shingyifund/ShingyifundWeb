@@ -80,7 +80,7 @@ export default async function RecipientAdminPage() {
                 <div className="min-w-0">
                   <h3 className="truncate font-semibold text-navy-900">{batch.file_name}</h3>
                   <p className="mt-1 text-xs leading-5 text-ink-muted">
-                    {new Intl.DateTimeFormat("zh-TW", { dateStyle: "medium", timeStyle: "short" }).format(new Date(batch.created_at))}
+                    {new Intl.DateTimeFormat("zh-TW", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Taipei" }).format(new Date(batch.created_at))}
                     {" · "}{formatBytes(batch.file_size)}{" · "}{batch.period_count} 個月份
                   </p>
                   <p className="mt-1 text-sm text-ink-soft">{batch.record_count.toLocaleString("zh-TW")} 筆 · {formatRecipientAmount(batch.total_amount)}</p>
