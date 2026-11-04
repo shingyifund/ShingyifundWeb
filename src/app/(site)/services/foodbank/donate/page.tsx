@@ -120,20 +120,6 @@ export default async function FoodbankDonationPage() {
               <h4 className="pt-2 font-semibold text-navy-900">Life-ET 操作步驟</h4>
               <ol className="list-decimal space-y-2 pl-6 marker:font-semibold marker:text-amber-700">{steps.map((step) => <li key={step} className="pl-2">{step}</li>)}</ol>
               <p className="font-semibold text-navy-800">透過此服務寄出後，不需另行通知本會。</p>
-              <details className="group rounded-xl border border-navy-100 bg-white">
-                <summary className="cursor-pointer rounded-xl px-5 py-4 font-semibold text-navy-800 hover:bg-navy-50 focus-visible:outline-2 focus-visible:outline-amber-500">查看完整操作圖解</summary>
-                <div className="px-5 pb-5">
-                  <p className="mb-5 text-sm text-ink-muted">以下為寄件流程示意，請依門市 Life-ET 機台實際畫面操作。</p>
-                  <ol className="relative ml-4 border-l-2 border-amber-200">
-                    {steps.map((step, index) => (
-                      <li key={step} className="relative pb-6 pl-8 last:pb-0">
-                        <span className="absolute -left-[17px] top-0 flex size-8 items-center justify-center rounded-full bg-navy-800 text-sm font-bold text-white">{index + 1}</span>
-                        <p className="min-h-8">{step}</p>
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              </details>
               <h4 className="pt-4 font-semibold text-navy-900">寄送前請留意</h4>
               <p>請先查閱萊爾富官方公告，確認最新運費、包裝規範及寄件限制。以下提供包裹規格的簡要提醒：</p>
               <InfoTable headers={["項目", "規格提醒"]} rows={[
