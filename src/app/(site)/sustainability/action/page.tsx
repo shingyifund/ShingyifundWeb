@@ -76,9 +76,14 @@ export default async function SustainabilityActionPage() {
               </div>
               <div className="mt-9 rounded-2xl border border-amber-200 bg-amber-50 p-6 sm:p-7">
                 <p className="font-semibold leading-relaxed text-amber-900">{c.scopeNote}</p>
-                <p className="mt-3 leading-relaxed text-ink-soft">{c.foodbankNote}</p>
-                <Button href={localizeHref("/services/foodbank", locale)} variant="white" size="sm" className="mt-5">
-                  {locale === "en" ? "Visit Zhongxin Food Bank" : "前往忠信食物銀行"}
+                <p className="mt-3 leading-relaxed text-ink-soft">
+                  {c.foodbankNote}
+                  <span className="font-semibold text-rose-600">
+                    {locale === "en" ? "visit Zhongxin Food Bank – Supplies Donation." : "請前往「忠信食物銀行－物資捐贈」頁面。"}
+                  </span>
+                </p>
+                <Button href={localizeHref("/services/foodbank/donate", locale)} variant="white" size="sm" className="mt-5 h-auto min-h-9 max-w-full whitespace-normal py-2 text-rose-600 hover:text-rose-700">
+                  {locale === "en" ? "Zhongxin Food Bank – Supplies Donation" : "忠信食物銀行－物資捐贈"}
                   <ArrowRight className="size-4" />
                 </Button>
               </div>

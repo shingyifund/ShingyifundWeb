@@ -11,7 +11,7 @@ const tw = {
     "我們希望減少的不只是食物浪費，也包含生活物資的閒置與報廢。讓原本可能被丟棄的資源延續價值，也讓每一份物資成為支持弱勢家庭與社區的一份力量。",
   ],
   scopeNote: "「興毅永續行動」主要針對剩餘、閒置、庫存、短效期或其他可能被浪費的食品與生活物資。",
-  foodbankNote: "若您希望購買食品、日用品捐贈，或定期提供食物銀行日常所需物資，請前往「忠信食物銀行」頁面。",
+  foodbankNote: "若您希望購買食品、日用品捐贈，或定期提供食物銀行日常所需物資，",
   suppliesTitle: "哪些物資適合提供？",
   supplies: [
     {
@@ -73,7 +73,7 @@ const en = {
     "Our goal is to reduce not only food waste, but also the unnecessary disposal of daily essentials—extending the value of every resource while supporting vulnerable families and communities.",
   ],
   scopeNote: "This initiative focuses on surplus, idle, overstocked, short-dated, or otherwise usable food and daily essentials that may go to waste.",
-  foodbankNote: "To purchase food or daily necessities for regular donation, please visit the Zhongxin Food Bank page.",
+  foodbankNote: "To purchase food or daily necessities for regular donation, ",
   suppliesTitle: "What Can You Provide?",
   supplies: [
     { title: "Food", items: ["Short-dated food that remains safe to eat", "Products removed from shelves but still safe", "Overstocked products", "Products with replaced packaging or specifications", "Inventory from cancelled orders", "Production surplus", "Complete goods left after festivals or events", "Other safe food at risk of disposal"], notes: ["Food should be properly packaged and stored, clearly labeled, and within its valid date.", "Short-dated food should generally have at least 20 days remaining.", "Contact us first for large quantities, chilled, frozen, fresh, or other special items so we can assess storage, transport, and distribution capacity."] },

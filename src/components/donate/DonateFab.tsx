@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ClipboardList, Handshake, Heart, type LucideIcon } from "lucide-react";
+import { ClipboardList, Handshake, Heart, PackageOpen, type LucideIcon } from "lucide-react";
 import { useLocale } from "@/i18n/provider";
 import { translate } from "@/i18n/translations";
 import { localizeHref } from "@/i18n/config";
@@ -47,6 +47,13 @@ export function DonateFab() {
       onNavigate: undefined,
     },
   ];
+  const suppliesAction = {
+    label: locale === "en" ? "Supplies Donation" : "物資捐贈",
+    shortLabel: locale === "en" ? "Supplies" : "物資捐贈",
+    href: localizeHref("/services/foodbank/donate", locale),
+    icon: PackageOpen,
+    current: normalizedPath === "/services/foodbank/donate",
+  };
 
   return (
     <>
@@ -57,6 +64,7 @@ export function DonateFab() {
           ))}
         </nav>
         <DonationButton locale={locale} onClick={() => setOpen(true)} embedded />
+        <DesktopQuickAction {...suppliesAction} locale={locale} />
       </div>
 
       <DonationButton
@@ -67,9 +75,9 @@ export function DonateFab() {
 
       <nav
         aria-label={translate(locale, "網站快捷選單")}
-        className="fixed bottom-3 left-3 right-20 z-[115] grid grid-cols-2 gap-2 rounded-2xl border border-navy-100/80 bg-cream/95 p-1.5 shadow-[0_12px_32px_-14px_rgb(15_38_71/0.45)] backdrop-blur-md md:hidden"
+        className="fixed bottom-3 left-3 right-20 z-[115] grid grid-cols-3 gap-1 rounded-2xl border border-navy-100/80 bg-cream/95 p-1.5 shadow-[0_12px_32px_-14px_rgb(15_38_71/0.45)] backdrop-blur-md md:hidden"
       >
-        {quickActions.map((action) => {
+        {[...quickActions, { ...suppliesAction, onNavigate: undefined }].map((action) => {
           const Icon = action.icon;
           return (
             <Link
@@ -84,7 +92,7 @@ export function DonateFab() {
                   : action.onNavigate
               }
               className={cn(
-                "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 py-2 text-center text-xs font-bold text-navy-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400",
+                "inline-flex min-h-11 min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-center text-xs font-bold text-navy-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400",
                 action.current
                   ? "pointer-events-none cursor-default opacity-40"
                   : "hover:bg-navy-50",
