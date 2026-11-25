@@ -47,37 +47,18 @@ export async function FacebookFeed() {
             style={{ transform: "translateZ(0)" }}
           />
 
-          <div className="relative grid items-start gap-8 lg:grid-cols-[minmax(0,360px)_1fr] lg:gap-12">
-            {/* 左：文案 + 追蹤理由 + CTA */}
-            <div>
-              <span className="inline-flex items-center gap-2 text-sm font-medium tracking-wide text-amber-300">
-                <span className="h-px w-6 bg-current opacity-60" />
-                {translate(locale, "最新動態")}
-              </span>
-              <h2 className="mt-3 font-serif text-3xl font-bold leading-tight text-white sm:text-4xl">
-                {translate(locale, "追蹤興毅，看見愛心的流動")}
-              </h2>
-
-              <ul className="mt-8 space-y-5">
-                {reasons.map((reason) => {
-                  const Icon = reason.icon;
-                  return (
-                    <li key={reason.title} className="flex items-start gap-4">
-                      <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-amber-300">
-                        <Icon className="size-5" strokeWidth={1.8} />
-                      </span>
-                      <div>
-                        <p className="font-semibold text-white">{reason.title}</p>
-                        <p className="mt-0.5 text-sm leading-relaxed text-navy-100/80">
-                          {reason.desc}
-                        </p>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-
-              <div className="mt-9 flex flex-wrap items-center gap-3">
+          <div className="relative space-y-7 sm:space-y-8">
+            <header className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <span className="inline-flex items-center gap-2 text-sm font-medium tracking-wide text-amber-300">
+                  <span className="h-px w-6 bg-current opacity-60" />
+                  {translate(locale, "最新動態")}
+                </span>
+                <h2 className="mt-3 text-balance font-serif text-3xl font-bold leading-tight text-white sm:text-4xl">
+                  {translate(locale, "追蹤興毅，看見愛心的流動")}
+                </h2>
+              </div>
+              <div className="flex shrink-0 flex-wrap items-center gap-3">
                 <Link
                   href={siteConfig.social.facebook}
                   target="_blank"
@@ -108,10 +89,28 @@ export async function FacebookFeed() {
                   <FaThreads className="size-5" />
                 </Link>
               </div>
-            </div>
+            </header>
 
-            {/* 右：粉專最新貼文（Graph API，全平台可顯示） */}
             <FacebookPosts posts={posts} />
+
+            <ul className="grid gap-4 border-t border-white/15 pt-6 sm:grid-cols-3 sm:gap-5">
+              {reasons.map((reason) => {
+                const Icon = reason.icon;
+                return (
+                  <li key={reason.title} className="flex items-start gap-3">
+                    <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-white/10 text-amber-300">
+                      <Icon className="size-4" strokeWidth={1.8} />
+                    </span>
+                    <div>
+                      <p className="text-sm font-semibold text-white">{reason.title}</p>
+                      <p className="mt-0.5 text-sm leading-relaxed text-navy-100/80">
+                        {reason.desc}
+                      </p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
         </div>
       </Container>

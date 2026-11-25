@@ -4,6 +4,7 @@ import { getSiteConfig } from "@/config/site.server";
 import type { FacebookPost } from "@/lib/types";
 import { getRequestLocale } from "@/i18n/request";
 import { localeToIntl } from "@/i18n/config";
+import { cn } from "@/lib/utils";
 
 /**
  * 粉專最新貼文（伺服器端取資料，全平台可顯示）。
@@ -16,7 +17,14 @@ export async function FacebookPosts({ posts }: { posts: FacebookPost[] }) {
   if (posts.length === 0) return <FacebookFallbackCard locale={locale} siteConfig={siteConfig} />;
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
+    <div
+      className={cn(
+        "grid gap-4",
+        posts.length === 1 ? "sm:max-w-sm" : "sm:grid-cols-2",
+        posts.length === 3 && "lg:grid-cols-3",
+        posts.length >= 4 && "xl:grid-cols-4",
+      )}
+    >
       {posts.map((post) => (
         <PostCard key={post.id} post={post} locale={locale} dateFormatter={dateFormatter} />
       ))}
@@ -30,7 +38,7 @@ function PostCard({ post, locale, dateFormatter }: { post: FacebookPost; locale:
       href={post.permalink}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_50px_-20px_rgb(15_38_71/0.45)]"
+      className="group flex min-w-0 flex-col overflow-hidden rounded-2xl bg-white shadow-card focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-300 motion-safe:transition-transform motion-safe:hover:-translate-y-1"
     >
       {post.fullPicture && (
         <div className="aspect-[3/2] overflow-hidden bg-mist">
@@ -40,12 +48,12 @@ function PostCard({ post, locale, dateFormatter }: { post: FacebookPost; locale:
             alt={locale === "en" ? `Shing Yi Foundation post: ${post.message.slice(0, 30)}` : `興毅基金會貼文：${post.message.slice(0, 30)}`}
             referrerPolicy="no-referrer"
             loading="lazy"
-            className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+            className="size-full object-cover motion-safe:transition-transform motion-safe:duration-500 motion-safe:group-hover:scale-[1.04]"
           />
         </div>
       )}
-      <div className="flex flex-1 flex-col p-6">
-        <p className="line-clamp-4 whitespace-pre-line text-base leading-7 text-ink-soft">
+      <div className="flex flex-1 flex-col p-5">
+        <p className="line-clamp-4 whitespace-pre-line break-words text-base leading-relaxed text-ink-soft">
           {post.message}
         </p>
         <div className="mt-auto flex items-center gap-1.5 pt-5 text-xs font-medium tracking-wide text-navy-400">
